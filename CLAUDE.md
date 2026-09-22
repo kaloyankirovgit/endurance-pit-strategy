@@ -60,6 +60,16 @@ Be concise. Ask **one question at a time**, and only when the answer genuinely c
 
 ---
 
+## 3a. Session format (required)
+
+**Every working session opens with a plan table** — invoke the `session-plan` skill before writing any code. Five columns: task, who does it (Kaloyan / Claude / Both), platform (Terminal, Spyder, Jupyter, DB Browser), and what Kaloyan will learn. 4–7 rows, fitted to the time he has, with deferrals stated.
+
+**Every working session closes by updating `docs/cv/CV_SECTIONS.md`** — the paste-ready CV content, gated by evidence. A line moves tier only when the work runs, is reproducible, and he could explain it unprompted.
+
+Tooling available: Terminal, Spyder 6, Anaconda/Jupyter, DB Browser for SQLite. **Not installed:** VS Code, Cursor, `uv`, DuckDB CLI.
+
+---
+
 ## 4. Scientific principles
 
 Every quantity in this project belongs to exactly one category, and the category must be stated wherever it matters:
@@ -150,7 +160,7 @@ Details: `.claude/rules/testing.md`.
 
 ## 9. CV evidence
 
-CV claims are evidence-gated. `docs/cv/CV_EVIDENCE.md` is the ledger; status is one of `TARGET`, `IN PROGRESS`, `VERIFIED`, `PORTFOLIO READY`.
+CV claims are evidence-gated. `docs/cv/CV_EVIDENCE.md` is the ledger; `docs/cv/CV_SECTIONS.md` holds the paste-ready LaTeX for his CV template. Status is one of `TARGET`, `IN PROGRESS`, `VERIFIED`, `PORTFOLIO READY`.
 
 Do not claim production deployment, statistical significance, model performance or engineering capability until it has been demonstrated with reproducible evidence in this repository. When a milestone genuinely becomes CV-worthy, proactively propose a concise bullet using only verified evidence.
 

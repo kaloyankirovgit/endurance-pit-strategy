@@ -48,16 +48,18 @@ Still outstanding within TASK 1:
 
 ## Next task
 
-**Resolve D-009 (depth vs breadth), then finish the TASK 1 audit items above.**
+**D-009 resolved: breadth first, micro-sector depth as a traffic sub-study.** Layer 1 therefore targets the 3-sector `23_Analysis_*` files across many events, with the `AnalysisEnduranceWithSections` path added later for the sub-study.
 
-D-009 comes first because it determines whether the ingestion pipeline targets one
-circuit at high resolution or many events at 3-sector resolution — and that changes
-what the parser, the schema contract and the Layer 2 traffic design must handle.
+Immediate sequence:
 
-Then Layer 1 proper: parse to a standard schema, build raw → interim → processed,
-write to Parquet, query through DuckDB, add data-quality checks and parser tests.
+1. **Finish the TASK 1 audit items** listed under In progress — duplicates, `ELAPSED` monotonicity, lap-sequence integrity, a "usable clean lap" definition, the pit-crossing discrepancy.
+2. **Create the synthetic fixture** in `tests/fixtures/` against the verified schema.
+3. **Decide the event scope for breadth.** 121 events spans LMP1 and GTE eras that no longer exist; the modern Hypercar/LMP2/LMGT3 structure starts 2023. Pooling across a regulation change needs an argument. Provisional recommendation: 2023–2026, roughly 29 events — record it as a decision.
+4. **Layer 1 proper:** parse to a standard schema, raw → interim → processed, Parquet, DuckDB, data-quality checks, parser tests.
 
-The `audit-wec-data` skill covers the remaining audit steps.
+Kaloyan implements the analytical core (order reconstruction, gap calculation, stint boundaries); Claude writes the parser, schema contract and test scaffolding.
+
+---
 
 ---
 
@@ -99,7 +101,6 @@ Facts directly established by evidence.
 
 Not yet established. The full list lives in `Strategy.md` §26; these are the ones blocking near-term work.
 
-- **Depth or breadth?** 121 events at 3-sector resolution, or the 3 race sessions with 15-point intra-lap timing? See DECISIONS D-009 — this blocks the shape of Layer 2 and is Kaloyan's call.
 - What exactly does `CROSSING_FINISH_LINE_IN_PIT = B` mark — in-lap, out-lap, or both?
 - What does `PIT_TIME` measure, and why do 1,902 crossings yield only 1,896 values?
 - Is the `23_Analysis_*` schema identical across 2011–2026? Only 2025 Le Mans verified.
@@ -112,9 +113,7 @@ Not yet established. The full list lives in `Strategy.md` §26; these are the on
 
 ## Current blockers
 
-- **D-009 is unresolved.** The depth-versus-breadth choice determines what the ingestion pipeline targets, so Layer 1's scope depends on it.
-
-The previous blockers are cleared: source data is obtained (2025 Le Mans race, weather and micro-sector files are in `data/raw/`), and access terms have been checked.
+None. Source access is verified, one race's files are on disk, and D-009 has settled Layer 1's scope.
 
 ---
 

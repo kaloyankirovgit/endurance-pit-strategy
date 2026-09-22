@@ -1,0 +1,30 @@
+name: CI
+
+# CI must never depend on the proprietary WEC timing dataset. It runs against
+# committed synthetic fixtures only.
+#
+# This workflow has never executed -- there is no remote repository yet.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run tests
+        run: pytest -q

@@ -1,0 +1,145 @@
+# ---------------------------------------------------------------------------
+# Data — NOTHING under data/ is committed.
+#
+# FIA WEC / Al Kamel timing data is owned by Al Kamel Systems S.L. and may not
+# be redistributed without permission. Raw timing files, derived Parquet and
+# generated marts all stay local. Do not weaken these rules.
+# ---------------------------------------------------------------------------
+data/*
+!data/README.md
+!data/raw/
+!data/interim/
+!data/processed/
+data/raw/*
+data/interim/*
+data/processed/*
+!data/raw/.gitkeep
+!data/interim/.gitkeep
+!data/processed/.gitkeep
+
+# Belt-and-braces: these extensions are never committed from anywhere except
+# the small synthetic fixtures under tests/fixtures/.
+*.csv
+*.parquet
+*.duckdb
+*.db
+*.sqlite
+*.sqlite3
+*.feather
+*.arrow
+*.h5
+*.hdf5
+*.xlsx
+*.xls
+*.json.gz
+*.zip
+*.7z
+*.tar
+*.tar.gz
+*.tgz
+
+# Committed synthetic test fixtures are the one exception.
+!tests/fixtures/**
+
+# Regulation / source PDFs are fetched locally, never redistributed.
+*.pdf
+!docs/**/*.pdf.md
+
+# Vector stores / retrieval indexes (regenerable, and derived from source PDFs)
+.chroma/
+chroma/
+*.faiss
+*.index
+indexes/
+
+# ---------------------------------------------------------------------------
+# Secrets
+# ---------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+secrets.yaml
+secrets.yml
+.secrets/
+
+# ---------------------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+sdist/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Environments
+.venv/
+venv/
+ENV/
+env/
+.conda/
+.python-version
+
+# Tooling caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.pytype/
+.hypothesis/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.cover
+.tox/
+.nox/
+.cache/
+
+# ---------------------------------------------------------------------------
+# Notebooks
+# ---------------------------------------------------------------------------
+.ipynb_checkpoints/
+*-checkpoint.ipynb
+
+# ---------------------------------------------------------------------------
+# Generated reports and figures
+#
+# reports/ holds generated output. Keep it out of Git by default; a small number
+# of final portfolio figures may be force-added (git add -f) once the README
+# genuinely needs them.
+# ---------------------------------------------------------------------------
+reports/figures/**
+reports/outputs/**
+!reports/figures/.gitkeep
+!reports/outputs/.gitkeep
+
+# ---------------------------------------------------------------------------
+# OS / editor
+# ---------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ---------------------------------------------------------------------------
+# Claude Code local overrides (shared config in .claude/ IS committed)
+# ---------------------------------------------------------------------------
+.claude/settings.local.json

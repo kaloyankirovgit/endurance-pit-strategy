@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "endurance-strategy"
+version = "0.0.0"
+description = "Endurance racing pit strategy planner: WEC timing data to simulated, optimised and explained pit strategy."
+readme = "README.md"
+requires-python = ">=3.11"
+
+# Dependencies are added when a layer needs them, not in advance.
+# See the "Technology candidates" section of docs/DECISIONS.md before adding one.
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

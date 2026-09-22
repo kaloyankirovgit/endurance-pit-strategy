@@ -248,3 +248,28 @@ CONSEQUENCES: Under (b) or (c), D-004 should be revisited — 15 segments per la
 REVISIT WHEN: If the breadth strand shows the 3-sector traffic effect is identifiable after all, the sub-study becomes a validation of it rather than the primary estimate. Also if micro-sector coverage expands beyond two circuits.
 
 **Consequence for D-004:** the decision to model inferred exposure rather than detected overtakes **stands unchanged**. Fifteen segments per lap localises *where* time was lost; it does not observe a pass, and there is still no ground-truth overtake label to validate a detector against. What changes is the plausible precision of the exposure window, not the nature of the claim.
+
+---
+
+## D-010 — Primary corpus is 2024–2026 (21 races)
+
+DECISION ID: D-010
+DATE: 2026-09-22
+QUESTION: Which events form the primary corpus for Layer 1 and the pace, stint and pit models?
+OPTIONS CONSIDERED:
+(a) All 28 races 2023–2026 — 236,738 laps, 11 circuits, maximum coverage;
+(b) 2024–2026, 21 races — 179,259 laps, 8 circuits, one consistent class structure;
+(c) Le Mans only, 4 races — the only genuinely three-class racing, plus micro-sectors.
+DECISION: **(b) — 2024–2026, 21 races, 8 circuits, 179,259 laps, 9,813 pit events.**
+REASON: 2023 is a different championship. Its third class is LMGTE Am rather than LMGT3 — different cars, different performance envelope, different BoP — and LMP2 ran the full season rather than Le Mans only. Including it would require an era term in every model and an explicit argument for every pooled estimate, in exchange for 6 races and 3 circuits. A clean, consistent 21-race corpus supports stronger claims than a 28-race one that needs a caveat attached to each result.
+
+The split also falls out naturally: **fit on 2024 (8 races), validate on 2025 (8), test on 2026 (5)** — a genuine temporal holdout, not a random split, satisfying `.claude/rules/statistics.md`.
+EVIDENCE: Full audit of all 28 modern-era races, 2026-09-22. Per-event counts and class structures in `docs/research/data_sources.md`. Schema verified identical across all 28 files.
+CONSEQUENCES:
+
+- 8 circuits permit leave-one-circuit-out transfer testing.
+- **Traffic is a two-class problem in 18 of the 21 races.** LMP2 appears only in the 3 Le Mans races. Class-pair effects must be estimated per pair, not pooled into a single "multi-class" coefficient.
+- **Terminology must change.** `Strategy.md` says "multi-class" throughout, which implies three classes. Outside Le Mans the data is Hypercar + LMGT3. Reports and CV bullets must say what the data is — "two-class" where that is what was modelled, or state the class pair explicitly.
+- The 2023 files remain on disk as an **optional robustness extension**: a later check of whether an effect estimated on Hypercar/LMGT3 also appears for Hypercar/LMGTE Am. That is a transfer test with an argument attached, not part of the primary corpus.
+- Sample size is reported as 21 races / 8 circuits / 9,813 pit events, never as 179,259 laps alone.
+REVISIT WHEN: 2026 completes (Fuji outstanding, plus later rounds) and adds test-set races; or if the two-class restriction proves to make the traffic effect unidentifiable, in which case the Le Mans three-class subset becomes the primary traffic evidence.

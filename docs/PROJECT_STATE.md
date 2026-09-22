@@ -48,16 +48,18 @@ Still outstanding within TASK 1:
 
 ## Next task
 
-**D-009 resolved: breadth first, micro-sector depth as a traffic sub-study.** Layer 1 therefore targets the 3-sector `23_Analysis_*` files across many events, with the `AnalysisEnduranceWithSections` path added later for the sub-study.
+**Scope settled.** D-009: breadth as the spine, micro-sector depth as a traffic sub-study. D-010: primary corpus is **2024–2026, 21 races, 8 circuits, 179,259 laps, 9,813 pit events**, split fit-2024 / validate-2025 / test-2026.
+
+All 28 files (2023–2026) are on disk at `data/raw/wec/` with a manifest. The 2023 races are held as an optional robustness extension, not part of the corpus.
 
 Immediate sequence:
 
-1. **Finish the TASK 1 audit items** listed under In progress — duplicates, `ELAPSED` monotonicity, lap-sequence integrity, a "usable clean lap" definition, the pit-crossing discrepancy.
-2. **Create the synthetic fixture** in `tests/fixtures/` against the verified schema.
-3. **Decide the event scope for breadth.** 121 events spans LMP1 and GTE eras that no longer exist; the modern Hypercar/LMP2/LMGT3 structure starts 2023. Pooling across a regulation change needs an argument. Provisional recommendation: 2023–2026, roughly 29 events — record it as a decision.
-4. **Layer 1 proper:** parse to a standard schema, raw → interim → processed, Parquet, DuckDB, data-quality checks, parser tests.
+1. **Finish the TASK 1 quality checks** — now across 21 files, not one: duplicates, `ELAPSED` monotonicity within each car, lap-sequence integrity, the pit-crossing / `PIT_TIME` discrepancy, and a "usable clean lap" definition.
+2. **Synthetic fixture** in `tests/fixtures/` against the verified 29-column schema.
+3. **Layer 1 proper** — parser and schema contract over the 21-file corpus, raw → interim → processed, Parquet, DuckDB, data-quality tests. Claude writes the parser, contract and test scaffolding.
+4. **Kaloyan implements** order reconstruction, gap calculation and stint-boundary detection, per the working agreement in `CLAUDE.md` §3.
 
-Kaloyan implements the analytical core (order reconstruction, gap calculation, stint boundaries); Claude writes the parser, schema contract and test scaffolding.
+**Terminology fix outstanding:** `Strategy.md` says "multi-class" throughout. In 18 of 21 corpus races the data is two-class (Hypercar + LMGT3). Wording in reports and CV bullets must match the data — see D-010.
 
 ---
 

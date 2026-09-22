@@ -66,7 +66,7 @@ Be concise. Ask **one question at a time**, and only when the answer genuinely c
 
 **Every working session closes by updating `docs/cv/CV_SECTIONS.md`** — the paste-ready CV content, gated by evidence. A line moves tier only when the work runs, is reproducible, and he could explain it unprompted.
 
-Tooling available: Terminal, Spyder 6, Anaconda/Jupyter, DB Browser for SQLite. **Not installed:** VS Code, Cursor, `uv`, DuckDB CLI.
+Tooling available: **VS Code** (default editor; has Python, Pylance, Jupyter, rainbow-csv, parquet-viewer), Terminal, Spyder 6, Anaconda/Jupyter, DB Browser for SQLite. **Not installed:** `uv`, DuckDB CLI.
 
 ---
 

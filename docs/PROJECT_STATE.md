@@ -75,19 +75,29 @@ Facts directly established by evidence.
 - Per-minute **weather data** (air and track temperature, humidity, pressure, wind, rain) is published as a separate CSV for most recent events.
 - **15-point intra-lap timing** (`23_AnalysisEnduranceWithSections_*`) exists for Le Mans 2025, Le Mans 2026 and COTA 2026 only. Every other event is 3-sector.
 
-**2025 Le Mans race file (measured, `23_Analysis_Race_Hour 24.CSV`, 20,182 rows, 29 columns):**
+**Modern-era archive audited (28 races, 2023–2026, all downloaded and parsed):**
 
-| | Cars | Laps | Pit crossings |
-|---|---:|---:|---:|
-| Hypercar | 21 | 7,710 | 660 |
-| LMP2 | 17 | 5,779 | 555 |
-| LMGT3 | 24 | 6,693 | 687 |
-| **Total** | **62** | **20,182** | **1,902** |
+| | Races | Circuits | Laps | Pit events |
+|---|---:|---:|---:|---:|
+| 2023–2026 all | 28 | 11 | 236,738 | 12,775 |
+| 2024–2026 (Hypercar/LMGT3) | 21 | 8 | 179,259 | 9,813 |
+| Le Mans only (3-class) | 4 | 1 | 70,968 | 6,695 |
 
-- 186 distinct drivers. No stable driver ID — `DRIVER_NAME` is the only identifier.
-- Track status per lap in `FLAG_AT_FL`: GF 19,654 / SF 320 / FCY 159 / FF 49.
-- Data completeness is high: 0 missing lap times, 1 lap missing sector times out of 20,182.
-- **Cross-check passed:** the 21 / 17 / 24 class split matches the independently published entry list exactly.
+- **Schema is identical across all 28 files (29 columns).** One parser covers 2023–2026; no per-season variants. Pre-2023 unverified.
+- Track status across the archive: GF 221,287 / SF 12,112 / FCY 2,340 / FF 948 / RF 51 — ample for estimating race-control processes.
+- Weather CSVs available for every one of the 28 races.
+
+**Class structure is not uniform — this constrains the project:**
+
+- **2024–2026 championship rounds are two-class** (Hypercar + LMGT3). LMP2 left the championship after 2023 and now runs only at Le Mans.
+- **2023's third class is LMGTE Am, not LMGT3** — different cars and performance envelope, so pooling 2023 with later seasons requires an explicit argument.
+- The structurally-consistent three-class subset is **Le Mans 2024–2026: three races at one circuit**.
+
+Outside Le Mans this is a *two-class* traffic problem. Still a large closing-speed differential and still the core phenomenon — but `Strategy.md`'s "multi-class" wording and any CV bullet must match what the data actually is.
+
+**2025 Le Mans detail (the file audited first):** 20,182 laps, 62 cars, 186 drivers, 1,902 pit crossings. Class split 21 Hypercar / 17 LMP2 / 24 LMGT3 matches the published entry list exactly.
+
+**Scraping hazard:** the event-selector endpoint intermittently serves a *different* event than requested. Any downloader must verify the returned page's SELECTED season and event match the request. Recorded in `data_sources.md`.
 
 **Licensing:** Al Kamel asserts ownership and prohibits **distribution and dissemination**. Local analysis is a separate matter; redistribution through the repo, a dataset host or a deployed app serving source rows is not permitted. `.gitignore` verified to exclude the downloaded files.
 

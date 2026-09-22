@@ -127,11 +127,101 @@ model outputs, not source rows.
 Event: 2025 24 Heures du Mans. Session: `202506141600_Race`. Accessed 2026-09-22.
 Confirmed excluded from Git via `git status --ignored`.
 
+### Full audit of the modern era, 2023–2026 (28 races, all downloaded and parsed)
+
+| Season | Event | Hours | Laps | Cars | Drivers | Pit events | Classes |
+|---|---|---:|---:|---:|---:|---:|---|
+| 2023 | Sebring | 8 | 7,417 | 36 | 104 | 310 | HC, LMP2, LMGTE Am |
+| 2023 | Algarve | 6 | 7,596 | 37 | 110 | 233 | HC, LMP2, LMGTE Am |
+| 2023 | Spa | 6 | 4,817 | 37 | 103 | 227 | HC, LMP2, LMGTE Am |
+| 2023 | **Le Mans** | 24 | 15,030 | 62 | 177 | 1,396 | HC, LMP2, LMGTE Am, Innovative Car |
+| 2023 | Monza | 6 | 6,390 | 36 | 104 | 258 | HC, LMP2, LMGTE Am |
+| 2023 | Fuji | 6 | 7,774 | 36 | 108 | 225 | HC, LMP2, LMGTE Am |
+| 2023 | Bahrain | 8 | 8,455 | 36 | 107 | 313 | HC, LMP2, LMGTE Am |
+| 2024 | Losail | 10 | 11,211 | 37 | 111 | 421 | HC, LMGT3 |
+| 2024 | Imola | 6 | 6,825 | 37 | 107 | 302 | HC, LMGT3 |
+| 2024 | Spa | 6 | 4,410 | 37 | 98 | 209 | HC, LMGT3 |
+| 2024 | **Le Mans** | 24 | 15,593 | 62 | 185 | 1,548 | HC, LMP2, LMGT3 |
+| 2024 | São Paulo | 6 | 7,796 | 36 | 104 | 219 | HC, LMGT3 |
+| 2024 | COTA | 6 | 5,675 | 36 | 103 | 221 | HC, LMGT3 |
+| 2024 | Fuji | 6 | 7,042 | 36 | 106 | 251 | HC, LMGT3 |
+| 2024 | Bahrain | 8 | 7,486 | 36 | 105 | 288 | HC, LMGT3 |
+| 2025 | Losail | 10 | 9,696 | 36 | 103 | 373 | HC, LMGT3 |
+| 2025 | Imola | 6 | 7,044 | 36 | 103 | 244 | HC, LMGT3 |
+| 2025 | Spa | 6 | 4,630 | 36 | 96 | 261 | HC, LMGT3 |
+| 2025 | **Le Mans** | 24 | 20,182 | 62 | 186 | 1,902 | HC, LMP2, LMGT3 |
+| 2025 | São Paulo | 6 | 7,930 | 36 | 100 | 210 | HC, LMGT3 |
+| 2025 | COTA | 6 | 3,964 | 36 | 102 | 182 | HC, LMGT3 |
+| 2025 | Fuji | 6 | 6,683 | 36 | 102 | 220 | HC, LMGT3 |
+| 2025 | Bahrain | 8 | 7,795 | 36 | 105 | 288 | HC, LMGT3 |
+| 2026 | Imola | 6 | 6,758 | 35 | 97 | 221 | HC, LMGT3 |
+| 2026 | Spa | 6 | 4,831 | 35 | 102 | 207 | HC, LMGT3 |
+| 2026 | **Le Mans** | 24 | 20,163 | 62 | 185 | 1,849 | HC, LMP2, LMGT3 |
+| 2026 | São Paulo | 6 | 8,015 | 35 | 102 | 188 | HC, LMGT3 |
+| 2026 | COTA | 6 | 5,530 | 35 | 103 | 209 | HC, LMGT3 |
+
+Fuji 2026 has not yet run. Support-series races (Porsche Carrera Cup, Lamborghini
+Super Trofeo, F1 Academy, Michelin Le Mans Cup, Legends of Le Mans) are present in
+the archive but excluded — this project covers the FIA WEC series only.
+
+**Totals:** 28 races, 11 circuits, 236,738 laps, 12,775 pit events.
+Track status across the archive: GF 221,287 / SF 12,112 / FCY 2,340 / FF 948 / RF 51.
+
+### Schema consistency — resolved
+
+**All 28 files share an identical 29-column schema.** This was an open question and
+is now closed for 2023–2026: one parser handles the whole modern era, with no
+per-season variants. Consistency before 2023 remains unverified.
+
+### The class-structure finding — this constrains the project
+
+The archive is **not** uniformly three-class. Counting by class structure:
+
+| Structure | Races | Circuits | Laps | Pit events | Seasons |
+|---|---:|---:|---:|---:|---|
+| Hypercar + LMGT3 (two classes) | 18 | 8 | 123,321 | 4,514 | 2024–2026 |
+| Hypercar + LMP2 + LMGTE Am | 6 | 6 | 42,449 | 1,566 | 2023 only |
+| Hypercar + LMP2 + LMGT3 (Le Mans) | 4 | 1 | 70,968 | 6,695 | 2023–2026 |
+
+Two consequences:
+
+1. **LMP2 left the championship after 2023.** From 2024 it runs only at Le Mans.
+   Every other 2024–2026 round is a *two-class* race.
+2. **2023's third class is LMGTE Am, not LMGT3** — different cars, different
+   performance envelope, different BoP. It is not interchangeable with LMGT3, so
+   pooling 2023 with later seasons needs an explicit argument, not convenience.
+
+So the genuinely three-class, structurally-consistent subset is **Le Mans 2024,
+2025 and 2026 — three races at one circuit**. The project's "multi-class" framing
+is, outside Le Mans, a two-class problem. This is not a flaw: Hypercar catching
+LMGT3 is still a large closing-speed differential and the core traffic phenomenon.
+But the wording in `Strategy.md` and any CV bullet must match what the data is.
+
+### Candidate scope subsets
+
+| Subset | Races | Circuits | Laps | Pit events | FCY laps | SC laps |
+|---|---:|---:|---:|---:|---:|---:|
+| 2023–2026, all | 28 | 11 | 236,738 | 12,775 | 2,340 | 12,112 |
+| 2024–2026 (Hypercar/LMGT3 era) | 21 | 8 | 179,259 | 9,813 | 1,794 | 9,306 |
+| Le Mans only | 4 | 1 | 70,968 | 6,695 | 554 | 4,859 |
+| Le Mans 2024–26 (LMGT3 era) | 3 | 1 | 55,938 | 5,299 | 393 | 3,587 |
+
+### A scraping hazard worth recording
+
+The event-selector endpoint **intermittently returns a different event than the one
+requested** — asking for Imola 2026 sometimes serves the Fuji 2026 page. Trusting
+the response blindly would silently attribute one event's laps to another, which no
+downstream data-quality check would catch.
+
+Any downloader must verify that the returned page's `SELECTED` season and event
+match the request, and that the file path contains the requested event folder,
+retrying until they do. This is implemented in the fetch used for the audit above.
+
 ### Remaining open questions
 
 - [x] ~~One race-wide file or only hourly?~~ **Race-wide.** The Hour 24 file is cumulative.
 - [x] ~~Does the site permit access?~~ **Public, no restrictions declared.**
-- [ ] Is the `23_Analysis_*` schema identical across 2011–2026? Only 2025 verified.
+- [x] ~~Is the schema identical across seasons?~~ **Identical across all 28 races, 2023–2026.** Pre-2023 unverified.
 - [ ] What exactly does `PIT_TIME` measure — stationary, lane transit, or aggregate?
 - [ ] Are the 15 intermediate points at Le Mans physically located, and are their names stable?
 - [ ] Are there separate race-control / flag message files beyond `FLAG_AT_FL`?

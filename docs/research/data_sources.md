@@ -2,7 +2,7 @@
 
 An assessment of every candidate data source: what it contains, whether it may be used, and where it sits in the evidence hierarchy.
 
-**Nothing in this document has been verified against a downloaded file.** Every entry is an assessment recorded from the project specification and needs confirmation. Statuses are marked accordingly.
+**The primary source has been accessed and measured (2026-09-22); every secondary source below is still an unverified assessment.** Statuses are marked per section.
 
 Evidence hierarchy for this project:
 
@@ -19,24 +19,122 @@ Evidence hierarchy for this project:
 
 **URL:** <https://fiawec.alkamelsystems.com/>
 
-**What it provides:** Official timing products for FIA WEC events — analysis files and classifications by race hour. This is the authoritative source for lap and sector timing.
+**Access verified 2026-09-22.** Publicly accessible: no login, no paywall, no access
+controls. `robots.txt` returns HTTP 200 and is empty (zero bytes), so no crawl
+restrictions are declared. Navigation is server-rendered PHP driven by two GET
+parameters:
 
-**Licensing — the binding constraint.** Al Kamel Systems S.L. asserts ownership of the timing data and warns against redistribution without permission. Therefore:
+```
+https://fiawec.alkamelsystems.com/?season={NN_YYYY}&evvent={NN_EVENT NAME}
+```
 
-- raw timing files are never committed to this repository;
-- no file derived from them is committed either;
-- files are obtained locally by the user and placed in `data/raw/`;
-- the README documents how a third party obtains them independently;
-- the current site terms must be checked before building any automated downloader, and the outcome of that check recorded here.
+Each event page lists direct file links of the form:
 
-**Provenance to record for every ingested file:** source URL, event, session, access date, filename, file size, SHA-256, whether the file is race-wide or hourly, and whether it is directly hosted by Al Kamel.
+```
+Results/{NN_season}/{NN_EVENT}/{NNN_SERIES}/{YYYYMMDDHHMM_Session}/{NN_Hour NN}/{NN_DocType_Session_Hour NN}.CSV
+```
 
-**Status: not yet accessed.** Open questions:
+### Archive scale (verified by enumerating all season pages)
 
-- [ ] Does the site expose one race-wide analysis file per event, or only hourly files?
-- [ ] Is the CSV schema consistent across 2023–2025?
-- [ ] Are official race-control / flag message files published alongside timing?
-- [ ] What do the current terms of use say about automated downloading and local caching?
+| | |
+|---|---|
+| Seasons | 15 (2011 – 2026) |
+| Events | 121 total |
+| Per event | Test day, FP1–4, qualifying, hyperpole, warm-up, race — each with its own document set |
+| Race session (2025 Le Mans) | 91 files, including 24 hourly classifications |
+
+### Document types (CSV)
+
+| File | Contents |
+|---|---|
+| `23_Analysis_*` | **Lap-by-lap timing.** 29 columns. The core dataset. |
+| `23_AnalysisEnduranceWithSections_*` | Same, plus **15 intra-lap intermediate timing points**. 59 columns. See availability caveat below. |
+| `26_Weather_*` | Per-minute air/track temperature, humidity, pressure, wind speed/direction, rain flag |
+| `03_Classification_*` | Per-hour classification snapshots |
+
+PDF-only products (not machine-readable without parsing): lap charts, pit-stop
+summaries, leader sequence, best sectors, top speeds, grid.
+
+### Micro-sector availability — important constraint
+
+`AnalysisEnduranceWithSections` is **not** published for every event. Verified
+per-event counts of race-session files:
+
+| Season | Events with micro-sector race data |
+|---|---|
+| 2022, 2023, 2024 | none (Le Mans checked) |
+| 2025 | Le Mans only |
+| 2026 | Le Mans, Circuit of the Americas |
+
+Every other event publishes only the 3-sector `23_Analysis_*` file. This creates a
+real depth-versus-breadth trade-off for the traffic layer — see `docs/DECISIONS.md`.
+
+### Measured content, 2025 Le Mans race (`23_Analysis_Race_Hour 24.CSV`)
+
+Downloaded 2026-09-22. The "Hour 24" file is **race-wide and cumulative**, not a
+single hour — it contains every lap of the race.
+
+| Quantity | Measured |
+|---|---:|
+| Lap rows | 20,182 |
+| Cars | 62 |
+| Drivers | 186 |
+| Pit-lane crossings (`CROSSING_FINISH_LINE_IN_PIT = B`) | 1,902 |
+| Rows carrying `PIT_TIME` | 1,896 |
+| Hypercar | 21 cars, 7,710 laps, 660 pit crossings |
+| LMP2 | 17 cars, 5,779 laps, 555 pit crossings |
+| LMGT3 | 24 cars, 6,693 laps, 687 pit crossings |
+| Missing sector times | 1 lap (S1, S2); 0 (S3) |
+| Missing lap time | 0 |
+
+**Cross-check passed:** the 21 / 17 / 24 class split matches the externally
+published 2025 Le Mans entry list exactly. Two independent sources agree, so the
+class and car identification in the timing file is trustworthy.
+
+Track status is present per lap in `FLAG_AT_FL`: GF 19,654 / SF 320 / FCY 159 /
+FF 49. This is the field the FCY and safety-car processes in Layer 4 will be
+estimated from.
+
+### Licensing — unchanged and binding
+
+The site states:
+
+> "The data contained on this page is wholly owned by Al Kamel Systems S.L. Any
+> attempt by 3rd parties to distribute and/or disseminate any data contained on
+> this page without the previous express consent by Al Kamel Systems S.L. will
+> lead to legal action taken by the company."
+
+This restricts **distribution and dissemination**, which is precisely what
+`.gitignore` prevents. Local download for personal analysis is a separate matter
+from republishing. The constraint on this project is therefore unchanged:
+
+- no raw timing data, and nothing derived from it, in Git;
+- no redistribution through the repository, a dataset host, or a deployed app that
+  serves the underlying rows;
+- the README documents how a third party obtains the files themselves.
+
+If the project is ever made public with a live demo, the demo must serve
+model outputs, not source rows.
+
+### Local files held
+
+| File | Bytes | SHA-256 (first 16) |
+|---|---:|---|
+| `23_Analysis_Race_Hour 24.CSV` | 3,913,706 | `cae1d9af21d44d60` |
+| `23_AnalysisEnduranceWithSections_Race_Hour 24.CSV` | 8,458,729 | `8e13f35e06788e7b` |
+| `26_Weather_Race_Hour 24.CSV` | 88,829 | `006ac3c5d2de4c7d` |
+
+Event: 2025 24 Heures du Mans. Session: `202506141600_Race`. Accessed 2026-09-22.
+Confirmed excluded from Git via `git status --ignored`.
+
+### Remaining open questions
+
+- [x] ~~One race-wide file or only hourly?~~ **Race-wide.** The Hour 24 file is cumulative.
+- [x] ~~Does the site permit access?~~ **Public, no restrictions declared.**
+- [ ] Is the `23_Analysis_*` schema identical across 2011–2026? Only 2025 verified.
+- [ ] What exactly does `PIT_TIME` measure — stationary, lane transit, or aggregate?
+- [ ] Are the 15 intermediate points at Le Mans physically located, and are their names stable?
+- [ ] Are there separate race-control / flag message files beyond `FLAG_AT_FL`?
 
 ---
 

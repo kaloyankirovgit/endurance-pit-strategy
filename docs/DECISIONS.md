@@ -227,3 +227,20 @@ Deferred during bootstrap. Candidates, in priority order:
 5. **Stale-state warning** — `Stop` hook warning when `PROJECT_STATE.md` has not been updated alongside substantive changes.
 
 Adopting any of these is itself a decision entry.
+
+---
+
+## D-009 — Depth versus breadth in source coverage (OPEN — decision required)
+
+DECISION ID: D-009
+DATE: 2026-09-22
+QUESTION: The Al Kamel archive exposes 121 events across 15 seasons at 3-sector resolution, but publishes 15-point intra-lap timing for only three race sessions (Le Mans 2025, Le Mans 2026, COTA 2026). Which does the project build on?
+OPTIONS CONSIDERED:
+(a) **Breadth** — many events at 3-sector resolution. Maximises races, circuits and pit events, so it maximises the independent units that matter for generalisation. Traffic localisation stays coarse.
+(b) **Depth** — the micro-sector races only. ~5× finer localisation of where lap time is lost, which materially improves the chance that traffic exposure is identifiable at all. But only 2–3 races, and the circuits are not representative.
+(c) **Both, in sequence** — establish the pipeline and pace models on breadth; use the micro-sector races as a higher-resolution sub-study for the traffic layer specifically.
+DECISION: **Not yet made — Kaloyan decides.**
+REASON: This is a genuine scientific trade-off, not a technical one. Breadth serves generalisation; depth serves identifiability. D-004 committed to inferred exposure rather than overtake detection *because* 3-sector resolution cannot localise an encounter — the micro-sector data partially reopens that, which is why the choice matters.
+EVIDENCE: Availability verified per event on 2026-09-22; see `docs/research/data_sources.md`.
+CONSEQUENCES: Under (b) or (c), D-004 should be revisited — 15 segments per lap is not overtake detection, but it is much closer to localising an encounter than 3 sectors. Under (c), the two strands must not be silently pooled: a traffic estimate from Le Mans micro-sectors is not transferable to a sprint circuit without an argument.
+REVISIT WHEN: Now. This blocks the shape of Layer 2.

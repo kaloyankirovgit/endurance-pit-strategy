@@ -57,6 +57,47 @@ DECISION / NEXT STEP:
 
 ## Log
 
-No experiments yet. The project is at Layer 0; no data has been ingested.
+| ID | Date | Question | Status |
+|---|---|---|---|
+| E-001 | 2026-09-22 | What does the FIA WEC timing archive actually contain? | complete (descriptive) |
 
-The first entry will be **E-001**, arising from TASK 1: the audit of one full 2025 WEC race timing file. That entry is descriptive rather than inferential — its question is "what does the source actually contain?" — but it is logged here because its measured counts replace the planning estimates in `Strategy.md` §8, and the gap between estimate and measurement is itself evidence worth keeping.
+---
+
+## E-001 — What does the FIA WEC timing archive actually contain?
+
+EXPERIMENT ID: E-001
+DATE: 2026-09-22
+STATUS: complete (descriptive); TASK 1 quality checks still outstanding
+QUESTION: What data is accessible from the primary source, at what resolution, over what coverage — and does one race file contain the fields the project's modelling layers require?
+HYPOTHESIS: `Strategy.md` assumed lap and 3-sector timing only, with weather "possibly if obtainable", and treated exact overtake localisation as impossible. Expected to confirm that picture.
+DATASET: <https://fiawec.alkamelsystems.com/>, enumerated across all 15 season pages. Three files downloaded for the 2025 Le Mans race (`202506141600_Race`): `23_Analysis_Race_Hour 24.CSV`, `23_AnalysisEnduranceWithSections_Race_Hour 24.CSV`, `26_Weather_Race_Hour 24.CSV`. Hashes in `docs/research/data_sources.md`.
+POPULATION: All 20,182 lap rows in the 2025 Le Mans race file. 62 cars, 186 drivers, 3 classes, 1 race, 1 circuit.
+METHOD: Direct HTTP access; enumeration of season and event pages via the site's `?season=&evvent=` parameters; Python `csv` parsing and counting. No modelling.
+FEATURES: All OBSERVED — no derived quantities computed.
+ASSUMPTIONS: That the "Hour 24" file is race-wide cumulative rather than the final hour alone. Supported by its 20,182 rows against 62 cars (~325 laps each, consistent with a full 24-hour race), but not confirmed against an official lap chart.
+
+RESULT:
+
+- **Coverage:** 15 seasons (2011–2026), 121 events. Public access, no authentication, empty `robots.txt`.
+- **Race-wide file exists** — a previously open question, now answered.
+- **20,182 laps** in one race: Hypercar 21 cars / 7,710 laps, LMP2 17 / 5,779, LMGT3 24 / 6,693. 1,902 pit crossings.
+- **Completeness is unusually high:** 0 missing lap times, 1 lap missing sector data out of 20,182.
+- **Per-lap track status** in `FLAG_AT_FL`: GF 19,654 / SF 320 / FCY 159 / FF 49.
+- **Per-minute weather** including track temperature and a rain flag — richer than `Strategy.md` anticipated.
+- **15 intra-lap timing points** exist in `AnalysisEnduranceWithSections`, but only for Le Mans 2025, Le Mans 2026 and COTA 2026.
+
+UNCERTAINTY: Schema verified on one file only. Consistency across 121 events and 15 seasons is unverified, and the 2011–2019 era predates the current class structure entirely. No uncertainty quantification applies — these are counts, not estimates.
+
+INTERPRETATION:
+
+The source is materially richer than the specification assumed, in two ways that matter.
+
+**Weather is available at high resolution.** `Strategy.md` §17.3 listed track condition as a baseline feature "possibly if obtainable". It is obtainable at ~1-minute resolution including track temperature and rain. This is a genuine confounder for stint-degradation modelling that can now be controlled rather than acknowledged.
+
+**Intra-lap resolution partially reopens D-004.** Fifteen segments per lap is roughly 5× finer than 3 sectors. It still does **not** observe overtakes — no segment boundary marks a passing event, and there is no ground-truth label — so the D-004 decision to model *inferred exposure* stands. But it substantially narrows where a lap-time loss occurred, which improves the chance the effect is identifiable at all. The limitation is availability: 3 race sessions, 2 circuits.
+
+This creates the depth-versus-breadth trade-off recorded as D-009, which is unresolved and blocks the shape of Layer 2.
+
+A caution on scale: 20,182 laps from one race is **one race**. For a traffic effect the effective sample size is closer to the number of independent encounters, and for generalisation it is the number of races. The large row count is not itself evidence of statistical power — see `.claude/rules/statistics.md`.
+
+DECISION / NEXT STEP: Resolve D-009. Complete the outstanding TASK 1 quality checks. Revisit D-004's wording if the depth path is chosen.

@@ -11,7 +11,9 @@ requires-python = ">=3.11"
 
 # Dependencies are added when a layer needs them, not in advance.
 # See the "Technology candidates" section of docs/DECISIONS.md before adding one.
-dependencies = []
+dependencies = [
+    "pandas>=2.2",
+]
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]

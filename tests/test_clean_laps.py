@@ -12,7 +12,7 @@ from endurance_strategy.reconstruct.stints import add_stint_columns
 
 
 def laps(car: str, times: list[float], flags: str | None = None, pits: str | None = None,
-         car_class: str = "HYPERCAR", event: str = "SYNTH") -> pd.DataFrame:
+         car_class: str = "HYPERCAR", event: str = "SYNTH", rain: list[int] | None = None) -> pd.DataFrame:
     n = len(times)
     flags = flags or "G" * n
     pits = pits or "." * n
@@ -33,6 +33,7 @@ def laps(car: str, times: list[float], flags: str | None = None, pits: str | Non
         "FLAG_AT_FL": [flag_codes[c] for c in flags],
         "CROSSING_FINISH_LINE_IN_PIT": ["B" if c == "B" else "" for c in pits],
         "PIT_TIME_S": pit_time,
+        "RAIN": rain if rain is not None else [0] * n,
     })
 
 
@@ -68,7 +69,27 @@ def test_missing_sector_is_flagged() -> None:
     frame = laps("1", [110, 100, 100])
     frame.loc[2, "S2_S"] = np.nan
     out = run(frame)
-    assert out["is_missing_time"].tolist() == [False, False, True]
+    assert out["is_missing_data"].tolist() == [False, False, True]
+
+
+def test_missing_weather_is_flagged() -> None:
+    frame = laps("1", [110, 100, 100])
+    frame["RAIN"] = frame["RAIN"].astype(float)
+    frame.loc[1, "RAIN"] = np.nan
+    out = run(frame)
+    assert out["is_missing_data"].tolist() == [False, True, False]
+
+
+def test_rain_makes_a_lap_wet_and_unusable() -> None:
+    out = run(laps("1", [110, 100, 100, 100], rain=[0, 0, 1, 0]))
+    assert out["is_wet"].tolist() == [False, False, True, False]
+    assert out["is_usable_for_pace_model"].tolist() == [False, True, False, True]
+
+
+def test_wet_laps_do_not_set_the_reference() -> None:
+    frame = laps("1", [100, 100, 130, 130, 130, 130, 130, 108], rain=[0, 0, 1, 1, 1, 1, 1, 0])
+    out = run(frame)
+    assert out["is_slow_lap"].iloc[-1]
 
 
 def test_slow_lap_threshold_is_relative_to_class_median() -> None:

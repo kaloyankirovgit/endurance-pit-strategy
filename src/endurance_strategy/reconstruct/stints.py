@@ -4,6 +4,7 @@ import pandas as pd
 
 CAR_KEY = ["event_key", "NUMBER"]
 LAP_KEY = CAR_KEY + ["LAP_NUMBER"]
+GARAGE_STOP_RATIO = 3.0
 
 
 def add_stint_columns(frame: pd.DataFrame) -> pd.DataFrame:
@@ -23,4 +24,15 @@ def add_stint_columns(frame: pd.DataFrame) -> pd.DataFrame:
     out["stint_number"] = starts_stint.groupby([out[k] for k in CAR_KEY]).cumsum() + 1
     out["stint_lap"] = out.groupby(CAR_KEY + ["stint_number"]).cumcount() + 1
 
+    return out
+
+
+def add_garage_stop_flag(frame: pd.DataFrame, ratio: float = GARAGE_STOP_RATIO) -> pd.DataFrame:
+    """Add `is_garage_stop`: an out-lap whose PIT_TIME is over `ratio` times the race median.
+
+    Needs `is_out_lap`. The ratio is a choice, not a measurement.
+    """
+    out = frame.copy()
+    median = out["PIT_TIME_S"].groupby(out["event_key"]).transform("median")
+    out["is_garage_stop"] = out["is_out_lap"] & (out["PIT_TIME_S"] > ratio * median)
     return out

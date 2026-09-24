@@ -115,3 +115,19 @@ def test_synthetic_fixture_driver_change_stop() -> None:
     car = out[out["NUMBER"] == "007"]
     assert car["stint_number"].tolist() == [1, 1, 1, 2]
     assert car["DRIVER_NUMBER"].tolist() == ["1", "1", "1", "2"]
+
+
+def test_garage_stop_is_a_long_pit_time_relative_to_the_race() -> None:
+    from endurance_strategy.reconstruct.stints import add_garage_stop_flag
+
+    frame = laps("1", "B.B.B.B.", pit_times={2: 80.0, 4: 85.0, 6: 90.0, 8: 600.0})
+    out = add_garage_stop_flag(add_stint_columns(frame))
+    assert out["is_garage_stop"].tolist() == [False] * 7 + [True]
+
+
+def test_garage_ratio_can_be_changed() -> None:
+    from endurance_strategy.reconstruct.stints import add_garage_stop_flag
+
+    frame = laps("1", "B.B.B.B.", pit_times={2: 80.0, 4: 85.0, 6: 90.0, 8: 200.0})
+    assert not add_garage_stop_flag(add_stint_columns(frame))["is_garage_stop"].any()
+    assert add_garage_stop_flag(add_stint_columns(frame), ratio=2.0)["is_garage_stop"].iloc[-1]

@@ -11,16 +11,17 @@ EXCLUSION_FLAGS = [
     "is_pit_lap",
     "is_caution_lap",
     "is_after_caution",
-    "is_missing_time",
+    "is_missing_data",
     "is_slow_lap",
+    "is_wet",
 ]
 
 
 def add_clean_lap_flags(frame: pd.DataFrame, slow_lap_ratio: float = SLOW_LAP_RATIO) -> pd.DataFrame:
-    """Flag laps that shouldn't feed a pace model. Needs the stint columns.
+    """Flag laps that shouldn't feed a pace model. Needs the stint columns and RAIN.
 
     A lap is slow if it's more than `slow_lap_ratio` times the median green,
-    non-pit lap for its class at that event. The ratio is a choice, not a
+    non-pit, dry lap for its class at that event. The ratio is a choice, not a
     measurement. Returns a copy sorted by car and lap.
     """
     out = frame.sort_values(LAP_KEY).copy()
@@ -33,11 +34,12 @@ def add_clean_lap_flags(frame: pd.DataFrame, slow_lap_ratio: float = SLOW_LAP_RA
     out["is_pit_lap"] = out["is_in_lap"] | out["is_out_lap"]
     out["is_caution_lap"] = ~green
     out["is_after_caution"] = ~previous_green
-    out["is_missing_time"] = out[["LAP_TIME_S", "S1_S", "S2_S", "S3_S"]].isna().any(axis=1)
+    out["is_wet"] = out["RAIN"].gt(0)
+    out["is_missing_data"] = out[["LAP_TIME_S", "S1_S", "S2_S", "S3_S", "RAIN"]].isna().any(axis=1)
 
     reference = (
         out["LAP_TIME_S"]
-        .where(green & ~out["is_pit_lap"])
+        .where(green & ~out["is_pit_lap"] & ~out["is_wet"])
         .groupby([out["event_key"], out["CLASS"]])
         .transform("median")
     )

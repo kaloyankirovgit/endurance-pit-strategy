@@ -11,6 +11,7 @@ def load_weather_csv(path: str | Path) -> pd.DataFrame:
     path = Path(path)
     frame = pd.read_csv(path, sep=";", encoding="utf-8-sig")
     frame = frame.loc[:, [c for c in frame.columns if not c.startswith("Unnamed:")]]
+    frame[WEATHER_COLUMNS] = frame[WEATHER_COLUMNS].astype(float)
     frame["weather_utc"] = pd.to_datetime(frame["TIME_UTC_SECONDS"], unit="s", utc=True).astype("datetime64[ns, UTC]")
     frame["event_key"] = path.stem
     return frame

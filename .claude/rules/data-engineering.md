@@ -10,7 +10,7 @@ How data moves through this project.
 |---|---|---|
 | `data/raw/` | Faithful source material (bronze) | Never edited in place. Never "fixed". Preserved exactly as obtained, with provenance metadata alongside. |
 | `data/interim/` | Standardised and validated (silver) | Column names normalised, times converted to seconds, categories normalised, invalid rows **flagged not deleted**, pit and stint boundaries identified. |
-| `data/processed/` | Analytical marts (gold) | Task-specific tables built for a named consumer — a model, a figure, the simulator. |
+| `data/processed/` | Analytical marts (gold) | Task-specific tables built for a named consumer: a model, a figure, the simulator. |
 
 Data flows one way. A processed table is never written back into interim, and interim is never written back into raw.
 
@@ -37,12 +37,12 @@ Bronze records carry their source metadata as columns or in a sidecar manifest, 
 
 ---
 
-## Licensing — the hard constraint
+## Licensing: the hard constraint
 
 FIA WEC timing data is owned by Al Kamel Systems S.L. and may not be redistributed without permission.
 
 - **No raw timing data in Git.** Not compressed, not sampled, not "just a few rows".
-- **No data derived from it in Git** — that includes Parquet files, DuckDB databases and aggregate tables, since these are derivative works.
+- **No data derived from it in Git:** that includes Parquet files, DuckDB databases and aggregate tables, since these are derivative works.
 - `.gitignore` excludes `data/**` wholesale plus tabular and PDF extensions repository-wide. **Do not weaken these patterns.** If a legitimate file is being blocked, the file is in the wrong place.
 - Only small **synthetic** fixtures are committed, under `tests/fixtures/`, each labelled as synthetic in a header.
 - The README documents how a third party obtains the source data themselves.
@@ -54,14 +54,14 @@ If in doubt, the file stays local.
 
 ## Data contracts and schemas
 
-Once the real schema is known (not before — a contract written against an assumed schema is worse than none):
+Once the real schema is known (not before: a contract written against an assumed schema is worse than none):
 
 - Define an explicit schema for every table crossing a layer boundary: column names, dtypes, nullability, allowed categorical values, value ranges.
 - Validate on write, not on read. A bad row should fail where it was produced, not three transformations later.
 - Contract violations fail loudly. Do not coerce, silently drop, or fill.
 - Schema changes are versioned. A parser that no longer produces the contracted schema is a bug, not a new contract.
 
-Pandera is the preferred tool. Great Expectations is not adopted — see `docs/DECISIONS.md`.
+Pandera is the preferred tool. Great Expectations is not adopted: see `docs/DECISIONS.md`.
 
 ---
 
@@ -70,7 +70,7 @@ Pandera is the preferred tool. Great Expectations is not adopted — see `docs/D
 - The same input file produces the same output, byte for byte where practical.
 - No dependence on wall-clock time, dictionary iteration order, filesystem ordering, or unseeded randomness.
 - Any randomness is explicitly seeded and the seed recorded.
-- Transformations are re-runnable from `data/raw/` without manual intervention — no notebook that must be executed in a particular order by hand.
+- Transformations are re-runnable from `data/raw/` without manual intervention: no notebook that must be executed in a particular order by hand.
 - Target state: one documented command takes locally supplied source files through to validated analytical tables.
 
 ---
@@ -85,7 +85,7 @@ is_in_lap               is_out_lap              is_flagged
 is_missing_sector       is_candidate_traffic    is_usable_for_pace_model
 ```
 
-Two reasons. First, the exclusion criteria are modelling decisions that will be revisited, and revisiting them is impossible if the rows are gone. Second, the *pattern* of invalid data is itself evidence — a car with systematically missing sector times is telling you something about the source.
+Two reasons. First, the exclusion criteria are modelling decisions that will be revisited, and revisiting them is impossible if the rows are gone. Second, the *pattern* of invalid data is itself evidence: a car with systematically missing sector times is telling you something about the source.
 
 Filtering happens at the point of analysis, using the flags, and the filter used is recorded with the result.
 
@@ -102,7 +102,7 @@ Data-quality checks are tests in `tests/`, not one-off notebook cells. At minimu
 - monotonicity where expected (elapsed time within a car)
 - lap-number sequence integrity
 - referential consistency (every lap's car appears in the entry list)
-- categorical vocabulary — unexpected class, flag or team labels
+- categorical vocabulary: unexpected class, flag or team labels
 - distributional drift between events, once more than one is ingested
 
 A quality check that has never failed on real data has not been tested. Verify each one fires on a deliberately corrupted fixture.

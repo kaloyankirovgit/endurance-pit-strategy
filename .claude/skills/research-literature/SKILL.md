@@ -5,7 +5,7 @@ description: Read a paper or reference implementation and record what it changes
 
 # Research literature
 
-Read to make a better design decision, not to summarise. A paper earns an entry in `docs/research/literature.md` when it changes something — or when it explicitly fails to.
+Read to make a better design decision, not to summarise. A paper earns an entry in `docs/research/literature.md` when it changes something, or when it explicitly fails to.
 
 ---
 
@@ -13,15 +13,15 @@ Read to make a better design decision, not to summarise. A paper earns an entry 
 
 State the design question the paper is being read to answer. Without one, the notes become a summary that is never used.
 
-Check the reading queue in `docs/research/literature.md` — read what the current layer needs, not what is most interesting.
+Check the reading queue in `docs/research/literature.md`: read what the current layer needs, not what is most interesting.
 
 ## 2. Extract
 
-- **Research question** — what the authors set out to answer
-- **Methodology** — data, model, evaluation design
-- **Useful result** — the specific finding or technique worth having
-- **Limitation** — what it does not establish; where it would not transfer
-- **Relevance here** — what this changes in our design. "Interesting" is not relevance.
+- **Research question:** what the authors set out to answer
+- **Methodology:** data, model, evaluation design
+- **Useful result:** the specific finding or technique worth having
+- **Limitation:** what it does not establish; where it would not transfer
+- **Relevance here:** what this changes in our design. "Interesting" is not relevance.
 
 ## 3. Transfer critically
 
@@ -32,11 +32,11 @@ Most race-strategy literature is single-class Formula 1 with telemetry access. T
 - Does it assume a controlled simulator rather than observational data?
 - Would its validation design pass our own standards? (Several published papers use random lap-level splits.)
 
-A method that cannot transfer is still worth recording — the reason it cannot is often the sharpest statement of our own constraints.
+A method that cannot transfer is still worth recording: the reason it cannot is often the sharpest statement of our own constraints.
 
 ## 4. Check the numbers
 
-Do not import a figure as a justification without checking what it means. The ~99,928-lap figure in the Sasikumar et al. paper is a scale reference, **not** evidence that a lap count confers statistical validity — those laps are clustered within races, cars and drivers.
+Do not import a figure as a justification without checking what it means. The ~99,928-lap figure in the Sasikumar et al. paper is a scale reference, **not** evidence that a lap count confers statistical validity: those laps are clustered within races, cars and drivers.
 
 ## 5. Licensing
 
@@ -50,7 +50,7 @@ Write the entry in `docs/research/literature.md` using its template. If the pape
 
 ## Watch for
 
-**Reading in order of interest rather than need.** The RL papers are the most interesting and the least immediately useful — they are stretch references (see DECISIONS D-007).
+**Reading in order of interest rather than need.** The RL papers are the most interesting and the least immediately useful: they are stretch references (see DECISIONS D-007).
 
 **Adopting an architecture because it is published.** Reference implementations are built for their authors' data and constraints.
 

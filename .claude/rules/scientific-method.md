@@ -85,7 +85,7 @@ That is scientifically stronger, and more impressive in an interview, than a fab
 
 - No fabricated metrics, counts, p-values, effect sizes or performance numbers.
 - No citation of a paper, regulation or dataset that has not been retrieved and read.
-- No filling of an unknown field with a plausible value. Write `UNKNOWN — requires validation`.
+- No filling of an unknown field with a plausible value. Write `UNKNOWN: requires validation`.
 - No presentation of a planning estimate as a measurement. The data-volume figures in `Strategy.md` §8 are estimates and are labelled as such until measured counts replace them.
 
 If a number is needed and not available, say so and stop. An honest gap is recoverable; an invented number discovered later is not.
@@ -94,7 +94,7 @@ If a number is needed and not available, say so and stop. An honest gap is recov
 
 ## Association is not causation
 
-Traffic is the most vulnerable quantity in this project. A lap may be slow because the car encountered a slower-class car — or because of a driver error, tyre degradation, fuel load, a mechanical issue, a yellow flag, changing weather, deliberate tyre or fuel saving, or because it was an in-lap or out-lap.
+Traffic is the most vulnerable quantity in this project. A lap may be slow because the car encountered a slower-class car, or because of a driver error, tyre degradation, fuel load, a mechanical issue, a yellow flag, changing weather, deliberate tyre or fuel saving, or because it was an in-lap or out-lap.
 
 Control for observable confounders and state plainly which remain uncontrolled. The remaining confounders belong in the same paragraph as the result, not in a limitations section at the end that nobody reads.
 
@@ -102,7 +102,7 @@ Control for observable confounders and state plainly which remain uncontrolled. 
 
 ## State limitations where the result is stated
 
-Whenever a modelling choice affects scientific interpretation, the limitation appears **alongside the result** — same section, same figure caption, same summary sentence. Not in an appendix.
+Whenever a modelling choice affects scientific interpretation, the limitation appears **alongside the result**: same section, same figure caption, same summary sentence. Not in an appendix.
 
 The test: if someone quoted the result sentence alone, would it mislead? If yes, the qualifier belongs inside that sentence.
 

@@ -20,7 +20,7 @@ Report sample size in **every** relevant unit: races, circuits, cars, drivers, s
 
 ---
 
-## Clustered observations — the central issue
+## Clustered observations: the central issue
 
 Laps are not independent. They are nested within stints, within cars, within races, within circuits. Adjacent laps are temporally correlated. A driver who is fast on lap 40 is fast on lap 41 for reasons that have nothing to do with the effect being estimated.
 
@@ -75,9 +75,9 @@ Build explicit "information available at time *t*" logic into feature constructi
 
 A lap-time residual has many possible causes. Before attributing one to traffic, control for what is observable: circuit, car, driver, stint lap, flag state, in-lap and out-lap status, race phase, and where possible weather.
 
-Then state which confounders remain uncontrolled, next to the result. Deliberate tyre or fuel saving is the hardest — it is a driver decision that is invisible in timing data and correlated with strategic context, which is exactly the thing being modelled.
+Then state which confounders remain uncontrolled, next to the result. Deliberate tyre or fuel saving is the hardest: it is a driver decision that is invisible in timing data and correlated with strategic context, which is exactly the thing being modelled.
 
-Matched comparison — same driver, same car, same circuit, similar stint lap, same flag state, similar pre-lap pace — reduces confounding without pretending treatment was randomised. It is a useful first analysis precisely because it is transparent about what it does and does not achieve.
+Matched comparison (same driver, same car, same circuit, similar stint lap, same flag state, similar pre-lap pace) reduces confounding without pretending treatment was randomised. It is a useful first analysis precisely because it is transparent about what it does and does not achieve.
 
 ---
 
@@ -103,7 +103,7 @@ A non-identifiability finding is a legitimate project result. It is also the kin
 Report uncertainty with every estimate. Point estimates alone are not results.
 
 - Bootstrap confidence intervals, **resampling at the cluster level** (races or cars), not the row level.
-- Empirical distributions and quantiles in preference to a mean where the distribution is skewed — pit losses certainly will be.
+- Empirical distributions and quantiles in preference to a mean where the distribution is skewed: pit losses certainly will be.
 - Distinguish *parameter* uncertainty (how well the effect is estimated) from *outcome* randomness (how variable a race is). They compose differently and answer different questions.
 - Prediction intervals for simulator output, not just expected values.
 
@@ -127,7 +127,7 @@ If the conclusion flips under a reasonable alternative specification, **that ins
 
 ## Testing choice
 
-Choose a test because of the data-generating structure and the question, not because it is familiar. With repeated measures on the same driver, car and race, standard tests assuming independence do not apply — use hierarchical or repeated-measures methods.
+Choose a test because of the data-generating structure and the question, not because it is familiar. With repeated measures on the same driver, car and race, standard tests assuming independence do not apply: use hierarchical or repeated-measures methods.
 
 Do not report only accuracy or R². For a strategy project, distributional calibration and decision quality matter more than fit statistics: a model with mediocre R² that produces well-calibrated distributions is more useful to an optimiser than a high-R² model that is overconfident.
 

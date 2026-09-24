@@ -28,7 +28,7 @@ The two "disable X" invariants matter most: they confirm a component acts only t
 
 ## 2. Component validation
 
-Compare simulated against observed **distributions**, not means — two distributions with equal means and different tails give very different strategy recommendations:
+Compare simulated against observed **distributions**, not means: two distributions with equal means and different tails give very different strategy recommendations:
 
 - lap times, by class
 - stint lengths
@@ -51,9 +51,9 @@ Generate strategies using only past or currently available information; evaluate
 
 ## 5. Hindsight benchmark
 
-Construct a hindsight-constrained optimum under the **same** simulator assumptions. This separates optimiser quality from model quality — if the optimiser cannot find a good strategy even with hindsight, the problem is the search, not the model.
+Construct a hindsight-constrained optimum under the **same** simulator assumptions. This separates optimiser quality from model quality: if the optimiser cannot find a good strategy even with hindsight, the problem is the search, not the model.
 
-## 6. Actual-strategy comparison — descriptive only
+## 6. Actual-strategy comparison: descriptive only
 
 The team's real strategy is **not ground truth**. They had live tyre and fuel state, driver feedback and telemetry the model does not.
 

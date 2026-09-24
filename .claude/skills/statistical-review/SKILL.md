@@ -13,7 +13,7 @@ Run this **before** a finding is written up, and always before it becomes a CV c
 
 ## 1. What is being claimed?
 
-Write the claim in one sentence. Then ask whether the sentence says more than the evidence supports — an association stated as an effect, an effect stated as a cause, a simulated outcome stated as a prediction.
+Write the claim in one sentence. Then ask whether the sentence says more than the evidence supports: an association stated as an effect, an effect stated as a cause, a simulated outcome stated as a prediction.
 
 ## 2. Unit of analysis
 
@@ -23,7 +23,7 @@ Write the claim in one sentence. Then ask whether the sentence says more than th
 
 ## 3. Clustering
 
-- What is the nesting structure — laps in stints in cars in races in circuits?
+- What is the nesting structure: laps in stints in cars in races in circuits?
 - Does the estimator account for it, or does it treat rows as independent?
 - Does the interval resample **clusters** or rows?
 - How many independent units genuinely inform this estimate? Often far fewer than it appears.
@@ -44,7 +44,7 @@ Write the claim in one sentence. Then ask whether the sentence says more than th
 ## 6. Identifiability
 
 - Can the data distinguish these parameters at all, or would the fit produce arbitrary numbers?
-- Fuel and tyre both act through stint age — is anything claiming to separate them?
+- Fuel and tyre both act through stint age: is anything claiming to separate them?
 - What would change if a parameter were fixed at a different plausible value?
 
 ## 7. Uncertainty
@@ -69,7 +69,7 @@ Does the conclusion survive? If it flips, **that is the finding**.
 
 ## 9. Category check
 
-Every quantity labelled OBSERVED / RECONSTRUCTED / INFERRED / ASSUMED / SIMULATED. Does the write-up preserve the labels, or has an inferred quantity become an observed one in the prose? Check variable names and plot titles, not just the text — that is where conversions start.
+Every quantity labelled OBSERVED / RECONSTRUCTED / INFERRED / ASSUMED / SIMULATED. Does the write-up preserve the labels, or has an inferred quantity become an observed one in the prose? Check variable names and plot titles, not just the text: that is where conversions start.
 
 ## 10. The null alternative
 

@@ -5,7 +5,7 @@ description: Open every working session with a plan table (what, who does it, pl
 
 # Session plan
 
-**Run this at the start of every working session, before any code is written.** Kaloyan asked for this format explicitly — it is not optional and it is not a summary written afterwards.
+**Run this at the start of every working session, before any code is written.** Kaloyan asked for this format explicitly: it is not optional and it is not a summary written afterwards.
 
 ---
 
@@ -18,10 +18,10 @@ Produce a table with exactly these five columns:
 
 Rules for each column:
 
-- **What we're doing** — one concrete, checkable task per row. Not "work on the parser" but "write the loader that handles the leading-space headers and `m:ss.SSS` durations".
-- **Who** — `Kaloyan`, `Claude`, or `Both`. This is governed by `CLAUDE.md` §3: Kaloyan implements the analytical core (order reconstruction, gap calculation, traffic logic, statistical features, simulator state, Monte Carlo structure, optimisation formulation, retrieval strategy). Claude writes boilerplate (config, parsers, SQL, Docker, CI, test scaffolding, plotting, logging, API/Streamlit). `Both` means paired review, not vague ownership.
-- **Platform** — name the actual software: VS Code, Terminal, Jupyter, DB Browser for SQLite, a browser. Do not write "local machine". If a step needs a tool that is not installed, say so in the row.
-- **What you'll learn** — the transferable concept, not the keystrokes. "Why `groupby().diff()` beats a loop for monotonicity checks" is a lesson; "run the script" is not. If a row teaches nothing, question whether Kaloyan should be doing it rather than Claude.
+- **What we're doing:** one concrete, checkable task per row. Not "work on the parser" but "write the loader that handles the leading-space headers and `m:ss.SSS` durations".
+- **Who:** `Kaloyan`, `Claude`, or `Both`. This is governed by `CLAUDE.md` §3: Kaloyan implements the analytical core (order reconstruction, gap calculation, traffic logic, statistical features, simulator state, Monte Carlo structure, optimisation formulation, retrieval strategy). Claude writes boilerplate (config, parsers, SQL, Docker, CI, test scaffolding, plotting, logging, API/Streamlit). `Both` means paired review, not vague ownership.
+- **Platform:** name the actual software: VS Code, Terminal, Jupyter, DB Browser for SQLite, a browser. Do not write "local machine". If a step needs a tool that is not installed, say so in the row.
+- **What you'll learn:** the transferable concept, not the keystrokes. "Why `groupby().diff()` beats a loop for monotonicity checks" is a lesson; "run the script" is not. If a row teaches nothing, question whether Kaloyan should be doing it rather than Claude.
 
 Keep the table to **4–7 rows.** A session with fifteen rows is not a session, it is a roadmap.
 
@@ -51,7 +51,7 @@ At the end of the session, update `docs/cv/CV_SECTIONS.md`:
 
 Then update `docs/PROJECT_STATE.md`, and add to `DECISIONS.md` or `EXPERIMENT_LOG.md` if the session produced a decision or a finding.
 
-**The CV file is a draft.** Keep tiers roughly accurate, but do not police authorship (Kaloyan vs Claude) or block lines for work not yet done — see `CLAUDE.md` §9. Run wording through the `humanizer` skill.
+**The CV file is a draft.** Keep tiers roughly accurate, but do not police authorship (Kaloyan vs Claude) or block lines for work not yet done: see `CLAUDE.md` §9. Run wording through the `humanizer` skill.
 
 ---
 
@@ -63,4 +63,4 @@ Then update `docs/PROJECT_STATE.md`, and add to `DECISIONS.md` or `EXPERIMENT_LO
 
 **Plans that assume tools he does not have.** Verified available: **VS Code** (at `~/Downloads/Packages/Visual Studio Code.app`, with the Python, Pylance, Jupyter, rainbow-csv and parquet-viewer extensions), Terminal, Spyder 6, Anaconda/Jupyter, DB Browser for SQLite, Chrome. **Not installed:** `uv`, DuckDB CLI.
 
-VS Code is the default editor for this project. `rainbow-csv` colourises the semicolon-delimited timing files and `parquet-viewer` opens Parquet output directly — use both rather than writing throwaway inspection scripts.
+VS Code is the default editor for this project. `rainbow-csv` colourises the semicolon-delimited timing files and `parquet-viewer` opens Parquet output directly: use both rather than writing throwaway inspection scripts.

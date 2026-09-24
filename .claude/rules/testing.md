@@ -35,7 +35,7 @@ Deterministic functions, on synthetic fixtures with known answers. Construct cas
 - the first and last lap of a race
 - a duplicate timing row
 
-Edge cases first. The interesting bugs are at boundaries — the first lap of a stint, the transition into a pit sequence, a car that does not finish.
+Edge cases first. The interesting bugs are at boundaries: the first lap of a stint, the transition into a pit sequence, a car that does not finish.
 
 ---
 
@@ -57,7 +57,7 @@ The two "disable X, observe Y" properties are the most useful tests in the suite
 
 For reconstruction:
 
-- ordering is a total order — no ties without a documented tie-break
+- ordering is a total order: no ties without a documented tie-break
 - gaps are non-negative where defined
 - stint laps within a stint are contiguous from 1
 
@@ -69,7 +69,7 @@ Property-based testing (Hypothesis) is worth considering for the simulator once 
 
 Quality checks live in `tests/`, not in notebook cells. Per ingested file:
 
-- schema conformance — names, dtypes, nullability
+- schema conformance: names, dtypes, nullability
 - missingness within expected bounds
 - no unexpected duplicates
 - values within plausible ranges
@@ -77,7 +77,7 @@ Quality checks live in `tests/`, not in notebook cells. Per ingested file:
 - categorical vocabulary matches the known set
 - referential integrity between tables
 
-**Verify each check actually fires.** A quality check that has never failed has not been tested — run it against a deliberately corrupted fixture and confirm it raises.
+**Verify each check actually fires.** A quality check that has never failed has not been tested: run it against a deliberately corrupted fixture and confirm it raises.
 
 ---
 
@@ -97,7 +97,7 @@ The synthetic-recovery test is worth the effort: generate data with a known traf
 
 ## Regression tests
 
-When a bug is found, write the failing test first, then fix it. When a result is established, pin it — if a refactor changes a reported number, that must fail loudly rather than quietly changing the finding.
+When a bug is found, write the failing test first, then fix it. When a result is established, pin it. If a refactor changes a reported number, that must fail loudly rather than quietly changing the finding.
 
 ---
 
@@ -132,7 +132,7 @@ without the real dataset. This is what makes CI possible, and it catches interfa
 
 ## CI
 
-CI runs without the proprietary dataset — that is a hard constraint, not a convenience. It should run:
+CI runs without the proprietary dataset: that is a hard constraint, not a convenience. It should run:
 
 - the unit and property test suite
 - data-contract tests against fixtures

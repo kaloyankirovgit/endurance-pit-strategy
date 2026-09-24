@@ -21,7 +21,7 @@ Record, before parsing:
 - whether the file is race-wide or hourly/partial
 - whether it is directly hosted by the official source
 
-Write this to `docs/research/data_sources.md`. Confirm the file is in `data/raw/` and excluded by `.gitignore` — check with `git status --ignored` before going further.
+Write this to `docs/research/data_sources.md`. Confirm the file is in `data/raw/` and excluded by `.gitignore`: check with `git status --ignored` before going further.
 
 ## 2. Schema
 
@@ -31,11 +31,11 @@ Watch for: multi-row headers, per-car section blocks rather than a flat table, e
 
 ## 3. Semantic mapping
 
-For each field the project needs — car, driver, lap number, lap time, sectors 1–3, pit indicator, pit time, elapsed time, clock time, class, team, manufacturer, flag, speeds — record the actual source column, or `ABSENT`.
+For each field the project needs (car, driver, lap number, lap time, sectors 1–3, pit indicator, pit time, elapsed time, clock time, class, team, manufacturer, flag, speeds), record the actual source column, or `ABSENT`.
 
 Do not guess a mapping from a plausible-looking name. Verify against the values: a column named `PIT` could be a boolean, a duration, or a lane time.
 
-Update `docs/DATA_DICTIONARY.md` with what was verified. Anything unresolved stays `UNKNOWN — requires validation`.
+Update `docs/DATA_DICTIONARY.md` with what was verified. Anything unresolved stays `UNKNOWN: requires validation`.
 
 ## 4. Measured counts
 
@@ -44,7 +44,7 @@ Update `docs/DATA_DICTIONARY.md` with what was verified. Anything unresolved sta
 
 Plus: total rows, total cars, rows and laps per car, pit events by class, percentage of rows with valid sector data, percentage with valid flag data.
 
-State the criterion used for "usable clean lap" — it is a modelling choice, not an objective fact.
+State the criterion used for "usable clean lap": it is a modelling choice, not an objective fact.
 
 ## 5. Replace estimates
 
@@ -54,7 +54,7 @@ Update `Strategy.md` §8 to mark the estimates superseded, and update `PROJECT_S
 
 ## 6. Quality findings
 
-- missingness patterns — is it random, or concentrated in particular cars or race phases?
+- missingness patterns: is it random, or concentrated in particular cars or race phases?
 - duplicate rows
 - impossible lap times (negative, zero, implausibly fast or slow for the circuit)
 - inconsistent class or team labels for the same car
@@ -66,14 +66,14 @@ Update `Strategy.md` §8 to mark the estimates superseded, and update `PROJECT_S
 
 ## 7. Fixture
 
-Create a small **synthetic** fixture in `tests/fixtures/` matching the verified schema — not an extract of the real file. Small enough to verify by eye. Header comment marking it synthetic.
+Create a small **synthetic** fixture in `tests/fixtures/` matching the verified schema, not an extract of the real file. Small enough to verify by eye. Header comment marking it synthetic.
 
 ## 8. Record
 
-- `docs/EXPERIMENT_LOG.md` — an entry with the measured counts and quality findings
-- `docs/DATA_DICTIONARY.md` — verified mappings
-- `docs/PROJECT_STATE.md` — known facts, open questions, next task
-- `docs/DECISIONS.md` — any decision the audit forced
+- `docs/EXPERIMENT_LOG.md`: an entry with the measured counts and quality findings
+- `docs/DATA_DICTIONARY.md`: verified mappings
+- `docs/PROJECT_STATE.md`: known facts, open questions, next task
+- `docs/DECISIONS.md`: any decision the audit forced
 
 ---
 
@@ -83,7 +83,7 @@ Provenance recorded; schema documented; semantic mapping verified against values
 
 ## Watch for
 
-**Assuming a column means what its name suggests.** The `pit_crossing` and `pit_time` semantics are named open questions — resolve them against the data, not by inference from the name.
+**Assuming a column means what its name suggests.** The `pit_crossing` and `pit_time` semantics are named open questions: resolve them against the data, not by inference from the name.
 
 **Reporting row count as sample size.** Report races, cars, drivers, stints and pit events too.
 

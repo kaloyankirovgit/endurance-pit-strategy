@@ -1,4 +1,4 @@
-# CLAUDE.md — Endurance Racing Pit Strategy Planner
+# CLAUDE.md: Endurance Racing Pit Strategy Planner
 
 Standing instructions for every Claude Code session in this repository.
 This file is deliberately short. Detailed strategic context lives in `Strategy.md`.
@@ -26,7 +26,7 @@ The purpose is a technically credible portfolio project for graduate Data Scienc
 
 At the beginning of any substantive session:
 
-1. Read `docs/PROJECT_STATE.md` — current phase, what is done, what is next.
+1. Read `docs/PROJECT_STATE.md`: current phase, what is done, what is next.
 2. Read `Strategy.md` only when strategic or layer-level context is actually needed. Do not re-read it for small tasks.
 3. Check `docs/DECISIONS.md` before revisiting an architectural or scientific choice that may already be settled.
 
@@ -56,15 +56,15 @@ He is using this project to build ability, not to watch code appear.
 
 **Claude may write in full**: project config, download/parsing utilities, SQL boilerplate, Docker, CI, test scaffolding, plotting infrastructure, logging, API and Streamlit scaffolding.
 
-Be concise. **Chat replies are short bullet points that stick to the task** — no long prose. He will say if he is confused. Ask **one question at a time**, and only when the answer changes the work. Do not lecture.
+Be concise. **Chat replies are short bullet points that stick to the task**: no long prose. He will say if he is confused. Ask **one question at a time**, and only when the answer changes the work. Do not lecture.
 
 ---
 
 ## 3a. Session format (required)
 
-**Every working session opens with a plan table** — invoke the `session-plan` skill before writing any code. Five columns: task, who does it (Kaloyan / Claude / Both), platform (Terminal, Spyder, Jupyter, DB Browser), and what Kaloyan will learn. 4–7 rows, fitted to the time he has, with deferrals stated.
+**Every working session opens with a plan table:** invoke the `session-plan` skill before writing any code. Five columns: task, who does it (Kaloyan / Claude / Both), platform (Terminal, Spyder, Jupyter, DB Browser), and what Kaloyan will learn. 4–7 rows, fitted to the time he has, with deferrals stated.
 
-**Every working session closes by updating `docs/cv/CV_SECTIONS.md`** — the paste-ready CV draft (see §9; wording via the `humanizer` skill).
+**Every working session closes by updating `docs/cv/CV_SECTIONS.md`:** the paste-ready CV draft (see §9; wording via the `humanizer` skill).
 
 Tooling available: **VS Code** (default editor; has Python, Pylance, Jupyter, rainbow-csv, parquet-viewer), Terminal, Spyder 6, Anaconda/Jupyter, DB Browser for SQLite. **Not installed:** `uv`, DuckDB CLI.
 
@@ -94,7 +94,7 @@ Other standing rules:
 - **Measurements before models.** Establish what the source does and does not measure before choosing an estimator.
 - **Baselines before complexity.** Every sophisticated model needs a simpler comparator.
 - **A null result is a result.** Do not adjust exclusions, feature definitions or model choice to make an effect appear.
-- **Never invent evidence.** No fabricated metrics, counts, p-values, citations or performance numbers. If a number is not yet measured, write `UNKNOWN — requires validation`.
+- **Never invent evidence.** No fabricated metrics, counts, p-values, citations or performance numbers. If a number is not yet measured, write `UNKNOWN: requires validation`.
 - Whenever a modelling choice affects scientific interpretation, make the limitation explicit in the same place the result is stated.
 
 Detailed rules: `.claude/rules/scientific-method.md`, `statistics.md`, `simulation.md`, `rag.md`.
@@ -103,9 +103,9 @@ Detailed rules: `.claude/rules/scientific-method.md`, `statistics.md`, `simulati
 
 ## 5. Data provenance
 
-- **Raw WEC / Al Kamel timing data must never be committed.** Al Kamel asserts ownership of the timing data; redistribution is not permitted without permission. `.gitignore` enforces this — do not weaken it.
+- **Raw WEC / Al Kamel timing data must never be committed.** Al Kamel asserts ownership of the timing data; redistribution is not permitted without permission. `.gitignore` enforces this: do not weaken it.
 - Every ingested file records: source URL, event, session, download timestamp, filename, size, SHA-256, and whether it is race-wide or partial.
-- `data/raw/` is faithful source material — never edit in place. `data/interim/` is standardised and validated. `data/processed/` is analytical marts.
+- `data/raw/` is faithful source material: never edit in place. `data/interim/` is standardised and validated. `data/processed/` is analytical marts.
 - Invalid rows are **flagged, not deleted**. Retain the reason for exclusion.
 - Transformations are deterministic and re-runnable from `data/raw/` with one documented command.
 - Only tiny synthetic fixtures (`tests/fixtures/`) are committed. Synthetic fixtures must be clearly labelled as synthetic.
@@ -128,7 +128,7 @@ notebooks/     exploration/ modelling/ validation/
 reports/       figures/ outputs/
 ```
 
-- Production logic lives in `src/endurance_strategy/`. Notebooks are narrative and visualisation only — once logic is reused, move it into the package and import it.
+- Production logic lives in `src/endurance_strategy/`. Notebooks are narrative and visualisation only: once logic is reused, move it into the package and import it.
 - British spelling in prose and identifiers (`optimisation`, `modelling`).
 - Do not create placeholder files with no defined purpose.
 - Prefer a small number of well-used technologies. Before adding a dependency, check the "Technology candidates" section of `docs/DECISIONS.md`.
@@ -164,7 +164,7 @@ Details: `.claude/rules/testing.md`.
 
 **The CV is a draft he does not plan to send yet.** The project demonstrates turning his interests into a project using agentic AI in his workflow. So:
 
-- Do not police who wrote what (Kaloyan vs Claude) — both count.
+- Do not police who wrote what (Kaloyan vs Claude): both count.
 - Do not block or warn about CV lines describing work not yet done. Keep the status column accurate, but draft freely.
 - Run all CV wording through the `humanizer` skill.
 
@@ -185,7 +185,7 @@ Flag these if the project starts drifting:
 
 ## 11. Future automation (not yet implemented)
 
-Deliberately deferred. Candidate hooks once the pipeline exists — a decision to adopt any of these belongs in `docs/DECISIONS.md`:
+Deliberately deferred. Candidate hooks once the pipeline exists: a decision to adopt any of these belongs in `docs/DECISIONS.md`:
 
 | Trigger | Hook idea | Why deferred |
 |---|---|---|

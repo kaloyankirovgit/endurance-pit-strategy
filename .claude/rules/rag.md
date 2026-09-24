@@ -25,7 +25,7 @@ The retrieval and explanation layer sits **around** the numerical system, never 
 - present an uncited regulation as fact
 - restate a tool's numerical output with different numbers
 
-**Every number in a generated answer must be traceable to a tool call or a retrieved document.** If a number appears that came from neither, that is a defect, and it should be detectable — log tool inputs and outputs alongside the generated text so the trace can be checked.
+**Every number in a generated answer must be traceable to a tool call or a retrieved document.** If a number appears that came from neither, that is a defect, and it should be detectable: log tool inputs and outputs alongside the generated text so the trace can be checked.
 
 This boundary is what separates this project from a chatbot with a racing theme. It is also the part an interviewer is most likely to probe, because it is where most LLM projects are weakest.
 
@@ -58,16 +58,16 @@ document_revision                  effective_date
 section          page              source_url        text
 ```
 
-The retriever must be able to answer "which version of this rule applied at this event?" — not merely "what does the rule say?". A clause that was superseded before the target event is a wrong answer regardless of how well it matches the query.
+The retriever must be able to answer "which version of this rule applied at this event?", not merely "what does the rule say?". A clause that was superseded before the target event is a wrong answer regardless of how well it matches the query.
 
 ---
 
 ## Chunking
 
-- Chunk on document structure — sections and articles — not on a fixed character count. Regulations are written in numbered clauses, and a clause split across two chunks retrieves as neither.
+- Chunk on document structure (sections and articles), not on a fixed character count. Regulations are written in numbered clauses, and a clause split across two chunks retrieves as neither.
 - Never split a clause from its identifying number, or a table from its header.
 - Preserve section and page metadata through chunking. The page number is what makes the citation checkable.
-- Keep enough surrounding context that a retrieved chunk is interpretable alone — a clause reading "this does not apply in the case of (c)" is useless without (c).
+- Keep enough surrounding context that a retrieved chunk is interpretable alone: a clause reading "this does not apply in the case of (c)" is useless without (c).
 
 ---
 
@@ -75,7 +75,7 @@ The retriever must be able to answer "which version of this rule applied at this
 
 Retrieval quality is measured independently of answer quality. A fluent answer over wrong documents is worse than no answer, and only separate evaluation detects it.
 
-- Build a held-out question set with known correct source passages. This must be constructed by hand — it is the expensive part and it is not skippable.
+- Build a held-out question set with known correct source passages. This must be constructed by hand: it is the expensive part and it is not skippable.
 - Measure retrieval directly: does the correct passage appear in the top *k*?
 - Report the metric with the question-set size. A recall figure over 12 questions is a different claim from one over 200, and the honest version states which.
 - Evaluate the failure cases specifically: near-miss clauses, superseded versions, and questions the corpus genuinely cannot answer.
@@ -87,7 +87,7 @@ Retrieval quality is measured independently of answer quality. A fluent answer o
 ## Citations
 
 - Every regulatory claim in an answer traces to a specific retrieved chunk, with document, revision, section and page.
-- No generic citation — "per the sporting regulations" — without an identifiable source.
+- No generic citation such as "per the sporting regulations" without an identifiable source.
 - Citations point to what was actually retrieved and used, not to what would be plausible. A citation that does not support the sentence it is attached to is a fabrication even when the document is real.
 
 ---
@@ -123,7 +123,7 @@ Log the retrieved set for every answer. If an answer is wrong, it must be possib
 
 ## LLM-assisted ETL
 
-An LLM may help structure PDF and race-control text — flag messages, event timestamps, regulation clauses — but it is never a source of truth. The pattern:
+An LLM may help structure PDF and race-control text (flag messages, event timestamps, regulation clauses), but it is never a source of truth. The pattern:
 
 ```
 PDF / text → deterministic extraction → candidate structured records
@@ -139,7 +139,7 @@ Every LLM-produced record retains provenance recording that an LLM produced it, 
 
 Simplest thing that works, first:
 
-1. Structural chunking with metadata, keyword or embedding retrieval, citations. Possibly no vector store — the corpus is small.
+1. Structural chunking with metadata, keyword or embedding retrieval, citations. Possibly no vector store: the corpus is small.
 2. Retrieval evaluation on a hand-built question set.
 3. Tool calling against a fixed simulator schema.
 4. A vector store only if simple retrieval is measurably insufficient.

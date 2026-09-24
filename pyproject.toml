@@ -4,13 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "endurance-strategy"
-version = "0.0.0"
-description = "Endurance racing pit strategy planner: WEC timing data to simulated, optimised and explained pit strategy."
+version = "0.1.0"
+description = "Pit strategy planning for WEC endurance races, built on real timing data."
 readme = "README.md"
 requires-python = ">=3.11"
 
-# Dependencies are added when a layer needs them, not in advance.
-# See the "Technology candidates" section of docs/DECISIONS.md before adding one.
 dependencies = [
     "pandas>=2.2",
 ]

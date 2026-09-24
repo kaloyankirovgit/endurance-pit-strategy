@@ -1,10 +1,5 @@
 name: CI
 
-# CI must never depend on the proprietary WEC timing dataset. It runs against
-# committed synthetic fixtures only.
-#
-# This workflow has never executed -- there is no remote repository yet.
-
 on:
   push:
     branches: [main]

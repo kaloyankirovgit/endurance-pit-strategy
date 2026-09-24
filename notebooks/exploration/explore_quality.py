@@ -1,5 +1,3 @@
-"""Scratch space. Run the cells in VS Code. Not imported by the package."""
-
 # %%
 from endurance_strategy.io.load import load_race_csv
 from endurance_strategy.paths import race_path

@@ -1,9 +1,3 @@
-"""Tests for the structural data-quality checks.
-
-Each check is proven to fire on a deliberate corruption of the synthetic
-fixture. See `docs/GUIDE.md`.
-"""
-
 from __future__ import annotations
 
 import pandas as pd
@@ -46,8 +40,8 @@ def test_both_duration_formats_parse(clean: pd.DataFrame) -> None:
     assert first["LAP_TIME_S"] == pytest.approx(210.0)
     assert first["ELAPSED_S"] == pytest.approx(210.0)
 
-    in_lap = clean[clean["CROSSING_FINISH_LINE_IN_PIT"] == "B"].iloc[0]
-    assert in_lap["PIT_TIME_S"] == pytest.approx(75.0)
+    out_lap = clean[clean["PIT_TIME"] != ""].iloc[0]
+    assert out_lap["PIT_TIME_S"] == pytest.approx(75.0)
 
 
 def test_clean_fixture_passes_every_check(clean: pd.DataFrame) -> None:
@@ -75,7 +69,7 @@ def test_same_car_number_in_two_events_is_not_a_duplicate(clean: pd.DataFrame) -
 
 def test_elapsed_going_backwards_is_detected(clean: pd.DataFrame) -> None:
     corrupt = clean.copy()
-    corrupt.loc[2, "ELAPSED_S"] = 400.0  # earlier than its own lap 2 (410.0)
+    corrupt.loc[2, "ELAPSED_S"] = 400.0
 
     found = find_elapsed_time_regressions(corrupt)
 
@@ -102,18 +96,18 @@ def test_elapsed_is_not_compared_across_cars(clean: pd.DataFrame) -> None:
 
 
 def test_lap_gap_is_detected(clean: pd.DataFrame) -> None:
-    corrupt = clean.drop(index=2)  # remove car 007's lap 3
+    corrupt = clean.drop(index=2)
 
     found = find_lap_number_breaks(corrupt)
 
     assert len(found) == 1
     assert found.iloc[0]["NUMBER"] == "007"
-    assert found.iloc[0]["LAP_NUMBER"] == 4  # step of 2 from lap 2
+    assert found.iloc[0]["LAP_NUMBER"] == 4
 
 
 def test_repeated_lap_number_is_detected(clean: pd.DataFrame) -> None:
     corrupt = clean.copy()
-    corrupt.loc[2, "LAP_NUMBER"] = 2  # 1, 2, 2, 4
+    corrupt.loc[2, "LAP_NUMBER"] = 2
 
     assert len(find_lap_number_breaks(corrupt)) == 2
 

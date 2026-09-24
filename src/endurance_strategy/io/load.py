@@ -1,30 +1,9 @@
 """Load FIA WEC race analysis CSVs into a standard dataframe.
 
-This is the only place in the project that touches the raw file format. Every
-downstream module works with the dataframe this produces, so the quirks of the
-source are handled once, here, rather than rediscovered in five places.
-
-Provenance of the fields this reads: `docs/DATA_DICTIONARY.md`, verified against
-the 2025 Le Mans race file and confirmed identical across all 28 race files in
-the 2023-2026 archive.
-
-Four traps in the source format, each of which fails silently:
-
-1. **UTF-8 BOM.** The first header is "\\ufeffNUMBER". Read with
-   ``encoding="utf-8-sig"`` or every lookup of "NUMBER" misses on column one.
-2. **Leading spaces in the first 15 header names** (" DRIVER_NUMBER"), but not
-   the rest. Headers are stripped on read. Without this, half the columns are
-   unreachable by name and pandas reports no error -- it just has a column
-   called " LAP_TIME" that nothing asks for.
-3. **Two different duration formats.** Lap and sector times are "m:ss.SSS"
-   ("3:54.555"); PIT_TIME is "h:mm:ss.SSS" ("0:01:15.964"). Parsing both with
-   one fixed format silently produces nonsense for one of them.
-4. **Car number is not a number.** Values include "007". Reading it as an
-   integer turns that into 7 and merges it with a different car. It stays a
-   string, always.
-
-A fifth, milder one: every row ends with a trailing ";", so a naive read adds an
-empty final column. It is dropped here.
+The only place in the project that touches the raw file format. Five source
+quirks are handled here so they are not rediscovered elsewhere: UTF-8 BOM,
+leading spaces on the first 15 headers, two different duration formats, car
+number as a string ("007"), and an empty trailing column. See `docs/GUIDE.md`.
 """
 
 from __future__ import annotations
@@ -33,8 +12,7 @@ from pathlib import Path
 
 import pandas as pd
 
-# Columns whose values are identifiers, not quantities. Read as strings so that
-# leading zeros survive and no arithmetic is accidentally possible on them.
+# Identifiers, not quantities: read as strings so leading zeros survive.
 _STRING_COLUMNS = [
     "NUMBER",
     "DRIVER_NUMBER",
@@ -47,10 +25,8 @@ _STRING_COLUMNS = [
     "CROSSING_FINISH_LINE_IN_PIT",
 ]
 
-# Source columns holding a duration, converted to float seconds alongside the
-# original. S1/S2/S3 are excluded: the file already provides S1_SECONDS etc.,
-# and re-deriving a value the source gives us is a needless chance to disagree
-# with it.
+# Converted to float seconds alongside the original. S1/S2/S3 are excluded:
+# the source already provides S1_SECONDS etc.
 _DURATION_COLUMNS = ["LAP_TIME", "PIT_TIME", "ELAPSED"]
 
 
@@ -100,21 +76,26 @@ def load_race_csv(path: str | Path) -> pd.DataFrame:
         path,
         sep=";",
         encoding="utf-8-sig",
-        dtype=str,  # parse nothing automatically; every conversion is deliberate
-        keep_default_na=False,  # "" stays "", so blank-vs-missing is not guessed
+        dtype=str,
+        keep_default_na=False,
     )
 
-    # Trap 2: strip the leading spaces the source puts on the first 15 headers.
     frame.columns = [column.strip() for column in frame.columns]
 
-    # Trap 5: the trailing ";" on every row produces an empty final column.
-    frame = frame.loc[:, [column for column in frame.columns if column != ""]]
+    # The trailing ";" produces an empty column, which pandas names "Unnamed: 29".
+    frame = frame.loc[
+        :,
+        [
+            column
+            for column in frame.columns
+            if column != "" and not column.startswith("Unnamed:")
+        ],
+    ]
 
     for column in _STRING_COLUMNS:
         if column in frame.columns:
             frame[column] = frame[column].str.strip()
 
-    # LAP_NUMBER is a genuine integer; it is the only one.
     if "LAP_NUMBER" in frame.columns:
         frame["LAP_NUMBER"] = pd.to_numeric(frame["LAP_NUMBER"], errors="coerce")
 
@@ -122,8 +103,6 @@ def load_race_csv(path: str | Path) -> pd.DataFrame:
         if column in frame.columns:
             frame[f"{column}_S"] = frame[column].map(parse_duration)
 
-    # The source already supplies sector seconds; use them rather than
-    # re-parsing S1/S2/S3 and risking a disagreement with the source.
     for sector in ("S1", "S2", "S3"):
         source_column = f"{sector}_SECONDS"
         if source_column in frame.columns:

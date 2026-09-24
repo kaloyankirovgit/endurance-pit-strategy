@@ -3,13 +3,13 @@
 **Operational state of the project. Read this at the start of every substantive session.**
 Keep it short. Update it at the end of every substantial milestone.
 
-Last updated: 2026-09-22 (source access verified; schema audited)
+Last updated: 2026-09-24 (TASK 1 structural quality checks complete)
 
 ---
 
 ## Current phase
 
-**Layer 0 complete; Layer 1 partially begun.** Repository, working agreement and provenance controls exist. Source access is verified and one race's files are on disk with their schema audited. No pipeline, no models, no simulator.
+**Layer 0 complete; Layer 1 partially begun.** Repository, working agreement and provenance controls exist. All 21 corpus races are on disk, a loader reads them, and the three structural quality checks pass across all 179,259 laps with a tested fixture behind them. No interim/processed layer yet, no models, no simulator.
 
 ---
 
@@ -28,21 +28,24 @@ Verified completed work only.
 - `README.md` with the intended architecture (explicitly labelled as intended, not implemented) and the layer roadmap.
 - `pyproject.toml`, an importable `src/endurance_strategy` package, and a smoke test that runs under pytest.
 - A minimal GitHub Actions workflow that installs the package and runs the test suite with no proprietary data.
+- `endurance_strategy.io.load` — a loader for the 29-column race CSV handling the four source traps (BOM, leading-space headers, two duration formats, car number as string) plus the empty trailing column. Reads one race or the 21-race corpus.
+- `endurance_strategy.paths` — absolute filesystem anchors, so a path works from any working directory.
+- `endurance_strategy.validation.quality` — three structural checks: duplicate laps, `ELAPSED` regressions within a car, lap-number sequence breaks. Each returns violating rows rather than a boolean.
+- `tests/fixtures/synthetic_race.CSV` — synthetic 3-car, 4-lap fixture matching the verified schema, including a driver change and a pit in-lap.
+- `tests/test_quality.py` — 16 tests. Each check is proven to fire on a deliberate corruption; mutation testing confirmed five plausible implementation errors each break the suite.
 
 ---
 
 ## In progress
 
-**TASK 1 — race file audit.** Substantially done for 2025 Le Mans; see Known facts.
+**TASK 1 — race file audit.** Structural checks now complete across the full corpus (E-002).
 
 Still outstanding within TASK 1:
 
-- duplicate-row detection
-- `ELAPSED` monotonicity check within each car
-- lap-number sequence integrity check
 - a definition of "usable clean lap", and the count under it
-- a synthetic fixture in `tests/fixtures/` matching the verified schema
 - resolving the 1,902 vs 1,896 pit-crossing / `PIT_TIME` discrepancy
+- what `CROSSING_FINISH_LINE_IN_PIT = B` actually marks (in-lap, out-lap, or both)
+- value-level checks: implausible lap times, missing sectors, `KPH` consistency
 
 ---
 
@@ -54,8 +57,8 @@ All 28 files (2023–2026) are on disk at `data/raw/wec/` with a manifest. The 2
 
 Immediate sequence:
 
-1. **Finish the TASK 1 quality checks** — now across 21 files, not one: duplicates, `ELAPSED` monotonicity within each car, lap-sequence integrity, the pit-crossing / `PIT_TIME` discrepancy, and a "usable clean lap" definition.
-2. **Synthetic fixture** in `tests/fixtures/` against the verified 29-column schema.
+1. **Pit semantics** — settle what `CROSSING_FINISH_LINE_IN_PIT` and `PIT_TIME` measure, and the six-row discrepancy. This blocks stint detection, which blocks everything in Layer 2.
+2. **"Usable clean lap"** — an explicit, tested definition with the count under it, and the sensitivity of that count to each exclusion.
 3. **Layer 1 proper** — parser and schema contract over the 21-file corpus, raw → interim → processed, Parquet, DuckDB, data-quality tests. Claude writes the parser, contract and test scaffolding.
 4. **Kaloyan implements** order reconstruction, gap calculation and stint-boundary detection, per the working agreement in `CLAUDE.md` §3.
 
@@ -89,6 +92,8 @@ Facts directly established by evidence.
 - Track status across the archive: GF 221,287 / SF 12,112 / FCY 2,340 / FF 948 / RF 51 — ample for estimating race-control processes.
 - Weather CSVs available for every one of the 28 races.
 
+**Structural integrity of the lap record (measured 2026-09-24, E-002):** across all 21 corpus races and 179,259 laps — **0 duplicate laps, 0 elapsed-time regressions within a car, 0 lap-number sequence breaks**. `ELAPSED` is monotonic within a car, answering a question left open by E-001. The checks are mutation-tested, so the zeros are informative rather than vacuous. This is structural soundness only: it says nothing about whether lap-time *values* are plausible, and nothing about the open pit-data questions.
+
 **Class structure is not uniform — this constrains the project:**
 
 - **2024–2026 championship rounds are two-class** (Hypercar + LMGT3). LMP2 left the championship after 2023 and now runs only at Le Mans.
@@ -116,7 +121,6 @@ Not yet established. The full list lives in `Strategy.md` §26; these are the on
 - What exactly does `CROSSING_FINISH_LINE_IN_PIT = B` mark — in-lap, out-lap, or both?
 - What does `PIT_TIME` measure, and why do 1,902 crossings yield only 1,896 values?
 - Is the `23_Analysis_*` schema identical across 2011–2026? Only 2025 Le Mans verified.
-- Is `ELAPSED` monotonic within a car across the full race?
 - Where are the 15 intermediate timing points physically, and are the codes stable across circuits?
 - What is the clock offset between lap `HOUR` (local) and weather `TIME_UTC_STR`?
 - Are there separate race-control / flag message files beyond `FLAG_AT_FL`?
@@ -133,8 +137,8 @@ None. Source access is verified, one race's files are on disk, and D-009 has set
 
 | Component | Status |
 |---|---|
-| Data ingestion | Not built |
-| Data-quality checks | Not built |
+| Data ingestion | Loader built and tested; no interim/processed layer yet |
+| Data-quality checks | Three structural checks, 16 tests, mutation-verified. Value-level checks not built |
 | Race-order reconstruction | Not built |
 | Traffic exposure model | Not built |
 | Pace / stint model | Not built |
@@ -143,7 +147,7 @@ None. Source access is verified, one race's files are on disk, and D-009 has set
 | Optimiser | Not built |
 | RAG / retrieval | Not built |
 | Application | Not built |
-| Test suite | Scaffolding only — three smoke tests, no substantive coverage |
+| Test suite | 19 tests. Substantive coverage of the loader and the three structural checks; nothing else |
 | CI | Workflow file exists but has never run; no remote repository yet |
 
 Nothing has been validated, because nothing has been built.

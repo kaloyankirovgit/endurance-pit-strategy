@@ -60,6 +60,7 @@ DECISION / NEXT STEP:
 | ID | Date | Question | Status |
 |---|---|---|---|
 | E-001 | 2026-09-22 | What does the FIA WEC timing archive actually contain? | complete (descriptive) |
+| E-002 | 2026-09-24 | Is the lap record structurally sound across the 21-race corpus? | complete (null result) |
 
 ---
 
@@ -101,3 +102,49 @@ This creates the depth-versus-breadth trade-off recorded as D-009, which is unre
 A caution on scale: 20,182 laps from one race is **one race**. For a traffic effect the effective sample size is closer to the number of independent encounters, and for generalisation it is the number of races. The large row count is not itself evidence of statistical power — see `.claude/rules/statistics.md`.
 
 DECISION / NEXT STEP: Resolve D-009. Complete the outstanding TASK 1 quality checks. Revisit D-004's wording if the depth path is chosen.
+
+---
+
+## E-002 — Is the lap record structurally sound across the 21-race corpus?
+
+EXPERIMENT ID: E-002
+DATE: 2026-09-24
+STATUS: complete — null result (no defects found)
+QUESTION: Does the corpus contain duplicated lap rows, non-monotonic elapsed race time within a car, or breaks in the lap-number sequence? These three properties are assumed by race-order reconstruction, gap calculation and stint detection, none of which has been written yet.
+HYPOTHESIS: Some defects expected, concentrated around retirements, red flags and cars rejoining from the garage. A lap-number gap in particular seemed likely wherever the timing system missed a crossing. Being wrong would mean either a genuinely clean source or checks that cannot fire.
+DATASET: `data/raw/wec/*.CSV`, 21 files, seasons 2024–2026, loaded via `load_corpus`. Commit f228e27 plus the working-tree changes described below. Hashes in `data/raw/wec/_manifest.json`.
+POPULATION: All 179,259 lap rows. 21 races, 8 circuits, 833 car-races. No exclusions — the checks run on the raw record, before any notion of a usable lap exists.
+METHOD: Three deterministic checks in `src/endurance_strategy/validation/quality.py`. Duplicates via `duplicated(subset=["event_key","NUMBER","LAP_NUMBER"], keep=False)`. Elapsed and lap-number monotonicity via `sort_values` then `groupby(["event_key","NUMBER"]).diff()`. No randomness, no seeds.
+FEATURES: `event_key` RECONSTRUCTED (from the file path). `NUMBER`, `LAP_NUMBER`, `ELAPSED` OBSERVED. `ELAPSED_S` RECONSTRUCTED (deterministic parse of `ELAPSED`).
+ASSUMPTIONS: That the grouping key is right — that a car is identified by event plus `NUMBER`, and that a car's lap sequence is continuous across driver changes. Both are tested on the synthetic fixture, not established from documentation.
+VALIDATION DESIGN: Not a generalisation claim, so no holdout applies. The validity question here is whether the checks can fail at all. Addressed by mutation testing: five deliberate defects introduced into the implementation, each confirmed to break the suite (6, 1, 2, 2 and 1 test failures respectively). Without that step a zero count is uninterpretable.
+
+RESULT:
+
+| Check | Violating rows |
+|---|---:|
+| Duplicate laps | 0 |
+| Elapsed-time regressions | 0 |
+| Lap-number breaks | 0 |
+
+Out of 179,259 rows across 21 races.
+
+UNCERTAINTY: None applicable — these are exhaustive deterministic counts over the full corpus, not estimates. The residual risk is not statistical but logical: that the checks encode the wrong definition of a defect. The 16 tests in `tests/test_quality.py` constrain that risk; they do not eliminate it.
+
+INTERPRETATION:
+
+A clean null result. The lap record is structurally sound on all three properties, which was not the expected outcome and is worth stating plainly rather than passing over.
+
+This answers an open question carried since E-001: **`ELAPSED` is monotonic within a car**, across 21 races rather than the one race originally asked about.
+
+What it does **not** establish:
+
+- **Nothing about lap-time values.** A lap can be structurally perfect and semantically wrong. Implausible times, mis-parsed durations and the in-lap/out-lap question are all untouched by these checks.
+- **Nothing about completeness.** A gap-free lap sequence does not mean every lap the car ran was recorded — only that what was recorded is internally consistent. If the source dropped a lap and renumbered, this is invisible to the check by construction.
+- **Nothing about the pit data.** The 1,902 vs 1,896 `CROSSING_FINISH_LINE_IN_PIT` / `PIT_TIME` discrepancy from E-001 is unaffected and still open.
+
+The practical consequence is that race-order reconstruction can be built directly on `ELAPSED_S` without a repair step, and stint detection can count laps within a stint without handling gaps. Both of those would otherwise have needed defensive logic written against defects that, it turns out, are not there.
+
+One incidental finding, logged because it was silent: the loader was retaining an empty trailing column (`Unnamed: 29`) in every race loaded. The trailing-semicolon guard tested for a column named `""`, but pandas names it `Unnamed: 29`. Harmless so far, fixed at `src/endurance_strategy/io/load.py`, now pinned by a test.
+
+DECISION / NEXT STEP: Proceed to the remaining TASK 1 items — the `PIT_TIME` discrepancy and a "usable clean lap" definition — then Layer 1 proper. These three checks become part of the data-contract suite run on every ingest.

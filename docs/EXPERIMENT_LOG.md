@@ -10,6 +10,7 @@ Each entry says what I expected before looking and what I actually found — inc
 | E-002 | 2026-09-24 | Is the lap record structurally sound? | Yes — zero faults |
 | E-003 | 2026-09-24 | What do the pit columns mean, and can stints be rebuilt? | Fully explained |
 | E-004 | 2026-09-24 | How many laps are clean enough for a pace model? | 139,283 (78%) |
+| E-005 | 2026-09-24 | Can weather be joined to laps, and which stops are garage visits? | Yes — 138,884 clean laps once rain is out |
 
 ---
 
@@ -152,3 +153,62 @@ Going from 3% to 15% changes the count by about 5%. So the choice matters, but n
 - **Traffic laps are mostly still in.** That's on purpose — traffic is what the next layer measures, so it can't be filtered out here. Only the very worst cases get caught by the slow-lap rule.
 
 **Next:** separate garage visits from normal stops, then build the interim layer with these flags in it.
+
+---
+
+## E-005 — Can weather be joined to laps, and which stops are garage visits?
+
+*2026-09-24 · complete*
+
+**Question:** two gaps left by E-003 and E-004. The clean-lap rules couldn't see rain, and `PIT_TIME` mixed normal stops with cars parked in the garage for repairs.
+
+### Weather
+
+The weather files use UTC. The laps use local wall-clock time (`HOUR`) plus race time (`ELAPSED`). I expected to line them up with `ELAPSED` from the scheduled start in the session folder name. Two races showed that was wrong:
+
+- **Spa 2024** — `HOUR` minus `ELAPSED` jumps by nearly two hours partway through. `ELAPSED` stops during a red flag, and the wall clock doesn't. The weather file runs about two hours past the `ELAPSED`-based finish, which fits.
+- **COTA 2025** — the folder says 13:30, but every lap puts the start at 13:00. The weather file agrees with 13:00.
+
+So each lap's UTC time comes from `HOUR`, the race date and the circuit's time zone (`reconstruct/race_clock.py`), with a day added once a race passes midnight. Then `merge_asof` gives each lap the latest reading at or before it crossed the line, within five minutes.
+
+**Found:** all 179,259 laps got a reading. For every race, the weather file starts within about three minutes of the race start, which is also a check that each weather file belongs to the right race.
+
+Rain shows up in three races only:
+
+| Race | Laps with rain |
+|---|---:|
+| COTA 2025 | 875 |
+| Le Mans 2024 | 760 |
+| Imola 2024 | 40 |
+
+`RAIN` is mostly 0 or 1, but at Le Mans 2024 it goes up to 9. I'm treating anything above 0 as rain. What the numbers mean isn't documented.
+
+### Garage visits
+
+There's no clean break in the pit-time distribution, so I looked at it relative to each race's median stop:
+
+| Stop longer than | Stops |
+|---|---:|
+| 2× median | 404 |
+| **3× median** | **185** |
+| 4× median | 133 |
+| 6× median | 107 |
+
+Most stops at 2–3× the median happen under safety car (182 of 219) — that looks like queueing at pit exit behind the safety car, which is a real race cost, not a repair. Above 3× it's mostly green flag. So a **garage visit is a stop over 3× the race median** (about four minutes). That gives 185 stops across 19 races, 86 hours of garage time in total, with a median of 11 minutes.
+
+### Clean laps with rain added
+
+Wet laps are now a clean-lap rule, and they're kept out of the slow-lap reference too.
+
+- **138,884 of 179,259 laps are usable (77.5%)**, down from 139,283.
+- 1,675 laps are wet, but only 340 of those weren't already excluded for another reason. Most rain came with safety cars or slow laps anyway.
+- **COTA 2025 is now the weakest race at 41% usable**, then Le Mans 2024 at 43%.
+
+**What it doesn't show:**
+
+- **A track stays wet after the rain stops.** `RAIN` is a sensor reading, so drying laps pass as dry unless they're slow. Track temperature or lap times might pick that up later.
+- **The time zones are my lookup**, not from the source. They're checked indirectly by the weather lining up with every race.
+- **The 3× garage cut-off is a choice.** A pit-loss model should be checked at 2× and 4× as well.
+- **Only rain is used so far.** Track temperature is joined to every lap, but no rule uses it yet.
+
+**Next:** the interim layer in Parquet, with all these flags in it.

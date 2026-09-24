@@ -33,7 +33,7 @@ Each field has a label for where it comes from:
 | `S1`, `S2`, `S3` | Sector times, formatted | Use the `_SECONDS` versions instead. |
 | `S1_SECONDS` … `S3_SECONDS` | Sector times in seconds | |
 | `S1_LARGE` … `S3_LARGE` | Sector times in a longer format | How these differ from `S1` isn't known. |
-| `ELAPSED` | Race time at the line, `h:mm:ss.SSS` | Always increases within a car (E-002). |
+| `ELAPSED` | Race time at the line, `h:mm:ss.SSS` | Always increases within a car (E-002). Stops during a red flag (E-005). |
 | `HOUR` | Local clock time at the line | Called `HOUR` but it's a full timestamp. |
 | `KPH` | Average lap speed | |
 | `TOP_SPEED` | Top speed on the lap | Where it's measured isn't documented. |
@@ -67,12 +67,16 @@ A car is identified by `event_key` plus `NUMBER`.
 | `is_out_lap` | bool | Reconstructed | The lap starts from the pit lane. |
 | `stint_number` | int | Reconstructed | 1, 2, 3… per car. A new stint starts on each out-lap, except a pit-lane start on lap 1. |
 | `stint_lap` | int | Reconstructed | Lap within the stint, from 1. The in-lap is the last lap of its stint. |
+| `is_garage_stop` | bool | Reconstructed | An out-lap whose `PIT_TIME` is over 3× the race median. The 3× is assumed (D-013). |
+| `lap_end_utc` | datetime | Reconstructed | UTC time the lap crossed the line, from `HOUR`, race date and circuit time zone. |
+| `AIR_TEMP`, `TRACK_TEMP`, `RAIN`… | — | Observed | The weather reading joined to the lap (E-005). |
 
 | `is_first_lap` | bool | Reconstructed | The car's first lap. |
 | `is_pit_lap` | bool | Reconstructed | An in-lap or out-lap. |
 | `is_caution_lap` | bool | Reconstructed | Not green at the line. |
 | `is_after_caution` | bool | Reconstructed | The lap after a non-green lap. |
-| `is_missing_time` | bool | Reconstructed | Lap time or a sector is missing. |
+| `is_missing_data` | bool | Reconstructed | Lap time, a sector or the weather reading is missing. |
+| `is_wet` | bool | Reconstructed | `RAIN` above 0 at the line (D-013). |
 | `is_slow_lap` | bool | Reconstructed | More than 7% slower than the class median at that race. The 7% is assumed (D-012). |
 | `is_usable_for_pace_model` | bool | Reconstructed | None of the flags above (E-004). |
 
@@ -90,11 +94,11 @@ A car is identified by `event_key` plus `NUMBER`.
 
 **`23_AnalysisEnduranceWithSections_*`** — the same laps with 15 timing points each, for Le Mans (2025 and 2026) and COTA 2026 only. At Le Mans the point names look like track landmarks (`PORIN`/`POROUT` for the Porsche Curves, `FORDOUT` for the Ford chicanes), but I haven't found an official map of them.
 
-**`26_Weather_*`** — one row a minute: air and track temperature, humidity, pressure, wind, rain. It's keyed on UTC time, while laps use local clock time, so the offset has to be worked out before joining the two.
+**`26_Weather_*`** — one row a minute: air and track temperature, humidity, pressure, wind, rain. It's in UTC, while laps use local clock time. The join goes through each circuit's time zone (E-005). `RAIN` is mostly 0 or 1 but reaches 9 at Le Mans 2024. The scale isn't documented.
 
 ## Still open
 
 - What the `IMPROVEMENT` columns and `S*_LARGE` columns actually are.
 - Where the 15 intermediate points are on track, and whether the codes are stable between circuits.
-- The clock offset between lap `HOUR` and weather UTC time.
+- What the `RAIN` scale means.
 - Whether there's a separate race-control message file beyond `FLAG_AT_FL`.

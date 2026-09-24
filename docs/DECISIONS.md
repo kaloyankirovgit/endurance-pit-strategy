@@ -105,6 +105,14 @@ A lap feeds the pace model only if it's green at the line, not the first lap, no
 
 Laps are flagged, never deleted. Each rule has its own column, so any model can use a different combination and say which it used. The 7% is a judgement call — about 5% of the usable count moves between 3% and 15% — so results that depend on it get checked at other thresholds.
 
+## D-013 — Weather joining and garage visits
+
+*2026-09-24*
+
+Lap times get a UTC timestamp from `HOUR` (local wall clock), the race date and a per-circuit time zone — not from `ELAPSED`, which stops during red flags. Each lap takes the latest weather reading at or before it crossed the line, within five minutes. `RAIN` above 0 counts as wet, and wet laps are left out of the clean-lap set (so D-012 now has seven rules).
+
+A stop is a garage visit if its `PIT_TIME` is over 3× the race median. The long stops under safety car stay as normal stops, because queueing at pit exit is part of what a stop costs. Evidence in E-005.
+
 ---
 
 ## Tools

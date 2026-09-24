@@ -15,15 +15,16 @@ Layer 1, the data pipeline, is about half done. The 21-race corpus loads cleanly
 - `io/load.py` reads the race CSVs and handles the format quirks.
 - `validation/quality.py` has three structural checks. All return zero across the corpus, and each has been proven to fire (E-002).
 - `reconstruct/stints.py` flags in-laps and out-laps and numbers stints. The pit columns are fully explained (E-003, D-011): 10,577 stints, and all 3,478 driver changes land on out-laps.
-- `features/clean_laps.py` flags laps unfit for pace modelling. 139,283 of 179,259 laps are usable (E-004, D-012).
-- 44 tests, all running on synthetic data with no real data needed. One guards against CV files ever being committed.
+- Weather downloaded for all 21 races and joined to every lap through each circuit's time zone (E-005, D-013).
+- Garage visits separated from normal stops: 185 stops over 3× the race median.
+- `features/clean_laps.py` flags laps unfit for pace modelling, rain included. 138,884 of 179,259 laps are usable (E-004, E-005).
+- 55 tests, all running on synthetic data with no real data needed. One guards against CV files ever being committed.
 
 ## Next
 
-1. **Separate garage time from normal stops** in `PIT_TIME`. 94 values are over ten minutes.
-2. **Join the weather** so wet laps can be flagged — the clean-lap rules don't handle rain yet.
-3. **Layer 1 proper** — raw to interim to processed in Parquet, queried with DuckDB and checked with Pandera.
-4. **Race order and gaps** at each timing line. This is what the traffic work is built on.
+1. **Layer 1 proper** — one command that runs raw to interim to processed in Parquet, queried with DuckDB and checked with Pandera.
+2. **Race order and gaps** at each timing line. This is what the traffic work is built on.
+3. **Drying track** — find a way to catch laps on a wet track after the rain sensor reads zero.
 
 ## Key facts
 
@@ -31,7 +32,7 @@ Layer 1, the data pipeline, is about half done. The 21-race corpus loads cleanly
 - Every one of the 28 files has the same 29-column schema.
 - Outside Le Mans, 2024 to 2026 is two-class (Hypercar and LMGT3). LMP2 only races at Le Mans.
 - Only Le Mans (2025 and 2026) and COTA 2026 have the 15-point intra-lap timing.
-- Weather is available every minute for every race.
+- Weather is available every minute for every race. `ELAPSED` stops during red flags, so the weather join uses `HOUR`.
 - The site's event selector sometimes returns the wrong event, so downloads must be verified.
 - `B` in `CROSSING_FINISH_LINE_IN_PIT` is the in-lap, and `PIT_TIME` is on the out-lap.
 - Environment: Python 3.13, with a project venv in `.venv/`. `uv` and the DuckDB CLI aren't installed; the DuckDB Python package will do.
@@ -40,7 +41,7 @@ Layer 1, the data pipeline, is about half done. The 21-race corpus loads cleanly
 
 - What the `IMPROVEMENT` and `S*_LARGE` columns mean.
 - Where the 15 intermediate points are on track.
-- The clock offset between lap time-of-day and weather UTC.
+- What the `RAIN` scale means.
 - Whether a separate race-control message file exists.
 
 ## Status by layer
@@ -51,6 +52,7 @@ Layer 1, the data pipeline, is about half done. The 21-race corpus loads cleanly
 | Structural checks | Built and run on the full corpus |
 | Pits and stints | Built and run on the full corpus |
 | Clean-lap flags | Built and run on the full corpus |
+| Weather join and garage flag | Built and run on the full corpus |
 | Interim / processed layers | Not started |
 | Race order and gaps | Not started |
 | Traffic, pace and pit-loss models | Not started |

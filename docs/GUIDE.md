@@ -33,6 +33,10 @@ corpus = add_stint_columns(load_corpus(WEC_DIR))
 | `src/endurance_strategy/io/load.py` | Reads a race CSV and adds parsed columns in seconds next to the originals |
 | `src/endurance_strategy/validation/quality.py` | Structural checks. Each returns the bad rows, not just true or false |
 | `src/endurance_strategy/reconstruct/stints.py` | In-lap and out-lap flags, stint numbers |
+| `src/endurance_strategy/io/weather.py` | Reads the weather CSVs |
+| `src/endurance_strategy/io/download.py` | Downloads the weather for each race and records hashes |
+| `src/endurance_strategy/reconstruct/race_clock.py` | UTC time for each lap |
+| `src/endurance_strategy/features/weather.py` | Joins the latest weather reading to each lap |
 | `src/endurance_strategy/features/clean_laps.py` | Flags for laps that shouldn't feed a pace model, plus a summary of what each rule removes |
 | `src/endurance_strategy/paths.py` | Absolute paths, so things work from any folder |
 | `tests/fixtures/synthetic_race.CSV` | A made-up race small enough to check by eye |
@@ -82,9 +86,27 @@ The tests cover the awkward cases — a pit-lane start, a car retiring in the pi
 
 The slow-lap rule compares each lap with the median green, non-pit lap for its class at that race. Pit and caution laps are kept out of that median — otherwise a long safety car would drag it up and hide slow laps. `exclusion_summary` shows how many laps each rule catches, and how many only that rule catches.
 
+## Weather and garage stops
+
+The full chain, from raw files to flagged laps:
+
+```python
+from endurance_strategy.io.download import WEATHER_DIR
+from endurance_strategy.io.weather import load_weather_corpus
+from endurance_strategy.reconstruct.race_clock import add_lap_utc
+from endurance_strategy.reconstruct.stints import add_garage_stop_flag
+from endurance_strategy.features.weather import join_weather
+from endurance_strategy.features.clean_laps import add_clean_lap_flags
+
+laps = add_garage_stop_flag(add_stint_columns(load_corpus(WEC_DIR)))
+laps = join_weather(add_lap_utc(laps), load_weather_corpus(WEATHER_DIR))
+laps = add_clean_lap_flags(laps)
+```
+
+The lap's UTC time comes from `HOUR`, not `ELAPSED`. `ELAPSED` stops during a red flag, and at Spa 2024 that would have put the weather two hours out. `merge_asof` then picks the latest reading at or before each crossing, only within the same race.
+
 ## What's next
 
-- Join the weather so wet laps can be flagged.
+- Wrap everything below into one command that writes Parquet.
 - Build the pipeline properly: raw to interim to processed, in Parquet, with DuckDB for querying and Pandera for schema checks.
-- Split real pit stops from long garage visits in `PIT_TIME`.
 - Race order and gaps at each timing line, which the traffic work sits on.

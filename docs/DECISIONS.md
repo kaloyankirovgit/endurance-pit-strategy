@@ -1,275 +1,120 @@
-# DECISIONS
+# Decisions
 
-Architectural and scientific decision record.
-
-Record a decision here when it constrains later work, would be expensive to reverse, or affects how a result should be interpreted. Do **not** record trivial coding choices.
-
-Template:
-
-```
-## D-NNN — Short title
-
-DECISION ID:
-DATE:
-QUESTION:
-OPTIONS CONSIDERED:
-DECISION:
-REASON:
-EVIDENCE:
-CONSEQUENCES:
-REVISIT WHEN:
-```
-
-Decisions are append-only. If a decision is reversed, write a new entry that supersedes it and add a line to the original pointing forward.
+The choices that shape the rest of the project, and why I made them. If one gets reversed, it stays here with a note pointing to whatever replaced it.
 
 ---
 
-## D-001 — Repository location and structure
+## D-001 — Where the project lives
 
-DECISION ID: D-001
-DATE: 2026-09-22
-QUESTION: Where should the project live, and what top-level structure should it use?
-OPTIONS CONSIDERED:
-(a) Keep everything in `~/Downloads` alongside the existing strategy documents;
-(b) `~/Projects/endurance-pit-strategy-planner`;
-(c) `~/Documents/...` under iCloud sync.
-DECISION: (b) — `~/Projects/endurance-pit-strategy-planner`, with the top-level layout specified in the bootstrap brief: `CLAUDE.md`, `Strategy.md`, `.claude/`, `docs/`, `data/`, `src/`, `tests/`, `notebooks/`, `reports/`.
-REASON: `~/Downloads` is a volatile folder that gets cleared; iCloud sync can interfere with Git internals. A dedicated directory is the stable home a long-lived portfolio repository needs.
-EVIDENCE: User choice during the bootstrap session.
-CONSEQUENCES: `Strategy.md` is copied into the repository; the `~/Downloads` copy is now a stale duplicate and should not be edited. The repository is the single source of truth from here.
-REVISIT WHEN: Never, unless the repository is relocated or a remote is added.
+*2026-09-22*
 
----
+In `~/Projects/endurance-pit-strategy-planner` rather than Downloads or an iCloud folder. Downloads gets cleared out, and iCloud sync doesn't get on well with Git.
 
-## D-002 — Data layer naming: raw / interim / processed
+## D-002 — raw / interim / processed
 
-DECISION ID: D-002
-DATE: 2026-09-22
-QUESTION: `Strategy.md` §15 describes a bronze / silver / gold medallion architecture; the bootstrap brief specifies `data/raw/`, `data/interim/`, `data/processed/`. Which naming is used?
-OPTIONS CONSIDERED:
-(a) bronze / silver / gold, matching `Strategy.md` §15 and common data-engineering vocabulary;
-(b) raw / interim / processed, matching the bootstrap brief and the widely used cookiecutter-data-science convention;
-(c) both, with bronze/silver/gold as DuckDB schema names over raw/interim/processed directories.
-DECISION: (b) for directories, with the medallion semantics preserved exactly. The mapping is: `raw` = bronze (faithful source, never edited in place), `interim` = silver (standardised, validated, invalid rows flagged not deleted), `processed` = gold (task-specific analytical marts).
-REASON: One vocabulary avoids ambiguity about where a file belongs. The semantics of the medallion design — faithful source preservation, validation as a distinct stage, marts built for a task — are what matter, and they are retained in full. The directory names follow the brief.
-EVIDENCE: Bootstrap brief §5; `Strategy.md` §15.
-CONSEQUENCES: `Strategy.md` §15 and §12 should be amended to use the same names, or to state this mapping explicitly, so the two documents do not diverge. DuckDB schema names may still use `bronze`/`silver`/`gold` if that improves SQL readability — decided at Layer 1.
-REVISIT WHEN: Layer 1, when the first DuckDB database is created and schema naming is settled.
+*2026-09-22*
 
----
+Data moves from `raw` to `interim` to `processed`. It's the same idea as the bronze/silver/gold layers people use in data engineering — the source is never touched, and every step after it is cleaner and built for something more specific. I went with the more common folder names so there's only one vocabulary.
 
-## D-003 — Committed test fixtures live in `tests/fixtures/`
+## D-003 — Test fixtures go in `tests/fixtures/`
 
-DECISION ID: D-003
-DATE: 2026-09-22
-QUESTION: `Strategy.md` §12 lists both `data/fixtures/` and `tests/fixtures/`. Where do committed synthetic fixtures live?
-OPTIONS CONSIDERED:
-(a) `data/fixtures/`, grouping all data together;
-(b) `tests/fixtures/`, grouping fixtures with the tests that consume them;
-(c) both, split by purpose.
-DECISION: (b) — a single location, `tests/fixtures/`.
-REASON: `data/**` is ignored wholesale by `.gitignore` to make committing real timing data difficult. Putting committed fixtures inside `data/` would require an exception in exactly the rule that protects the licensing constraint. Keeping fixtures under `tests/` means the data directory has one unambiguous rule: nothing in it is ever committed.
-EVIDENCE: Licensing constraint in `Strategy.md` §6.1.
-CONSEQUENCES: `Strategy.md` §12 should drop `data/fixtures/`. Every fixture must be synthetic and labelled as such in a header comment or accompanying README — a real timing extract must never be introduced under a `tests/` path to evade the data rules.
-REVISIT WHEN: If a fixture is needed that is too large for Git, in which case a generator script is committed instead of the data.
+*2026-09-22*
 
----
+Everything under `data/` is git-ignored so real timing data can't slip into a commit. Putting fixtures in `data/fixtures/` would mean punching a hole in exactly that rule. So fixtures live with the tests instead, and they're always synthetic.
 
-## D-004 — Traffic is modelled as inferred exposure, not detected overtakes
+## D-004 — Traffic is inferred exposure, not overtakes
 
-DECISION ID: D-004
-DATE: 2026-09-22
-QUESTION: Should the traffic layer aim to detect individual overtaking events?
-OPTIONS CONSIDERED:
-(a) Build an overtake detector from lap and sector timing;
-(b) Model inferred multi-class traffic *exposure* and the lap/sector time loss associated with it;
-(c) Defer the traffic layer until positional data can be sourced.
-DECISION: (b). The modelling target is inferred exposure and traffic-associated timing effects, at lap/sector resolution, with an explicit statement that the exact instant and location of each overtake is unobserved.
-REASON: The primary source provides timing-line crossings and sector times, not continuous track position. An overtake detector built on that data would be an unfalsifiable claim: there is no ground-truth label to validate it against. Exposure-and-residual is a weaker claim that the data can actually support, and it is the quantity the simulator needs in any case.
-EVIDENCE: `Strategy.md` §16 (critical limitation), §17.1, §17.6. Not yet confirmed against a real file — if the audit in TASK 1 reveals positional or marshalling-sector data, this decision is reopened.
-CONSEQUENCES: No claim of overtake detection appears in the README, reports or CV. The traffic model reports an effect on lap/sector residuals with uncertainty, and reports honestly if the effect is not identifiable.
-REVISIT WHEN: TASK 1 audit, if the source contains positional, marshalling-sector or GPS-derived fields; or if a secondary source provides validated overtake labels.
+*2026-09-22*
 
----
+The timing data records when a car crosses a timing line — not where it is on track in between. An "overtake detector" built on that couldn't be checked against anything, because there's no ground truth. So the traffic model looks at when a car was likely running into slower traffic and how its lap times behaved, and says plainly that the exact pass isn't observed.
 
-## D-005 — Fuel and tyre effects are not claimed as separately measured
+The 15-point Le Mans data (D-009) narrows *where* time was lost. It still doesn't see a pass, so this stands.
 
-DECISION ID: D-005
-DATE: 2026-09-22
-QUESTION: How are fuel burn and tyre degradation represented, given that neither is directly measured in public timing data?
-OPTIONS CONSIDERED:
-(a) Fit separate fuel and tyre terms and report them as estimated effects;
-(b) Model an aggregate stint-age effect, with fuel and tyre as labelled model parameters inside a physically motivated parameterisation if needed;
-(c) Source fuel/tyre telemetry from a simulator (Le Mans Ultimate) and treat it as ground truth.
-DECISION: (b) as the default. Approach (a) is only permissible if a data source that identifies the components is found and documented. (c) may inform sensitivity experiments but is never treated as measurement of real-world behaviour.
-REASON: Fuel mass and tyre degradation both act monotonically through stint age and are confounded in timing-only data. Reporting them separately would convert an ASSUMED parameter into an INFERRED measurement — exactly the category error the project's scientific rules forbid.
-EVIDENCE: `Strategy.md` §18 (fuel/tyre confounding warning), §6.4.
-CONSEQUENCES: The simulator's fuel and tyre parameters are labelled ASSUMED unless externally identified. Any report separates "stint-age effect (inferred from data)" from "fuel/tyre decomposition (model assumption)". Sensitivity analysis over these parameters becomes mandatory rather than optional.
-REVISIT WHEN: A source with fuel flow, stint fuel allocation or tyre-set data is found and its provenance validated.
+## D-005 — Fuel and tyres aren't separated
 
----
+*2026-09-22*
 
-## D-006 — Regulation feasibility is a separate layer from the simulator
+Fuel burning off makes a car faster through a stint, tyres wearing makes it slower, and both happen as the stint goes on. Timing data alone can't tell those two apart. So I model one combined stint-age effect from the data. If the simulator needs separate fuel and tyre terms, they're labelled as assumptions and I test how sensitive the answer is to them.
 
-DECISION ID: D-006
-DATE: 2026-09-22
-QUESTION: Where do sporting-regulation constraints (driving-time limits, pit procedure, tyre and fuel rules) live?
-OPTIONS CONSIDERED:
-(a) Embedded as conditionals inside the simulator's state transitions;
-(b) A separate feasibility layer consuming a versioned structured rules table, queried before simulation;
-(c) Retrieved from regulation PDFs at simulation time by the RAG layer.
-DECISION: (b). A feasibility function takes a candidate strategy and returns `(feasible, violations)`; the simulator and optimiser consume its verdict. Rules are stored in a versioned structured table with `season`, `event_scope`, `class`, `section`, `page`, `source_document`, `effective_from`/`effective_to`.
-REASON: Three separate benefits. The optimiser never wastes computation on illegal strategies; regulations are season- and event-dependent so they must be versioned data rather than code constants; and the LLM layer can cite the exact rule that made a strategy infeasible, which is the strongest justification for having an LLM in the system at all. (c) is rejected because retrieval at simulation time is slow, non-deterministic and unauditable.
-EVIDENCE: `Strategy.md` §20A.
-CONSEQUENCES: Regulations must be retrieved and transcribed with page-level provenance before any constraint is encoded. No regulatory fact is hard-coded from memory — every row in the rules table cites a document and page.
-REVISIT WHEN: Layer 5/6, if the rules table proves too rigid for event-specific bulletins.
+This only changes if I find a source that actually measures fuel or tyre state.
 
----
+## D-006 — Regulations are a separate check
 
-## D-007 — Optimisation precedes reinforcement learning
+*2026-09-22*
 
-DECISION ID: D-007
-DATE: 2026-09-22
-QUESTION: What search method should produce the strategy recommendation?
-OPTIONS CONSIDERED:
-(a) Reinforcement learning from the start, matching current race-strategy literature;
-(b) Exhaustive / grid search over feasible pit windows, then dynamic programming and rolling-horizon re-optimisation, with RL as a stretch goal;
-(c) Bayesian optimisation as the primary method, reusing the dissertation experience.
-DECISION: (b). RL is not attempted until the simulator has passed validation against historical race distributions.
-REASON: An RL agent trained on an unvalidated simulator learns the simulator's errors, and its failures are hard to attribute between the policy and the environment. An exhaustive search over a small, feasible pit-window space is transparent, testable, and gives a baseline against which any later method must prove itself. Bayesian optimisation is appropriate for continuous parameters later, but the initial strategy space is low-dimensional and discrete.
-EVIDENCE: `Strategy.md` §20.2, §21.2. Carry-over principle from the BSE dissertation: separate parameter optimisation from policy evaluation.
-CONSEQUENCES: Layer 5 delivers a searched optimum with uncertainty, not a learned policy. Parameter tuning and final evaluation use different races.
-REVISIT WHEN: Layer 4 validation passes and the strategy space proves too large for exhaustive search.
+Legality gets checked before the simulator runs, by its own function that returns whether a strategy is allowed and which rules it breaks. The rules sit in a versioned table where every row cites a document and page — they change by season and sometimes by event, so they can't be hard-coded. This also gives the LLM layer a real job later on: pointing to the exact rule that ruled a strategy out.
+
+## D-007 — Plain search before reinforcement learning
+
+*2026-09-22*
+
+The first optimiser is an exhaustive search over legal pit windows. It's easy to test, and it gives a baseline anything fancier has to beat. RL only comes in once the simulator has been checked against real races — otherwise it just learns the simulator's mistakes, and you can't tell which is to blame.
+
+This carries over from my dissertation: tuning parameters and evaluating a policy are different jobs and need different data.
+
+## D-008 — The LLM explains, it doesn't compute
+
+*2026-09-22*
+
+The language model can read the regulations, pick simulator inputs from a fixed schema, call the simulator and explain what came back — with citations. It can't change the numbers or decide pit timing in prose. Every number in an answer has to trace back to a tool call or a document. Without that line it's a chatbot with a racing theme.
+
+## D-009 — Breadth first, with a Le Mans deep-dive
+
+*2026-09-22*
+
+The archive has 121 events at 3-sector resolution. Only Le Mans (2025 and 2026) and COTA 2026 have the finer 15-point timing.
+
+Breadth helps generalisation — more races, more circuits. Depth helps with the traffic question, since finer timing makes it more likely the effect can be picked out at all. So I'm doing both: the pipeline and all the pace and pit modelling run across the full corpus, and the 15-point races become a separate traffic sub-study.
+
+The two are never pooled into one number without an argument. A traffic effect found at Le Mans is a Le Mans result until something shows it transfers.
+
+## D-010 — The corpus is 2024 to 2026 (21 races)
+
+*2026-09-22*
+
+| Option | Races | Circuits | Laps |
+|---|---:|---:|---:|
+| 2023–2026, everything | 28 | 11 | 236,738 |
+| **2024–2026** | **21** | **8** | **179,259** |
+| Le Mans only | 4 | 1 | 70,968 |
+
+2023 is effectively a different championship. Its third class is LMGTE Am rather than LMGT3, and LMP2 ran the whole season. Mixing it in would mean an era adjustment in every model for six extra races. A clean 21-race set is easier to defend.
+
+It also splits neatly by time — **fit on 2024 (8 races), validate on 2025 (8), test on 2026 (5)**. The 2023 files stay on disk for a later robustness check.
+
+One consequence: 18 of the 21 races are two-class (Hypercar and LMGT3), because LMP2 only races at Le Mans now. So I describe it as two-class wherever that's what the data is, and class-pair effects get estimated per pair.
+
+## D-011 — How pits and stints are read from the timing
+
+*2026-09-24*
+
+The source has no in-lap or out-lap column. Working from the whole corpus (E-003):
+
+- `CROSSING_FINISH_LINE_IN_PIT = B` is the **in-lap** — the lap that ends in the pit lane.
+- `PIT_TIME` is on the **out-lap** — the lap after. It's time in the pit lane including the stop, not just time stationary.
+- A new stint starts on each out-lap. The in-lap is the last lap of its stint.
+- A lap-1 `PIT_TIME` is a pit-lane start, which is still stint 1.
+
+This lives in `src/endurance_strategy/reconstruct/stints.py` and is pinned by tests. A few `PIT_TIME` values run to hours — cars parked in the garage — so pit loss and garage time will need separating before any pit-loss model.
+
+## D-012 — What counts as a clean lap
+
+*2026-09-24*
+
+A lap feeds the pace model only if it's green at the line, not the first lap, not an in-lap or out-lap, not the lap right after a caution, has all its times, and is within 7% of the median clean lap for its class at that race. The numbers are in E-004.
+
+Laps are flagged, never deleted. Each rule has its own column, so any model can use a different combination and say which it used. The 7% is a judgement call — about 5% of the usable count moves between 3% and 15% — so results that depend on it get checked at other thresholds.
 
 ---
 
-## D-008 — The LLM explains; it does not compute
+## Tools
 
-DECISION ID: D-008
-DATE: 2026-09-22
-QUESTION: What is the language model's responsibility boundary?
-OPTIONS CONSIDERED:
-(a) An agent that reasons about strategy in natural language;
-(b) A retrieval and explanation layer that calls the simulator as a tool and reports its numerical output verbatim;
-(c) No LLM layer at all.
-DECISION: (b). The LLM may interpret user intent, select relevant regulations, choose simulator inputs from an approved schema, call the simulator, summarise its output and cite sources. It may not alter simulator outputs, invent numbers, or determine pit timing in prose.
-REASON: The credibility of the whole project rests on numerical results being traceable to data and code. A model that can produce a strategy number in free text destroys that traceability, and the resulting system would be a chatbot with a racing theme rather than a decision-support system.
-EVIDENCE: `Strategy.md` §5 RQ6, §30.6, §32.
-CONSEQUENCES: Every numerical value in a generated answer must be traceable to a tool call. Retrieval is evaluated separately from generation. The system must refuse, rather than guess, when the retrieved documents do not support a claim.
-REVISIT WHEN: Never for the core boundary. The tool schema itself is revisited whenever the simulator interface changes.
+The rule of thumb is to use a few tools properly rather than a lot of them badly. A tool comes in when a real need shows up.
 
----
+**In use:** Python, pandas, pytest, Git, GitHub Actions.
 
-# Technology candidates
+**Coming when needed:** Parquet and DuckDB (Layer 1), Pandera for data contracts, statsmodels and SciPy for the mixed-effects and bootstrap work, Matplotlib for figures, then Streamlit and Docker at the end.
 
-Classification as of 2026-09-22. This is a starting position, not a commitment. Move an item up a category only when a concrete need has appeared; record the move as a decision entry.
+**Only if something calls for it:** Polars, FastAPI, scikit-learn or XGBoost as a comparison to a simpler baseline, a vector store for retrieval, Ruff.
 
-The governing principle: **prefer a small number of well-used technologies over a long list used superficially.** A recruiter reading the repository should see tools that were needed, not tools that were available.
-
-## Required now
-
-| Technology | Why |
-|---|---|
-| Python 3.11+ | Project language. Local environment is 3.13.3; confirm the dependency landscape supports it at Layer 1. |
-| pandas | Initial parsing, exploration and transformation of timing files. |
-| NumPy | Numerical foundation. |
-| pytest | Tests are a stated expectation from Layer 0. |
-| Git | Version control and the provenance record. |
-
-## Probably useful later
-
-| Technology | Trigger for adoption |
-|---|---|
-| PyArrow / Parquet | As soon as parsed data is written for reuse — Layer 1. Near-certain. |
-| DuckDB | When analytical SQL over Parquet becomes clearer than pandas chains, and to demonstrate SQL competence. Layer 1–2. Note: CLI not currently installed; the Python package is sufficient. |
-| statsmodels | Hierarchical / mixed-effects traffic and pace models. Layer 2–3. |
-| SciPy | Distributions, bootstrap, statistical tests. Layer 2–3. |
-| Matplotlib | Publication-style figures from Layer 1 onwards. |
-| Pandera | Dataframe-level data contracts once the schema is known — cannot be written before the TASK 1 audit. |
-| Streamlit | Layer 7, the first interactive application. |
-| Docker | Layer 7, after the local pipeline is reproducible. |
-| GitHub Actions | Already scaffolded; becomes real when a remote repository exists. |
-| A vector store (FAISS or Chroma) | Layer 6. Start with the simplest retrieval that works — possibly no vector store at all for a corpus this small. |
-
-## Optional
-
-| Technology | Note |
-|---|---|
-| Polars | Only if data volume makes pandas genuinely slow. Unlikely at WEC data scale. |
-| FastAPI | Only if an API abstraction materially improves the architecture — a Streamlit app alone may not justify it. |
-| scikit-learn / XGBoost | Only as a comparator to a hierarchical baseline, and only if the baseline is established first. |
-| NetworkX | Only if a graph representation solves a real problem the tabular form does not. |
-| Ruff / Black | Cheap and useful; adopt when the codebase is large enough to benefit. |
-| A licence for the repository | Decide before making the repository public. |
-
-## Avoid unless evidence shows value
-
-| Technology | Why |
-|---|---|
-| Dagster / Prefect | An orchestration framework over a three-step pipeline is a liability, not a demonstration. Adopt only with a real multi-step, scheduled pipeline. |
-| Great Expectations | Pandera covers the need with far less machinery. |
-| Reinforcement learning | See D-007. Stretch goal after simulator validation. |
-| Deep learning of any kind | No identified problem in this project needs it. |
-| Cloud deployment (Azure / AWS) | Only after local reproducibility is established, and only if it adds something a Docker image does not. |
-| Kubernetes | No. |
-| An agent framework (LangChain, LlamaIndex, etc.) | Direct tool-calling against a defined schema is more auditable and easier to explain in an interview. Revisit only if retrieval complexity genuinely grows. |
-
----
-
-# Future automation and hooks
-
-Deferred during bootstrap. Candidates, in priority order:
-
-1. **Raw-data commit guard** — `PreToolUse` on Bash matching `git add` / `git commit`, blocking paths under `data/` and oversized files. This is the highest-value hook and should be implemented as soon as real data is on disk; `.gitignore` is the primary defence but a hook catches `git add -f`.
-2. **Format and lint on write** — `PostToolUse` on Edit/Write to `*.py`. Blocked on adopting a formatter.
-3. **Targeted test run** — `PostToolUse` on Edit/Write to `src/**`, running the affected test module. Blocked on having a meaningful suite.
-4. **Data-contract gate on push** — `PreToolUse` on `git push`, refusing if contract tests fail. Blocked on contracts existing.
-5. **Stale-state warning** — `Stop` hook warning when `PROJECT_STATE.md` has not been updated alongside substantive changes.
-
-Adopting any of these is itself a decision entry.
-
----
-
-## D-009 — Depth versus breadth in source coverage (OPEN — decision required)
-
-DECISION ID: D-009
-DATE: 2026-09-22
-QUESTION: The Al Kamel archive exposes 121 events across 15 seasons at 3-sector resolution, but publishes 15-point intra-lap timing for only three race sessions (Le Mans 2025, Le Mans 2026, COTA 2026). Which does the project build on?
-OPTIONS CONSIDERED:
-(a) **Breadth** — many events at 3-sector resolution. Maximises races, circuits and pit events, so it maximises the independent units that matter for generalisation. Traffic localisation stays coarse.
-(b) **Depth** — the micro-sector races only. ~5× finer localisation of where lap time is lost, which materially improves the chance that traffic exposure is identifiable at all. But only 2–3 races, and the circuits are not representative.
-(c) **Both, in sequence** — establish the pipeline and pace models on breadth; use the micro-sector races as a higher-resolution sub-study for the traffic layer specifically.
-DECISION: **(c) — both, in sequence.** Breadth is the project's spine: the ETL pipeline, pace, stint and pit-loss models are built across many events at 3-sector resolution, giving race-level and circuit-level holdout. The three micro-sector race sessions become a separate, higher-resolution **sub-study** for the traffic layer specifically.
-REASON: This is a genuine scientific trade-off, not a technical one. Breadth serves generalisation; depth serves identifiability. D-004 committed to inferred exposure rather than overtake detection *because* 3-sector resolution cannot localise an encounter — the micro-sector data partially reopens that, which is why the choice matters. Sequencing gets both: the engineering claim rests on coverage, and the hardest statistical claim gets the resolution it needs to be answerable at all.
-
-**Binding constraint on this decision:** the two strands are reported separately and are **never pooled into one estimate** without an explicit argument. A traffic effect estimated from Le Mans micro-sectors is a Le Mans result until something demonstrates it transfers. The sub-study's write-up must state its circuit scope in the same sentence as its result.
-EVIDENCE: Availability verified per event on 2026-09-22; see `docs/research/data_sources.md`.
-CONSEQUENCES: Under (b) or (c), D-004 should be revisited — 15 segments per lap is not overtake detection, but it is much closer to localising an encounter than 3 sectors. Under (c), the two strands must not be silently pooled: a traffic estimate from Le Mans micro-sectors is not transferable to a sprint circuit without an argument.
-REVISIT WHEN: If the breadth strand shows the 3-sector traffic effect is identifiable after all, the sub-study becomes a validation of it rather than the primary estimate. Also if micro-sector coverage expands beyond two circuits.
-
-**Consequence for D-004:** the decision to model inferred exposure rather than detected overtakes **stands unchanged**. Fifteen segments per lap localises *where* time was lost; it does not observe a pass, and there is still no ground-truth overtake label to validate a detector against. What changes is the plausible precision of the exposure window, not the nature of the claim.
-
----
-
-## D-010 — Primary corpus is 2024–2026 (21 races)
-
-DECISION ID: D-010
-DATE: 2026-09-22
-QUESTION: Which events form the primary corpus for Layer 1 and the pace, stint and pit models?
-OPTIONS CONSIDERED:
-(a) All 28 races 2023–2026 — 236,738 laps, 11 circuits, maximum coverage;
-(b) 2024–2026, 21 races — 179,259 laps, 8 circuits, one consistent class structure;
-(c) Le Mans only, 4 races — the only genuinely three-class racing, plus micro-sectors.
-DECISION: **(b) — 2024–2026, 21 races, 8 circuits, 179,259 laps, 9,813 pit events.**
-REASON: 2023 is a different championship. Its third class is LMGTE Am rather than LMGT3 — different cars, different performance envelope, different BoP — and LMP2 ran the full season rather than Le Mans only. Including it would require an era term in every model and an explicit argument for every pooled estimate, in exchange for 6 races and 3 circuits. A clean, consistent 21-race corpus supports stronger claims than a 28-race one that needs a caveat attached to each result.
-
-The split also falls out naturally: **fit on 2024 (8 races), validate on 2025 (8), test on 2026 (5)** — a genuine temporal holdout, not a random split, satisfying `.claude/rules/statistics.md`.
-EVIDENCE: Full audit of all 28 modern-era races, 2026-09-22. Per-event counts and class structures in `docs/research/data_sources.md`. Schema verified identical across all 28 files.
-CONSEQUENCES:
-
-- 8 circuits permit leave-one-circuit-out transfer testing.
-- **Traffic is a two-class problem in 18 of the 21 races.** LMP2 appears only in the 3 Le Mans races. Class-pair effects must be estimated per pair, not pooled into a single "multi-class" coefficient.
-- **Terminology must change.** `Strategy.md` says "multi-class" throughout, which implies three classes. Outside Le Mans the data is Hypercar + LMGT3. Reports and CV bullets must say what the data is — "two-class" where that is what was modelled, or state the class pair explicitly.
-- The 2023 files remain on disk as an **optional robustness extension**: a later check of whether an effect estimated on Hypercar/LMGT3 also appears for Hypercar/LMGTE Am. That is a transfer test with an argument attached, not part of the primary corpus.
-- Sample size is reported as 21 races / 8 circuits / 9,813 pit events, never as 179,259 laps alone.
-REVISIT WHEN: 2026 completes (Fuji outstanding, plus later rounds) and adds test-set races; or if the two-class restriction proves to make the traffic effect unidentifiable, in which case the Le Mans three-class subset becomes the primary traffic evidence.
+**Staying away from for now:** orchestration frameworks like Dagster or Prefect, Great Expectations (Pandera covers it), deep learning, cloud deployment, Kubernetes, and agent frameworks like LangChain. Direct tool calls against a fixed schema are easier to test and easier to explain.

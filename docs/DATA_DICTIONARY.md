@@ -1,154 +1,100 @@
-# DATA_DICTIONARY
+# Data dictionary
 
-**Schema verified against one file: 2025 Le Mans race, `23_Analysis_Race_Hour 24.CSV`, accessed 2026-09-22.**
-Consistency across other events and seasons is **not** verified.
+What each column means, and how sure I am about it. The schema is identical across all 28 race files from 2023 to 2026. Anything before 2023 hasn't been checked.
 
-Rules for this file:
+Each field has a label for where it comes from:
 
-- Never invent a field definition. If the meaning is not established from the file or from documentation, write `UNKNOWN — requires validation`.
-- A verified *source column name* is not a verified *meaning*. Several columns below have confirmed names and unconfirmed semantics.
-- Every field carries a provenance category: **OBSERVED**, **RECONSTRUCTED**, **INFERRED**, **ASSUMED**.
+- **Observed** — straight from the source file.
+- **Reconstructed** — calculated from observed data by a fixed rule.
+- **Inferred** — estimated statistically, with uncertainty.
+- **Assumed** — chosen because the data can't tell us.
 
----
+## The race file
 
-## Source files inspected
+`23_Analysis_Race_Hour NN.CSV` — one row per lap per car, 29 columns. Semicolon-separated, UTF-8 with a BOM. The first 15 header names start with a space, and there's an empty column at the end from a trailing semicolon. The loader handles both.
 
-| File | Event | Session | Accessed | SHA-256 | Rows | Cols |
-|---|---|---|---|---|---:|---:|
-| `23_Analysis_Race_Hour 24.CSV` | 2025 Le Mans | `202506141600_Race` | 2026-09-22 | `cae1d9af…` | 20,182 | 29 |
-| `23_AnalysisEnduranceWithSections_Race_Hour 24.CSV` | 2025 Le Mans | `202506141600_Race` | 2026-09-22 | `8e13f35e…` | 20,182 | 59 |
-| `26_Weather_Race_Hour 24.CSV` | 2025 Le Mans | `202506141600_Race` | 2026-09-22 | `006ac3c5…` | — | 9 |
+### Who
 
-**Format notes.** Semicolon-delimited, UTF-8 with BOM. The first 15 header names
-carry a **leading space** (`" DRIVER_NUMBER"`); the remainder do not. Strip keys on
-read or every lookup in that block silently returns nothing. Durations appear in
-mixed formats: `3:54.555` for laps, `0:01:15.964` for `PIT_TIME`, bare seconds in
-the `*_SECONDS` columns.
+| Column | Meaning | Notes |
+|---|---|---|
+| `NUMBER` | Car number | A string, not a number. `007` and `7` are different cars. |
+| `DRIVER_NUMBER` | Which of the car's drivers (1, 2, 3…) | Changes only on out-laps (E-003). |
+| `DRIVER_NAME` | e.g. `Harry TINCKNELL` | No driver ID exists, so the name is the only identifier. |
+| `CLASS` | `HYPERCAR`, `LMGT3`, `LMP2` | LMP2 only appears at Le Mans from 2024. |
+| `TEAM`, `MANUFACTURER` | Team and make | |
+| `GROUP` | Always empty | Unknown purpose. |
 
----
+### Timing
 
-## Identity and metadata
+| Column | Meaning | Notes |
+|---|---|---|
+| `LAP_NUMBER` | Lap count for the car, from 1 | No gaps or repeats in the corpus (E-002). |
+| `LAP_TIME` | Lap time, `m:ss.SSS` | No missing values at Le Mans 2025. |
+| `S1`, `S2`, `S3` | Sector times, formatted | Use the `_SECONDS` versions instead. |
+| `S1_SECONDS` … `S3_SECONDS` | Sector times in seconds | |
+| `S1_LARGE` … `S3_LARGE` | Sector times in a longer format | How these differ from `S1` isn't known. |
+| `ELAPSED` | Race time at the line, `h:mm:ss.SSS` | Always increases within a car (E-002). |
+| `HOUR` | Local clock time at the line | Called `HOUR` but it's a full timestamp. |
+| `KPH` | Average lap speed | |
+| `TOP_SPEED` | Top speed on the lap | Where it's measured isn't documented. |
+| `LAP_IMPROVEMENT`, `S1_IMPROVEMENT`… | Mostly `0`, sometimes `2` or `3` | Probably a best-lap marker. Not confirmed. |
 
-Source column names below are **verified** against the 2025 Le Mans race file.
+### Pits and flags
 
-| Semantic field | Source column | Category | Meaning | Status |
-|---|---|---|---|---|
-| `event_id` | *(none)* | RECONSTRUCTED | Event identifier | Not a column — must be derived from the file path / download metadata |
-| `session_id` | *(none)* | RECONSTRUCTED | Session identifier | Not a column — derive from path, e.g. `202506141600_Race` |
-| `car_number` | `NUMBER` | OBSERVED | Car number. **Categorical** — values include `007`, so leading zeros are significant and it must never be read as an integer | Verified |
-| `driver_number` | `DRIVER_NUMBER` | OBSERVED | Which driver in the crew (1, 2, 3…) — the key to driver changes | Verified name; numbering convention unconfirmed |
-| `driver_name` | `DRIVER_NAME` | OBSERVED | e.g. `Harry TINCKNELL`. 186 distinct values | Verified. No stable driver ID exists — name is the only identifier, so normalisation is required |
-| `class` | `CLASS` | OBSERVED | `HYPERCAR`, `LMP2`, `LMGT3` — exactly three values, no spelling variants in this file | Verified |
-| `group` | `GROUP` | OBSERVED | Empty throughout this file | Verified empty — purpose unknown |
-| `team` | `TEAM` | OBSERVED | e.g. `Aston Martin Thor Team` | Verified |
-| `manufacturer` | `MANUFACTURER` | OBSERVED | e.g. `Aston Martin` | Verified |
+| Column | Meaning | Notes |
+|---|---|---|
+| `CROSSING_FINISH_LINE_IN_PIT` | `B` on the **in-lap** — the lap ending in the pit lane | Verified across the corpus (E-003, D-011). |
+| `PIT_TIME` | Time in the pit lane, on the **out-lap** | Includes the stop. Median 80 s, but some are hours of garage time. |
+| `FLAG_AT_FL` | Track status at the line | `GF` green, `SF` safety car, `FCY` full-course yellow, `FF` finish, `RF` red. The meanings are my reading of the codes, not an official list. |
 
----
-
-## Timing
-
-| Semantic field | Source column | Category | Meaning | Status |
-|---|---|---|---|---|
-| `lap_number` | `LAP_NUMBER` | OBSERVED | Lap index, appears 1-based | Verified name; reset behaviour unconfirmed |
-| `lap_time` | `LAP_TIME` | OBSERVED | Format `m:ss.SSS`, e.g. `3:54.555`. **0 missing** in 20,182 rows | Verified |
-| `sector_1..3` | `S1`, `S2`, `S3` | OBSERVED | Format `ss.SSS` or `m:ss.SSS`. 1 lap missing S1 and S2; 0 missing S3 | Verified — effectively complete |
-| `sector_1..3_seconds` | `S1_SECONDS`, `S2_SECONDS`, `S3_SECONDS` | OBSERVED | **The same sectors already converted to decimal seconds.** Use these; do not re-parse the formatted columns | Verified |
-| `sector_*_large` | `S1_LARGE`, `S2_LARGE`, `S3_LARGE` | OBSERVED | Sector times in a wider format (`0:51.908`) | Verified name; the difference from `S1` is not established |
-| `elapsed_time` | `ELAPSED` | OBSERVED | Cumulative race time at the crossing, `h:mm:ss.SSS` | Verified name; monotonicity **not yet checked** |
-| `clock_time` | `HOUR` | OBSERVED | Wall-clock time of day at the crossing, e.g. `16:03:54.555`. Note the column is named `HOUR` but holds a full timestamp | Verified |
-| `average_speed` | `KPH` | OBSERVED | Average lap speed in km/h | Verified |
-| `top_speed` | `TOP_SPEED` | OBSERVED | km/h. 35 rows missing | Verified name; measurement point undefined |
-| `lap_improvement` | `LAP_IMPROVEMENT` | OBSERVED | Almost entirely `0`; 61 rows `2`, 1 row `3` | Verified values; **meaning unknown** — likely a personal/overall-best marker |
-
----
-
-## Pit and flag
-
-| Semantic field | Source column | Category | Meaning | Status |
-|---|---|---|---|---|
-| `pit_crossing` | `CROSSING_FINISH_LINE_IN_PIT` | OBSERVED | Blank, or `B`. 1,902 rows carry `B` | **Name and vocabulary verified; semantics still open.** The column name says the car crossed the finish line *in the pit lane*, which points to the out-lap rather than the in-lap — but this is inference, not established |
-| `pit_time` | `PIT_TIME` | OBSERVED | Format `h:mm:ss.SSS`, e.g. `0:01:15.964`. Present on 1,896 rows | **Verified present; what it measures is still open** — stationary time, pit-lane transit, or an aggregate. Typical values near 75 s suggest more than stationary time alone. Do not model until settled |
-| `flag` | `FLAG_AT_FL` | OBSERVED | Track status at the finish line for that lap. Full observed vocabulary: `GF` 19,654 / `SF` 320 / `FCY` 159 / `FF` 49 | Verified. `GF` green, `FCY` full-course yellow, `SF`/`FF` presumed safety-car and finish flags — **the expansions are inference, not confirmed** |
-
-The 1,902 / 1,896 discrepancy between pit crossings and `PIT_TIME` values is unexplained and worth resolving — six crossings carry no pit time.
-
----
-
-## Intra-lap intermediate points — `AnalysisEnduranceWithSections` only
-
-The extended file adds **15 intermediate timing points per lap**, each as a
-`_time` (segment duration) and `_elapsed` (cumulative from lap start) pair:
-
-```
-SCL2  Z4  IP1  Z12  SCLC  A7-1  IP2  A8-1  SCLB  PORIN  POROUT  PITREF  SCL1  FORDOUT  FL
-```
-
-`FL` closes the lap and its `_elapsed` equals the lap time, so the points partition
-the lap. The names suggest physical locations at Le Mans (`PORIN` / `POROUT` for the
-Porsche Curves, `FORDOUT` for the Ford chicanes, `PITREF` a pit reference point),
-but **no official mapping of these codes to track positions has been obtained** —
-treat the interpretation as unverified.
-
-This raises resolution from 3 sectors to 15 segments, roughly a 5× improvement in
-locating where lap time is lost. **Availability is the catch:** published only for
-Le Mans 2025, and Le Mans and COTA in 2026. See `docs/DECISIONS.md` D-009.
-
----
-
-## Weather — `26_Weather_*`
-
-Separate file, joined on time rather than on lap.
+### Added by the loader
 
 | Column | Meaning |
 |---|---|
-| `TIME_UTC_SECONDS` | Unix timestamp — the join key |
-| `TIME_UTC_STR` | Human-readable timestamp |
-| `AIR_TEMP`, `TRACK_TEMP` | °C |
-| `HUMIDITY`, `PRESSURE` | % and mbar |
-| `WIND_SPEED`, `WIND_DIRECTION` | Speed and bearing |
-| `RAIN` | Rain indicator, `0` in the opening rows |
+| `LAP_TIME_S`, `PIT_TIME_S`, `ELAPSED_S` | The duration columns in seconds |
+| `S1_S`, `S2_S`, `S3_S` | Sector times in seconds |
+| `KPH_N`, `TOP_SPEED_N` | Speeds as numbers |
+| `event_key` | Which race, from the filename, e.g. `2025_LE_MANS` |
+| `source_file` | The original filename |
 
-Sampled approximately once per minute. Joining to laps requires aligning the lap's
-`HOUR` (local wall clock) with `TIME_UTC_STR` — **the offset must be established,
-not assumed.** `Strategy.md` lists weather as "possibly if obtainable"; it is
-obtainable, at high resolution.
+A car is identified by `event_key` plus `NUMBER`.
 
----
+## Built by the project
 
-## Derived fields
+| Column | Type | Label | Meaning |
+|---|---|---|---|
+| `is_in_lap` | bool | Reconstructed | The lap ends in the pit lane. |
+| `is_out_lap` | bool | Reconstructed | The lap starts from the pit lane. |
+| `stint_number` | int | Reconstructed | 1, 2, 3… per car. A new stint starts on each out-lap, except a pit-lane start on lap 1. |
+| `stint_lap` | int | Reconstructed | Lap within the stint, from 1. The in-lap is the last lap of its stint. |
 
-Produced by this project, not present in the source. These definitions are provisional and will be fixed once the source schema is known.
+| `is_first_lap` | bool | Reconstructed | The car's first lap. |
+| `is_pit_lap` | bool | Reconstructed | An in-lap or out-lap. |
+| `is_caution_lap` | bool | Reconstructed | Not green at the line. |
+| `is_after_caution` | bool | Reconstructed | The lap after a non-green lap. |
+| `is_missing_time` | bool | Reconstructed | Lap time or a sector is missing. |
+| `is_slow_lap` | bool | Reconstructed | More than 7% slower than the class median at that race. The 7% is assumed (D-012). |
+| `is_usable_for_pace_model` | bool | Reconstructed | None of the flags above (E-004). |
 
-| Semantic field | Type | Category | Meaning | Status |
-|---|---|---|---|---|
-| `stint_id` | int | RECONSTRUCTED | Stint identifier, incrementing at pit and driver-change boundaries | Definition depends on unresolved `pit_crossing` semantics |
-| `stint_lap` | int | RECONSTRUCTED | Lap index within the stint. Essential for degradation modelling | Depends on `stint_id` |
-| `is_in_lap` | bool | RECONSTRUCTED | Lap ending in a pit entry | Depends on `pit_crossing` semantics |
-| `is_out_lap` | bool | RECONSTRUCTED | Lap beginning with a pit exit | Depends on `pit_crossing` semantics |
-| `is_duplicate` | bool | RECONSTRUCTED | Flagged duplicate row — flagged, never deleted | Criteria to be defined from observed duplicates |
-| `is_invalid_laptime` | bool | RECONSTRUCTED | Lap time outside a plausible range | Thresholds to be set per circuit and class from data |
-| `is_flagged` | bool | RECONSTRUCTED | Lap run under a non-green track status | Depends on flag vocabulary |
-| `is_missing_sector` | bool | RECONSTRUCTED | One or more sector times absent | — |
-| `is_usable_for_pace_model` | bool | RECONSTRUCTED | Passes the clean-pace filter | Filter definition is a modelling decision; record it in DECISIONS.md |
-| `race_position` | int | RECONSTRUCTED | Order by completed laps, then crossing time within the lap group | Validate against official classifications |
-| `gap_ahead` | float (s) | RECONSTRUCTED | Time gap to the car ahead at a timing-line crossing | Only defined at crossings — not continuous track position |
-| `is_candidate_traffic` | bool | INFERRED | Candidate multi-class exposure window | **Never describe as an observed overtake.** See DECISIONS D-004 |
-| `traffic_exposure` | float | INFERRED | Estimated exposure magnitude | Definition is a core modelling task; Kaloyan implements |
-| `lap_residual` | float (s) | INFERRED | Observed minus expected clean pace | Depends on the baseline pace model; the core modelling target |
-| `tyre_state` | float | ASSUMED | Modelled tyre condition | Not measured in public timing data. See DECISIONS D-005 |
-| `fuel_state` | float | ASSUMED | Modelled fuel load | Not measured in public timing data. See DECISIONS D-005 |
+### Planned
 
----
+| Column | Label | Meaning |
+|---|---|---|
+| `race_position` | Reconstructed | Order by laps completed, then crossing time. Only valid at the timing line. |
+| `gap_ahead` | Reconstructed | Time to the car ahead at the line. |
+| `is_candidate_traffic` | Inferred | Likely running in slower-class traffic. **Not an observed overtake** (D-004). |
+| `lap_residual` | Inferred | Actual lap time minus expected clean pace. |
+| `tyre_state`, `fuel_state` | Assumed | Not in the data at all (D-005). |
 
-## Open semantic questions
+## Other files
 
-Carried from `Strategy.md` §26. Answering these is part of TASK 1.
+**`23_AnalysisEnduranceWithSections_*`** — the same laps with 15 timing points each, for Le Mans (2025 and 2026) and COTA 2026 only. At Le Mans the point names look like track landmarks (`PORIN`/`POROUT` for the Porsche Curves, `FORDOUT` for the Ford chicanes), but I haven't found an official map of them.
 
-- [ ] What exactly does the pit-crossing flag mean?
-- [ ] What exactly does the `pit time` field measure?
-- [ ] Are in-lap / out-lap flags explicit in the source, or must they be derived?
-- [ ] How are driver changes represented?
-- [ ] What flag values occur in race files, and how are they encoded?
-- [ ] Is elapsed time monotonic and race-relative across the full event?
-- [ ] Are sector times present for all laps or only selected ones?
-- [ ] Is the schema consistent across 2023–2025 events?
+**`26_Weather_*`** — one row a minute: air and track temperature, humidity, pressure, wind, rain. It's keyed on UTC time, while laps use local clock time, so the offset has to be worked out before joining the two.
+
+## Still open
+
+- What the `IMPROVEMENT` columns and `S*_LARGE` columns actually are.
+- Where the 15 intermediate points are on track, and whether the codes are stable between circuits.
+- The clock offset between lap `HOUR` and weather UTC time.
+- Whether there's a separate race-control message file beyond `FLAG_AT_FL`.

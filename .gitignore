@@ -143,3 +143,8 @@ desktop.ini
 # Claude Code local overrides (shared config in .claude/ IS committed)
 # ---------------------------------------------------------------------------
 .claude/settings.local.json
+
+# Private working files, kept local
+Strategy.md
+CV_work/
+docs/cv/

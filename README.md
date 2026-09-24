@@ -1,141 +1,77 @@
-# Endurance Racing Pit Strategy Planner
+# Endurance Pit Strategy Planner
 
-A decision-support system for multi-class endurance racing: turn real FIA WEC timing data into a validated race-state dataset, estimate the lap-time cost of multi-class traffic, calibrate a stochastic race simulator, optimise pit-stop timing under uncertainty, and explain the result against the official sporting regulations.
+I've followed endurance racing for years, and the part I find most interesting isn't the driving — it's the pit wall. In a six or twenty-four hour race a team has to decide when to stop and who drives next, all while guessing how much time the slower cars in the other class are going to cost them. Most of that is judgement. I wanted to see how far I could get with real timing data and some honest statistics.
 
-The question the system is built to answer:
+This repo is that attempt. It starts from the public FIA WEC lap timing and works towards a race simulator that can compare pit strategies — with proper uncertainty on the answer, not just a single number.
 
-> Given a target car, circuit, race duration and estimated race conditions, how should a team time its pit stops and stints once driver pace, stint degradation, pit losses, multi-class traffic and random race-control events are taken into account — and how confident should it be in that answer?
+The question I'm working towards:
 
-**Status: Layer 0 — project foundation. No data has been ingested and no model exists yet.**
-See [`docs/PROJECT_STATE.md`](docs/PROJECT_STATE.md) for what is actually complete.
+> For a given car, circuit and race length, when should the team pit — once driver pace, stint length, pit losses, traffic from the other class and the odd safety car are accounted for — and how sure can we be about that answer?
 
----
+## Where it's at
 
-## Intended system architecture
+Early. The data side is in place and tested, and nothing is modelled yet.
 
-The diagram below is the **intended** end state. Nothing in it is implemented yet.
+What works right now:
 
-```text
-                 ENDURANCE RACING
-                        │
-                        ↓
-               REAL WEC DATA
-                        │
-                        ↓
-                   ETL / QA
-                        │
-                        ↓
-              STATISTICAL MODELS
-                 ↙           ↘
-          traffic            pace
-                 ↘           ↙
-                   SIMULATOR
-                       │
-                       ↓
-                  OPTIMISER
-                       │
-                       ↓
-                 STRATEGY RESULT
-                       │
-             ┌─────────┴─────────┐
-             ↓                   ↓
-      RAG / REGULATIONS      LLM AGENT
-             │                   │
-             └─────────┬─────────┘
-                       ↓
-              EXPLAINABLE OUTPUT
+- A loader for the WEC race CSVs that deals with the quirks of the source format — a BOM, leading spaces in some headers, two different duration formats and car numbers like `007` that must stay strings.
+- Structural checks across all 21 races from 2024 to 2026 (179,259 laps). Every one comes back clean, and I deliberately broke each check to prove it would actually catch a fault — a zero from a check that can't fail doesn't mean much.
+- Pit stops and stints rebuilt from the timing data. The source never says "this is an in-lap", so I worked it out: the `B` marker is the lap into the pits and `PIT_TIME` sits on the lap out. That gives 10,577 stints across the corpus, and every one of the 3,478 driver changes lands on an out-lap.
+- A clean-lap filter for pace modelling. 139,283 laps (78%) make it through, and I checked how much that number moves as the rules change — about 5% between the strictest and loosest settings.
+
+The full log of what's been tried is in [`docs/EXPERIMENT_LOG.md`](docs/EXPERIMENT_LOG.md), and the reasoning behind the bigger choices is in [`docs/DECISIONS.md`](docs/DECISIONS.md).
+
+## The plan
+
+The build goes in layers — each one has to work before the next one leans on it.
+
+1. **Data pipeline** — raw files to clean, validated tables (Parquet and DuckDB). *In progress.*
+2. **Race order and traffic** — rebuild who was where on track, then look at how lap times change when a faster car is working through slower traffic.
+3. **Pace, stints and pit loss** — how pace fades through a stint, and what a stop actually costs.
+4. **Simulator** — a lap-by-lap race model, deterministic first, then with randomness added one piece at a time and checked against real races.
+5. **Optimiser** — search the legal pit windows and compare strategies with intervals rather than single numbers.
+6. **Regulation assistant** — an LLM that can look up the sporting regulations, call the simulator as a tool and explain the result with citations. It explains the answer — it never makes the numbers up.
+
+Reinforcement learning is a maybe for the very end, and only if the simulator holds up against real races first. An RL agent trained on a bad simulator just learns the simulator's mistakes.
+
+## A few things I'm being careful about
+
+- **Timing data can't see overtakes.** There's no GPS here, just line crossings and sector times. So the traffic work looks at inferred exposure to slower cars and the lap time that goes with it — not individual passes.
+- **Fuel and tyres can't be separated.** Both get worse as a stint goes on, and timing alone can't tell them apart. I model the combined stint effect and treat any split as an assumption.
+- **The team's real strategy isn't the right answer.** They have telemetry and radio I don't. Comparing against it is context, not a score.
+- **Laps aren't independent.** 179,259 laps sounds like a lot, but they come from 21 races and 833 car entries. Results get split by race (fit on 2024, validate on 2025, test on 2026), never by shuffling laps.
+- **Outside Le Mans this is a two-class race.** Since 2024 the championship rounds are Hypercar and LMGT3 only — LMP2 turns up at Le Mans alone. So I say two-class where that's what the data is.
+
+## Running it
+
+```bash
+git clone https://github.com/kaloyankirovgit/endurance-pit-strategy.git
+cd endurance-pit-strategy
+python -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev]"
+pytest -q
 ```
 
-The LLM layer sits **around** the numerical core, not inside it. The strategy recommendation is computed by the simulator and optimiser; the language model retrieves regulations, calls the simulator as a tool, cites its sources and explains the assumptions. It does not compute the recommendation.
+The tests run on a small synthetic race in `tests/fixtures/`, so they don't need the real data.
 
----
+## Getting the data
 
-## Roadmap
+The timing data belongs to Al Kamel Systems and can't be redistributed, so none of it is in this repo — not the raw files and not anything derived from them.
 
-Derived from the layer plan in [`Strategy.md`](Strategy.md). Each layer has a definition of done; nothing is marked complete without reproducible evidence.
+It's free to download for your own use from <https://fiawec.alkamelsystems.com/>. Pick a season and event, open the race session and grab the `23_Analysis_Race_Hour NN.CSV` file with the highest hour (it covers the whole race). Save it as `data/raw/wec/<YEAR>_<CIRCUIT>.CSV`, for example `2025_LE_MANS.CSV`, and then:
 
-| Layer | Scope | Status |
-|---|---|---|
-| **0 — Foundation** | Repository, working agreement, documentation system, provenance controls, test scaffolding | In progress |
-| **1 — Data pipeline / ETL** | Obtain one full 2025 WEC race file, audit it, record provenance, build raw → interim → processed pipeline in Parquet/DuckDB with data-quality checks | Not started |
-| **2 — Race order and traffic exposure** | Reconstruct on-track order and gaps, identify candidate multi-class exposure windows, model traffic-associated lap/sector time loss with uncertainty and race-level holdout | Not started |
-| **3 — Pace, stint and pit models** | Driver / car / circuit pace decomposition, stint-age effects, pit-loss distributions, honest treatment of fuel–tyre confounding | Not started |
-| **4 — Stochastic simulator** | Deterministic lap-discrete core, then lap-time noise, stint effects, pit losses, traffic, FCY / safety-car processes; validated against historical race distributions | Not started |
-| **5 — Optimisation** | Feasibility / regulation filter, exhaustive pit-window search, strategy comparison with uncertainty and sensitivity analysis | Not started |
-| **6 — RAG / LLM / tool calling** | Versioned WEC regulation corpus, retrieval with citations, simulator exposed as a tool, refusal when documents do not support a claim | Not started |
-| **7 — Delivery** | Streamlit application, Docker, CI, public documentation | Not started |
+```python
+from endurance_strategy.io.load import load_race_csv
+from endurance_strategy.paths import race_path
+from endurance_strategy.reconstruct.stints import add_stint_columns
 
-Reinforcement learning, cloud deployment, cross-series (IMSA) validation and Le Mans Ultimate sensitivity experiments are explicit **stretch goals**, not part of the core plan.
-
----
-
-## What this project deliberately does not claim
-
-These constraints are design decisions, documented up front rather than discovered late:
-
-- **It does not detect individual overtakes.** The primary source is lap and sector timing, not continuous positional data. The modelling target is *inferred multi-class traffic exposure* and the lap/sector time loss associated with it.
-- **It does not separately measure fuel and tyre effects** unless a data source is found that identifies them. Both act through stint age, and the default model is an aggregate stint-age effect with fuel and tyre treated as labelled model parameters.
-- **It does not treat a team's real pit strategy as ground truth.** Real teams act on telemetry and judgement the public data do not contain. Actual pit laps are descriptive context, not a target to match.
-- **It does not treat lap count as sample size.** Laps are clustered within stints, cars, drivers, races and circuits; sample size is reported in races, circuits, cars, stints and pit events as well as laps.
-
----
-
-## Repository layout
-
-```text
-CLAUDE.md                  Standing instructions for Claude Code sessions
-Strategy.md                Full project specification, methodology and layer plan
-docs/
-  PROJECT_STATE.md         Current phase, completed work, next task — read this first
-  DECISIONS.md             Architectural and scientific decision record
-  EXPERIMENT_LOG.md        Experiments, hypotheses, results, interpretation
-  DATA_DICTIONARY.md       Field semantics (stub until the first race file is audited)
-  research/                Data sources, literature, regulations
-  cv/                      Evidence ledger for CV claims
-data/                      raw / interim / processed — contents never committed
-src/endurance_strategy/    All production logic
-tests/                     Unit, invariant and data-quality tests + synthetic fixtures
-notebooks/                 exploration / modelling / validation — narrative only
-reports/                   Generated figures and outputs
-.claude/                   Project rules, skills and specialist review agents
+laps = add_stint_columns(load_race_csv(race_path("2025_LE_MANS")))
 ```
 
----
+More detail on the source, including a quirk where the site sometimes serves the wrong event, is in [`docs/research/data_sources.md`](docs/research/data_sources.md).
 
-## Data sources and licensing
+## How it's built
 
-The primary source is FIA WEC timing data published through Al Kamel Systems (<https://fiawec.alkamelsystems.com/>). **Al Kamel Systems S.L. asserts ownership of this data and does not permit redistribution without permission.**
+I'm building this with Claude Code as a pair programmer. The rules and review agents it works with live in [`.claude/`](.claude/) and [`CLAUDE.md`](CLAUDE.md) — they're part of the project too, since a lot of what I'm learning is how to run a workflow like this well.
 
-Consequently:
-
-- **No raw timing data, and no data derived from it, is committed to this repository.** `.gitignore` enforces this.
-- Source files are obtained locally by the user and placed in `data/raw/`. The pipeline records source URL, event, session, download timestamp, file size and SHA-256 for every ingested file.
-- Only small **synthetic** fixtures — generated by this project, resembling the schema but containing no real timing data — are committed, under `tests/fixtures/`.
-- Reproduction instructions will be published here once the ingestion path is established, so a third party can obtain the data themselves and re-run the pipeline.
-
-Secondary sources under consideration (Kaggle WEC lap data, IMSA, Le Mans Ultimate, iRacing) are assessed for schema, provenance and licence in [`docs/research/data_sources.md`](docs/research/data_sources.md) before any use.
-
-This is an independent research and portfolio project. It is not affiliated with, endorsed by, or connected to the FIA, the ACO, the FIA World Endurance Championship or Al Kamel Systems.
-
----
-
-## Reproducing the analysis
-
-Not yet applicable — there is no pipeline to run. Setup, data-acquisition and execution instructions will be added as Layer 1 is built, and the intent is that one documented command takes locally supplied source files through to validated analytical tables.
-
----
-
-## Methodology and evidence
-
-Two conventions govern how results are reported in this repository:
-
-1. **Every quantity is labelled** OBSERVED, RECONSTRUCTED, INFERRED, ASSUMED or SIMULATED, and categories are never silently converted into one another.
-2. **Generalisation is assessed at race level**, not by randomly splitting lap rows, and results are reported with uncertainty and sensitivity analysis rather than as point estimates.
-
-Decisions are recorded in [`docs/DECISIONS.md`](docs/DECISIONS.md); experiments, including those that fail, in [`docs/EXPERIMENT_LOG.md`](docs/EXPERIMENT_LOG.md). A result that shows an effect is not identifiable from the available data is a legitimate and reportable outcome.
-
----
-
-## Licence
-
-Code: to be decided before the repository is made public (see `docs/DECISIONS.md`). Source timing data and official regulation documents are **not** covered by this repository's licence and are not redistributed here.
+This is an independent project. It isn't affiliated with the FIA, the ACO, the WEC or Al Kamel Systems.

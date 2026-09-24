@@ -1,150 +1,154 @@
-# EXPERIMENT_LOG
+# Experiment log
 
-A record of what was tried, what was found, and what it means. The project should accumulate a history of scientific decisions, not merely code commits.
+Every time I ask the data a question, it goes here — including the checks that found nothing. A null result is still a result, and writing it down stops me running the same dead end twice.
 
-**Log an experiment whenever a question is put to the data.** That includes exploratory checks, diagnostics and failed attempts. A negative or null result is logged with the same care as a positive one — it is often the more informative entry, and it is the entry that protects you from re-running the same dead end in three weeks.
+Each entry says what I expected before looking and what I actually found — including what the result does *not* show.
 
-Write the **Hypothesis** and **Validation design** sections *before* running the experiment. Filling them in afterwards turns an exploratory finding into a confirmatory-looking claim.
-
----
-
-## Template
-
-```
-## E-NNN — Short title
-
-EXPERIMENT ID:
-DATE:
-STATUS:            planned | running | complete | abandoned
-QUESTION:          The specific question being asked of the data.
-HYPOTHESIS:        What you expect, and what would count as being wrong.
-DATASET:           Source files, events, sessions, pipeline version, commit hash.
-POPULATION:        Which rows are in scope and which are excluded, with the reason
-                   for each exclusion. State the units: races, circuits, cars,
-                   drivers, stints, pit events, laps, sectors.
-METHOD:            Estimator, model specification, software, seeds.
-FEATURES:          Each feature labelled OBSERVED / RECONSTRUCTED / INFERRED /
-                   ASSUMED / SIMULATED.
-ASSUMPTIONS:       Everything the result depends on that the data do not establish.
-VALIDATION DESIGN: Holdout structure (race-level, circuit-level, temporal), what
-                   the tuning data were, what the evaluation data were, and how
-                   leakage was prevented.
-RESULT:            The numbers. No interpretation here.
-UNCERTAINTY:       Intervals, their construction, and the clustering structure
-                   they account for. Sensitivity to specification changes.
-INTERPRETATION:    What this does and does not support. State the alternative
-                   explanations that remain open.
-DECISION / NEXT STEP:
-```
-
----
-
-## Standards for an entry
-
-**Sample size is reported in the unit that matters.** "48,000 laps" is not a sample size for a traffic effect when those laps come from three races. Report races, circuits, cars, drivers, stints and pit events alongside lap and sector counts.
-
-**Uncertainty accounts for clustering.** Laps within a stint, stints within a car, cars within a race are not independent. An interval built as though they were will be too narrow. Say which level of clustering the interval accounts for.
-
-**Exclusions are listed with reasons.** In-laps, out-laps, FCY laps and laps with missing sectors will all be candidates for exclusion. Each exclusion is a modelling choice that can change the result — record it, and test the result's sensitivity to it.
-
-**Specification changes are part of the result.** If an effect appears under one traffic threshold and vanishes under another, that instability *is* the finding.
-
-**Tuning and evaluation data are named explicitly.** State which races each model component has seen. A result reported on races used for tuning is a fit statistic, not a generalisation claim.
-
-**Label every quantity.** A feature that is INFERRED must not be described in the interpretation as though it were OBSERVED.
-
----
-
-## Log
-
-| ID | Date | Question | Status |
+| ID | Date | Question | Outcome |
 |---|---|---|---|
-| E-001 | 2026-09-22 | What does the FIA WEC timing archive actually contain? | complete (descriptive) |
-| E-002 | 2026-09-24 | Is the lap record structurally sound across the 21-race corpus? | complete (null result) |
+| E-001 | 2026-09-22 | What's actually in the WEC timing archive? | Richer than expected |
+| E-002 | 2026-09-24 | Is the lap record structurally sound? | Yes — zero faults |
+| E-003 | 2026-09-24 | What do the pit columns mean, and can stints be rebuilt? | Fully explained |
+| E-004 | 2026-09-24 | How many laps are clean enough for a pace model? | 139,283 (78%) |
 
 ---
 
-## E-001 — What does the FIA WEC timing archive actually contain?
+## E-001 — What's actually in the WEC timing archive?
 
-EXPERIMENT ID: E-001
-DATE: 2026-09-22
-STATUS: complete (descriptive); TASK 1 quality checks still outstanding
-QUESTION: What data is accessible from the primary source, at what resolution, over what coverage — and does one race file contain the fields the project's modelling layers require?
-HYPOTHESIS: `Strategy.md` assumed lap and 3-sector timing only, with weather "possibly if obtainable", and treated exact overtake localisation as impossible. Expected to confirm that picture.
-DATASET: <https://fiawec.alkamelsystems.com/>, enumerated across all 15 season pages. Three files downloaded for the 2025 Le Mans race (`202506141600_Race`): `23_Analysis_Race_Hour 24.CSV`, `23_AnalysisEnduranceWithSections_Race_Hour 24.CSV`, `26_Weather_Race_Hour 24.CSV`. Hashes in `docs/research/data_sources.md`.
-POPULATION: All 20,182 lap rows in the 2025 Le Mans race file. 62 cars, 186 drivers, 3 classes, 1 race, 1 circuit.
-METHOD: Direct HTTP access; enumeration of season and event pages via the site's `?season=&evvent=` parameters; Python `csv` parsing and counting. No modelling.
-FEATURES: All OBSERVED — no derived quantities computed.
-ASSUMPTIONS: That the "Hour 24" file is race-wide cumulative rather than the final hour alone. Supported by its 20,182 rows against 62 cars (~325 laps each, consistent with a full 24-hour race), but not confirmed against an official lap chart.
+*2026-09-22 · descriptive*
 
-RESULT:
+**Expected:** lap and 3-sector timing, with no way of localising traffic within a lap. Weather only if I was lucky.
 
-- **Coverage:** 15 seasons (2011–2026), 121 events. Public access, no authentication, empty `robots.txt`.
-- **Race-wide file exists** — a previously open question, now answered.
-- **20,182 laps** in one race: Hypercar 21 cars / 7,710 laps, LMP2 17 / 5,779, LMGT3 24 / 6,693. 1,902 pit crossings.
-- **Completeness is unusually high:** 0 missing lap times, 1 lap missing sector data out of 20,182.
-- **Per-lap track status** in `FLAG_AT_FL`: GF 19,654 / SF 320 / FCY 159 / FF 49.
-- **Per-minute weather** including track temperature and a rain flag — richer than `Strategy.md` anticipated.
-- **15 intra-lap timing points** exist in `AnalysisEnduranceWithSections`, but only for Le Mans 2025, Le Mans 2026 and COTA 2026.
+**Looked at:** the Al Kamel timing site across all 15 seasons, then every file for the 2025 Le Mans race in detail (20,182 laps from 62 cars).
 
-UNCERTAINTY: Schema verified on one file only. Consistency across 121 events and 15 seasons is unverified, and the 2011–2019 era predates the current class structure entirely. No uncertainty quantification applies — these are counts, not estimates.
+**Found:**
 
-INTERPRETATION:
+- The archive is public — 121 events from 2011 to 2026, no login needed.
+- Each race publishes a race-wide lap-by-lap file, not just hourly snapshots.
+- The data is very complete. In 20,182 Le Mans laps there are no missing lap times, and only one lap is missing sector data.
+- Every lap carries the track status at the line (green, safety car, full-course yellow and so on).
+- **Weather is available every minute**, including track temperature and rain. I'd assumed it might not be.
+- **Some races have 15 timing points per lap** instead of three. But only at Le Mans (2025 and 2026) and COTA 2026.
 
-The source is materially richer than the specification assumed, in two ways that matter.
+**What it doesn't show:** 20,182 laps from one race is still one race. For anything that has to generalise, the sample size is the number of races, not laps.
 
-**Weather is available at high resolution.** `Strategy.md` §17.3 listed track condition as a baseline feature "possibly if obtainable". It is obtainable at ~1-minute resolution including track temperature and rain. This is a genuine confounder for stint-degradation modelling that can now be controlled rather than acknowledged.
-
-**Intra-lap resolution partially reopens D-004.** Fifteen segments per lap is roughly 5× finer than 3 sectors. It still does **not** observe overtakes — no segment boundary marks a passing event, and there is no ground-truth label — so the D-004 decision to model *inferred exposure* stands. But it substantially narrows where a lap-time loss occurred, which improves the chance the effect is identifiable at all. The limitation is availability: 3 race sessions, 2 circuits.
-
-This creates the depth-versus-breadth trade-off recorded as D-009, which is unresolved and blocks the shape of Layer 2.
-
-A caution on scale: 20,182 laps from one race is **one race**. For a traffic effect the effective sample size is closer to the number of independent encounters, and for generalisation it is the number of races. The large row count is not itself evidence of statistical power — see `.claude/rules/statistics.md`.
-
-DECISION / NEXT STEP: Resolve D-009. Complete the outstanding TASK 1 quality checks. Revisit D-004's wording if the depth path is chosen.
+**Next:** decide between breadth and depth (D-009), then audit the rest of the modern era (D-010).
 
 ---
 
-## E-002 — Is the lap record structurally sound across the 21-race corpus?
+## E-002 — Is the lap record structurally sound?
 
-EXPERIMENT ID: E-002
-DATE: 2026-09-24
-STATUS: complete — null result (no defects found)
-QUESTION: Does the corpus contain duplicated lap rows, non-monotonic elapsed race time within a car, or breaks in the lap-number sequence? These three properties are assumed by race-order reconstruction, gap calculation and stint detection, none of which has been written yet.
-HYPOTHESIS: Some defects expected, concentrated around retirements, red flags and cars rejoining from the garage. A lap-number gap in particular seemed likely wherever the timing system missed a crossing. Being wrong would mean either a genuinely clean source or checks that cannot fire.
-DATASET: `data/raw/wec/*.CSV`, 21 files, seasons 2024–2026, loaded via `load_corpus`. Commit f228e27 plus the working-tree changes described below. Hashes in `data/raw/wec/_manifest.json`.
-POPULATION: All 179,259 lap rows. 21 races, 8 circuits, 833 car-races. No exclusions — the checks run on the raw record, before any notion of a usable lap exists.
-METHOD: Three deterministic checks in `src/endurance_strategy/validation/quality.py`. Duplicates via `duplicated(subset=["event_key","NUMBER","LAP_NUMBER"], keep=False)`. Elapsed and lap-number monotonicity via `sort_values` then `groupby(["event_key","NUMBER"]).diff()`. No randomness, no seeds.
-FEATURES: `event_key` RECONSTRUCTED (from the file path). `NUMBER`, `LAP_NUMBER`, `ELAPSED` OBSERVED. `ELAPSED_S` RECONSTRUCTED (deterministic parse of `ELAPSED`).
-ASSUMPTIONS: That the grouping key is right — that a car is identified by event plus `NUMBER`, and that a car's lap sequence is continuous across driver changes. Both are tested on the synthetic fixture, not established from documentation.
-VALIDATION DESIGN: Not a generalisation claim, so no holdout applies. The validity question here is whether the checks can fail at all. Addressed by mutation testing: five deliberate defects introduced into the implementation, each confirmed to break the suite (6, 1, 2, 2 and 1 test failures respectively). Without that step a zero count is uninterpretable.
+*2026-09-24 · null result*
 
-RESULT:
+**Question:** before building anything on the lap data, is its basic structure sound? Race order and stint detection both quietly assume it is.
 
-| Check | Violating rows |
+**Expected:** some faults, mostly around retirements and cars coming back out of the garage.
+
+**Data:** all 21 races from 2024 to 2026 — 179,259 laps from 833 car entries. Nothing excluded.
+
+**Method:** three checks in `validation/quality.py`. Each one groups the laps by car (event plus car number — car 7 races in every event) and compares every lap with the one before it.
+
+**Found:**
+
+| Check | Faulty rows |
 |---|---:|
 | Duplicate laps | 0 |
-| Elapsed-time regressions | 0 |
-| Lap-number breaks | 0 |
+| Elapsed time going backwards | 0 |
+| Gaps in lap numbers | 0 |
 
-Out of 179,259 rows across 21 races.
+**Why I trust the zeros:** a check that can never fail also returns zero. So I broke each one on purpose — removing the sort or grouping by driver as well as car, for example — and in five out of five cases the tests caught it.
 
-UNCERTAINTY: None applicable — these are exhaustive deterministic counts over the full corpus, not estimates. The residual risk is not statistical but logical: that the checks encode the wrong definition of a defect. The 16 tests in `tests/test_quality.py` constrain that risk; they do not eliminate it.
+**What it doesn't show:** nothing about whether the lap times themselves make sense. A lap can be in the right place in the sequence and still have a bad value. It also can't spot a lap the timing system missed entirely if the numbering carried on as normal.
 
-INTERPRETATION:
+**Side finding:** the loader was keeping an empty trailing column in every race because of a trailing semicolon. Harmless, but it's fixed now and covered by a test.
 
-A clean null result. The lap record is structurally sound on all three properties, which was not the expected outcome and is worth stating plainly rather than passing over.
+**Next:** work out the pit columns, then define a usable clean lap.
 
-This answers an open question carried since E-001: **`ELAPSED` is monotonic within a car**, across 21 races rather than the one race originally asked about.
+---
 
-What it does **not** establish:
+## E-003 — What do the pit columns mean, and can stints be rebuilt?
 
-- **Nothing about lap-time values.** A lap can be structurally perfect and semantically wrong. Implausible times, mis-parsed durations and the in-lap/out-lap question are all untouched by these checks.
-- **Nothing about completeness.** A gap-free lap sequence does not mean every lap the car ran was recorded — only that what was recorded is internally consistent. If the source dropped a lap and renumbered, this is invisible to the check by construction.
-- **Nothing about the pit data.** The 1,902 vs 1,896 `CROSSING_FINISH_LINE_IN_PIT` / `PIT_TIME` discrepancy from E-001 is unaffected and still open.
+*2026-09-24 · complete*
 
-The practical consequence is that race-order reconstruction can be built directly on `ELAPSED_S` without a repair step, and stint detection can count laps within a stint without handling gaps. Both of those would otherwise have needed defensive logic written against defects that, it turns out, are not there.
+**Question:** the source has `CROSSING_FINISH_LINE_IN_PIT` (blank or `B`) and `PIT_TIME`, but nothing says which lap is the in-lap and which is the out-lap. At Le Mans 2025 there were 1,902 `B` laps but only 1,896 `PIT_TIME` values. Without sorting this out, stints can't be rebuilt, and without stints there's no degradation or pit-loss modelling.
 
-One incidental finding, logged because it was silent: the loader was retaining an empty trailing column (`Unnamed: 29`) in every race loaded. The trailing-semicolon guard tested for a column named `""`, but pandas names it `Unnamed: 29`. Harmless so far, fixed at `src/endurance_strategy/io/load.py`, now pinned by a test.
+**Expected:** `B` to mark the out-lap, going by the column name ("crossing the finish line in the pit").
 
-DECISION / NEXT STEP: Proceed to the remaining TASK 1 items — the `PIT_TIME` discrepancy and a "usable clean lap" definition — then Layer 1 proper. These three checks become part of the data-contract suite run on every ingest.
+**Found — the opposite:**
+
+- **`B` is the in-lap.** Its final sector is slow because the car is heading into the pit lane.
+- **`PIT_TIME` is on the next lap**, the out-lap. Across the whole corpus, a lap has `PIT_TIME` exactly when the lap before it was `B` — with two exceptions, both on lap 1.
+
+I checked this by eye on several stops in the raw file as well as in code.
+
+**The count gap is fully explained.** Across 21 races there are 9,813 `B` laps and 9,746 `PIT_TIME` values:
+
+- 69 in-laps are a car's final lap — it pitted and never came back out;
+- 2 cars have `PIT_TIME` on lap 1 because they started from the pit lane.
+
+9,813 − 69 + 2 = 9,746. Nothing is left over.
+
+**Stints:** with that settled, `reconstruct/stints.py` flags in-laps and out-laps and numbers each car's stints. Across the corpus that gives **10,577 stints** from 833 car entries. The median stint is 12 laps (middle half: 10 to 25), and every in-lap is the last lap of its stint.
+
+**A useful cross-check:** there are 3,478 driver changes in the corpus, and **every one of them happens on an out-lap.** That's independent evidence that the pit reading is right — drivers can only swap in the pits.
+
+**What `PIT_TIME` is:** the median is 80 seconds, with the middle half between 74 and 89. That's too long for time stationary alone, so it's time spent in the pit lane including the stop. But 94 values are over ten minutes, the longest around 17 hours. Those are cars sitting in the garage for repairs, not normal stops.
+
+**What it doesn't show:** pit-lane time isn't pit loss. Pit loss is how much time a stop costs compared with staying out, which needs the in-lap and out-lap compared against normal pace. Garage visits need separating out first.
+
+**Next:** define a usable clean lap, then the Layer 1 pipeline.
+
+---
+
+## E-004 — How many laps are clean enough for a pace model?
+
+*2026-09-24 · complete*
+
+**Question:** a pace model needs laps that show what the car can do on a normal green-flag lap. Which laps should be left out, and how much does the answer depend on where I draw the lines?
+
+**Expected:** around 80% left, with pit laps and caution laps doing most of the removing.
+
+**The rules** (`features/clean_laps.py`, D-012). A lap is left out if it's:
+
+- the car's first lap — standing start, cold tyres, a pack of cars;
+- an in-lap or out-lap;
+- run under anything other than green at the line;
+- the lap straight after a caution — the flag is read at the line, so a lap that went green halfway round still shows as green;
+- missing its lap time or a sector;
+- more than 7% slower than the median clean lap for its class at that race.
+
+**Found:** **139,283 of 179,259 laps (77.7%) are usable**, covering all 21 races and 832 of the 833 car entries.
+
+| Rule | Laps caught | Laps caught by this rule alone |
+|---|---:|---:|
+| First lap | 833 | 406 |
+| Pit lap | 19,382 | 6,351 |
+| Caution | 11,861 | 889 |
+| After caution | 11,146 | 123 |
+| Missing time | 24 | 10 |
+| Slow lap (>7%) | 32,013 | 6,501 |
+
+Most rules overlap a lot. The slow-lap rule catches the most, but four in five of those laps would go anyway for another reason.
+
+**How much the threshold matters:**
+
+| Slow-lap threshold | Usable laps |
+|---|---:|
+| 3% | 135,306 |
+| 5% | 138,390 |
+| **7%** | **139,283** |
+| 10% | 140,944 |
+| 15% | 142,889 |
+
+Going from 3% to 15% changes the count by about 5%. So the choice matters, but not dramatically.
+
+**It varies a lot by race.** São Paulo 2026 keeps 94% of its laps. Le Mans 2024 keeps only 43%, and COTA 2025 only 51% — both lost a large share to caution periods.
+
+**What it doesn't show:**
+
+- **Rain isn't handled yet.** A wet lap under green passes every rule unless it's slow against the race median, and in a mostly wet race the median is wet too. That needs the weather join.
+- **The reference uses the whole race.** Fine for cleaning historical data, but it can't be used for a decision during a race — that would be using the future.
+- **7% is my choice**, not something measured. Anything built on these laps should be re-run at a couple of other thresholds.
+- **Traffic laps are mostly still in.** That's on purpose — traffic is what the next layer measures, so it can't be filtered out here. Only the very worst cases get caught by the slow-lap rule.
+
+**Next:** separate garage visits from normal stops, then build the interim layer with these flags in it.

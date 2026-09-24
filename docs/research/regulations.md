@@ -1,93 +1,42 @@
 # Regulations
 
-Tracking of official sporting, technical and race-control documents, and the structured constraints derived from them.
+Nothing collected yet. This is the plan for when I do.
 
-Two hard rules govern this file:
+## Why they matter here
 
-1. **No regulatory fact is recorded from memory.** Every constraint cites a document, a revision and a page. A language model's recollection of a rule is not a source, and neither is a forum post or a news article.
-2. **Regulations are versioned data, not constants.** They are season- and event-dependent, and event bulletins modify standard rules mid-season. A constraint without an `effective_from` date and a source document is not usable.
+A pit strategy is only useful if it's legal. Before the simulator runs anything, a separate check takes the strategy and returns whether it's allowed and which rules it breaks (D-006). That's also where the LLM layer earns its place later — pointing to the exact rule that ruled a strategy out, with a citation.
 
-**Nothing has been collected yet.** The document registry is empty.
+## Ground rules
 
----
+- **Nothing from memory.** Every rule comes from an actual document, with the revision and page number. That goes for my memory and an LLM's.
+- **Rules have dates.** They change by season and sometimes mid-season through event bulletins. A rule with no source document and start date can't be used.
 
-## Why this matters to the project
+The PDFs stay local and aren't committed. This file keeps the record of what was downloaded and where it came from.
 
-A pit strategy is only meaningful if it is legal. The feasibility layer (DECISIONS D-006) takes a candidate strategy and returns `(feasible, violations)` before the simulator ever runs, so the optimiser does not waste computation on illegal strategies.
+## Documents
 
-It also gives the LLM layer its strongest role: explaining *which rule* made a strategy infeasible, with a citation, while the simulator handles the arithmetic. That is a genuine use for retrieval, as opposed to a chatbot bolted onto a model.
+| ID | Title | Season | Revision | Effective | Source | Retrieved |
+|---|---|---|---|---|---|---|
+| — | — | — | — | — | — | — |
 
----
+Source: <https://www.fiawec.com/en/page/regulations/18>
 
-## Document registry
+What to collect: the sporting regulations first. After that, any technical or balance-of-performance documents that limit what happens in a stop, plus the event bulletins that change the standard rules.
 
-| doc_id | Title | Season | Revision | Effective date | Scope | Source URL | Retrieved | SHA-256 |
-|---|---|---|---|---|---|---|---|---|
-| — | — | — | — | — | — | — | — | — |
+## Questions to put to the regulations
 
-Primary source: <https://www.fiawec.com/en/page/regulations/18>
+These are things to look up, not rules I'm claiming exist.
 
-Document types to collect:
+- Are there minimum or maximum driving times per driver?
+- What has to happen during a driver change?
+- What limits the work done in a pit stop, including refuelling?
+- How many tyre sets are allowed, and when can they be changed?
+- Are there mandatory stops for any class?
+- What's allowed under full-course yellow and safety car, especially pit entry?
+- Which event bulletins changed the rules at a given race?
 
-- FIA WEC Sporting Regulations (the main source of strategy constraints)
-- Technical regulations, where they constrain fuel, tyres or pit procedure
-- Balance of Performance documents, where they affect stint length or pace
-- Event-specific bulletins and sporting notices that amend the standard rules
-- Race-control documents, where they establish procedure under FCY and safety car
+The pit-entry question under a caution matters more than it looks. The whole value of pitting under a yellow depends on what's permitted at that moment, and getting it wrong would bias every strategy the optimiser picks.
 
-Regulation PDFs are **not committed** — `.gitignore` excludes `*.pdf`. They are stored locally with their provenance recorded in this registry, and the registry is what the repository publishes.
+## How the rules will be stored
 
----
-
-## Structured rules table — schema
-
-The feasibility layer consumes rows of this shape. The table is populated only from retrieved document text.
-
-| Column | Meaning |
-|---|---|
-| `rule_id` | Stable identifier for this project |
-| `season` | Championship season the rule applies to |
-| `event_scope` | `all`, or a specific event where a bulletin amends the standard rule |
-| `class` | Hypercar / LMP2 / LMGT3, or `all` |
-| `section` | Section number in the source document |
-| `page` | Page number, for citation |
-| `rule_type` | Category — see below |
-| `parameter` | The constrained quantity |
-| `value` | The constraint value |
-| `unit` | Units of `value` |
-| `effective_from` | Date the rule takes effect |
-| `effective_to` | Date it ceases to apply, if known |
-| `source_document` | `doc_id` from the registry above |
-
----
-
-## Candidate constraints to encode
-
-**Implement a constraint only once its exact wording has been retrieved from the applicable official document.** The list below is a list of *questions to ask the regulations*, not a list of rules. None of these is asserted to exist in the form described.
-
-| rule_type | Question to put to the regulations | Status |
-|---|---|---|
-| `driving_time` | Are there minimum or maximum driving-time requirements per driver, per race or per stint? | UNKNOWN — requires retrieval |
-| `driver_change` | What crew and procedural requirements apply to a driver change? | UNKNOWN — requires retrieval |
-| `pit_procedure` | What constrains activity in the pit box — simultaneous operations, personnel limits, sequencing? | UNKNOWN — requires retrieval |
-| `refuelling` | What constrains refuelling — rate, simultaneity with other work, minimum stop duration? | UNKNOWN — requires retrieval |
-| `tyres` | Are there restrictions on tyre allocation, sets per race, or changes per stop? | UNKNOWN — requires retrieval |
-| `mandatory_stops` | Are there mandatory stops or minimum stop counts for any class or event? | UNKNOWN — requires retrieval |
-| `class_specific` | Which sporting constraints differ by class? | UNKNOWN — requires retrieval |
-| `fcy_procedure` | What is permitted during FCY and safety-car periods, particularly regarding pit entry? | UNKNOWN — requires retrieval |
-| `event_bulletin` | Which event bulletins amended the standard rules for the target event? | UNKNOWN — requires retrieval |
-
-The FCY and pit-entry question matters more than it appears: the strategic value of pitting under a caution depends entirely on what the regulations permit at that moment, and getting it wrong would systematically bias the optimiser.
-
----
-
-## Retrieval corpus notes
-
-For Layer 6, each indexed chunk carries: `document_id`, `document_title`, `season`, `document_revision`, `effective_date`, `section`, `page`, `source_url`, `text`.
-
-Two properties are required of the retrieval layer:
-
-- **Every regulatory claim in a generated answer traces to a retrieved chunk.** No generic citation of "the sporting regulations" without an identifiable source.
-- **The system refuses rather than guesses** when the retrieved documents do not support the claim being asked about.
-
-Retrieval accuracy is evaluated separately from generation quality. See `.claude/rules/rag.md`.
+One row per rule, with the season, the event (or "all"), the class, the constrained quantity and its value, the dates it applies between, and the document, section and page it came from.

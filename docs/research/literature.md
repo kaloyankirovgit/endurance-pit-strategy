@@ -1,116 +1,33 @@
-# Literature
+# Reading list
 
-Reading notes for the papers and repositories that inform design decisions.
+Papers and code I want to read before designing the parts they cover. Nothing here has been read properly yet — each entry just says why it's on the list. Once I've read one, I'll note what it actually changes for this project, or why it doesn't.
 
-**Read strategically.** The purpose is to make better architecture and modelling decisions, not to reproduce an academic paper line for line. A paper earns an entry here when it has changed, or explicitly failed to change, something about this project.
-
-**Nothing below has been read yet.** The entries are stubs recording why each source is on the list, taken from `Strategy.md` §25. Citation details are as given in the specification and should be verified against the source on first read.
-
----
-
-## Template
-
-```
-## Short citation
-
-PAPER:              Full citation, DOI or arXiv ID, link.
-DATE READ:
-RESEARCH QUESTION:  What the authors set out to answer.
-METHODOLOGY:        How they did it — data, model, evaluation.
-USEFUL RESULT:      The specific finding or technique worth having.
-LIMITATION:         What the work does not establish; where it would not transfer.
-RELEVANCE HERE:     What this changes in our design — a decision, a method, or an
-                    argument for not doing something. "Interesting" is not relevance.
-```
-
----
-
-## Reading queue
-
-Ordered by when the project needs them.
-
-| Priority | Source | Needed for |
+| When | Source | For |
 |---|---|---|
-| 1 | Heilmeier et al. 2020 — Monte Carlo race simulation | Layer 4 simulator design |
-| 2 | TUMFTM race-simulation repository | Layer 4 architecture reference |
-| 3 | Heilmeier et al. 2020 — Virtual Strategy Engineer | Layer 4–5 state and decision representation |
-| 4 | Fieni et al. 2025 | Layer 5 optimisation formulation |
-| 5 | Sasikumar et al. 2025 | Sample-size and validation-design comparison |
-| 6 | Boettinger & Klotz 2023 | GT endurance specifics; stretch RL reference |
-| 7 | Thomas et al. 2026 | Stretch RL reference only |
+| Before the simulator | Heilmeier et al. 2020, Monte Carlo race simulation | How to add randomness to a race sim |
+| Before the simulator | TUMFTM race-simulation repo | A working reference implementation |
+| Before the optimiser | Heilmeier et al. 2020, Virtual Strategy Engineer | How a strategy decision can be framed |
+| Before the optimiser | Fieni et al. 2025 | Optimisation versus RL for race strategy |
+| For validation design | Sasikumar et al. 2025 | How others have split train and test |
+| Stretch | Boettinger & Klotz 2023 | GT endurance, closest to WEC |
+| Stretch | Thomas et al. 2026 | RL for pit strategy |
 
----
+## Notes on each
 
-## TUMFTM race-simulation (repository)
+**Heilmeier et al. (2020), "Application of Monte Carlo Methods to Consider Probabilistic Effects in a Race Simulation for Circuit Motorsport".** [doi:10.3390/app10124229](https://doi.org/10.3390/app10124229). The closest thing to what I want the simulator to be — random lap times and pit stop variation, with safety cars on top. The one to read first.
 
-SOURCE: <https://github.com/TUMFTM/race-simulation>
-DATE READ: —
-WHY IT IS HERE: Reference implementation of lap-discrete race simulation with probabilistic effects. Useful for simulator architecture, the separation of state transition from stochastic sampling, and race-strategy formulation.
-CAUTION: Do not copy the architecture blindly — it is built for a different series with different data availability. This project's model must fit WEC's multi-class structure and the fields the timing data actually provides. **Check the repository licence before reusing code or substantial implementation patterns.**
-STATUS: Not read.
+**TUMFTM race-simulation.** <https://github.com/TUMFTM/race-simulation>. The code behind the paper above. It's built for F1, so I'll borrow ideas, not structure. Need to check the licence before reusing anything.
 
----
+**Heilmeier et al. (2020), "Virtual Strategy Engineer".** [doi:10.3390/app10217805](https://doi.org/10.3390/app10217805). Neural networks making pit decisions on top of a race sim. Mostly interesting for how they represent the race state.
 
-## Heilmeier et al. (2020) — Virtual Strategy Engineer
+**Fieni et al. (2025), "Towards Learning-Based Formula 1 Race Strategies".** [arXiv:2512.21570](https://arxiv.org/abs/2512.21570). Compares mixed-integer optimisation with RL. Relevant to why I'm doing plain search first (D-007).
 
-PAPER: "Virtual Strategy Engineer: Using Artificial Neural Networks for Making Race Strategy Decisions in Circuit Motorsport". DOI: [10.3390/app10217805](https://doi.org/10.3390/app10217805)
-DATE READ: —
-WHY IT IS HERE: How a race-strategy decision can be formalised — state representation, decision-making architecture, and the relationship between a learned strategy model and the underlying race simulator.
-STATUS: Not read.
+**Sasikumar, Leema & Balakrishnan (2025), "Data-driven pit stop decision support for Formula 1".** [Frontiers in AI](https://www.frontiersin.org/journals/artificial-intelligence/articles/10.3389/frai.2025.1673148/full). About 100,000 laps and 3,000 pit stops. A useful comparison for scale — but laps from the same race aren't independent, so a big lap count isn't a big sample.
 
----
+**Boettinger & Klotz (2023), "Mastering Nordschleife".** [arXiv:2306.16088](https://arxiv.org/abs/2306.16088). RL strategy for GT endurance racing. Closer to WEC than the F1 papers.
 
-## Heilmeier et al. (2020) — Monte Carlo race simulation
+**Thomas et al. (2026), "Race Strategy Reinforcement Learning".** [doi:10.1007/s10994-026-07081-3](https://link.springer.com/article/10.1007/s10994-026-07081-3). RL pit strategy in F1. Only relevant if I ever get to the RL stretch goal.
 
-PAPER: "Application of Monte Carlo Methods to Consider Probabilistic Effects in a Race Simulation for Circuit Motorsport". DOI: [10.3390/app10124229](https://doi.org/10.3390/app10124229)
-DATE READ: —
-WHY IT IS HERE: The closest reference for Layer 4. Probabilistic lap times, pit-stop variability, FCY and safety-car modelling, and the argument for evaluating robustness rather than a single deterministic optimum.
-STATUS: Not read. **Read before designing the simulator's stochastic components.**
+## Gaps
 
----
-
-## Boettinger & Klotz (2023) — Mastering Nordschleife
-
-PAPER: arXiv:[2306.16088](https://arxiv.org/abs/2306.16088)
-DATE READ: —
-WHY IT IS HERE: Race simulation for GT endurance racing specifically — fuel, tyre and pit strategy, observation and reward design, and the stated limitations of simulation-based strategy learning. The endurance context is closer to this project than the F1 literature.
-STATUS: Not read.
-
----
-
-## Fieni et al. (2025) — Towards Learning-Based Formula 1 Race Strategies
-
-PAPER: arXiv:[2512.21570](https://arxiv.org/abs/2512.21570)
-DATE READ: —
-WHY IT IS HERE: Joint energy, tyre and pit-stop strategy; mixed-integer optimisation; an RL-versus-optimisation comparison. Directly relevant to the argument in DECISIONS D-007 that an optimisation baseline should precede RL.
-STATUS: Not read.
-
----
-
-## Thomas et al. (2026) — Race Strategy Reinforcement Learning
-
-PAPER: "Race Strategy Reinforcement Learning: Optimising Pitstop Strategy with Emergent Tactics in Formula One". *Machine Learning*, 2026. DOI: [10.1007/s10994-026-07081-3](https://link.springer.com/article/10.1007/s10994-026-07081-3)
-DATE READ: —
-WHY IT IS HERE: RL for race strategy, multi-agent interaction, cross-circuit generalisation and explainability.
-CAUTION: **Stretch reference.** Its presence on this list is not a reason to implement RL. See DECISIONS D-007.
-STATUS: Not read.
-
----
-
-## Sasikumar, Leema & Balakrishnan (2025) — Pit-stop decision support for F1
-
-PAPER: "Data-driven pit stop decision support for Formula 1 using deep learning models". *Frontiers in Artificial Intelligence*, 2025. DOI: [10.3389/frai.2025.1673148](https://www.frontiersin.org/journals/artificial-intelligence/articles/10.3389/frai.2025.1673148/full)
-DATE READ: —
-WHY IT IS HERE: A comparison point for time-series modelling, pit-stop prediction, class imbalance and train/test design at lap-level resolution.
-CAUTION: The paper reports roughly 99,928 lap observations and about 3,131 pit-stop instances before class balancing. **This is a scale reference, not a sample-size justification.** Those laps are clustered within races, cars and drivers, and adjacent laps are temporally correlated — the effective sample size for most questions is far smaller than the row count. Do not cite this figure as evidence that a given number of laps confers statistical validity. See `.claude/rules/statistics.md`.
-STATUS: Not read.
-
----
-
-## Gaps in the reading list
-
-Areas where a reference is wanted but none has been identified:
-
-- Multi-class traffic effects specifically. The cited literature is predominantly single-class (F1). If no multi-class treatment exists, that is worth stating in the final report — it makes the traffic layer the novel part of this project rather than a reimplementation.
-- Statistical identification of traffic effects from timing-only data, without positional telemetry.
-- Endurance-specific driver-change and driving-time constraints in a strategy optimisation context.
+I haven't found anything on traffic between classes specifically — almost all of this is single-class F1. If there really isn't much out there, that makes the traffic work the most original part of the project. I'm also looking for anything on picking out traffic effects from timing data alone, without GPS.

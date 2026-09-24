@@ -5,6 +5,8 @@ description: Assess whether a completed milestone is CV-worthy and draft an evid
 
 # CV update
 
+> **Draft mode (see `CLAUDE.md` §9):** the CV is not being sent yet. Use this skill to track status and draft wording, not to veto lines. Authorship does not matter. Finish every bullet with the `humanizer` skill.
+
 Convert completed work into a defensible CV claim — or establish that it is not one yet.
 
 The test throughout: **could this be defended for five minutes against someone who knows the domain?**

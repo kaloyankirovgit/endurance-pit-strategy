@@ -56,7 +56,7 @@ He is using this project to build ability, not to watch code appear.
 
 **Claude may write in full**: project config, download/parsing utilities, SQL boilerplate, Docker, CI, test scaffolding, plotting infrastructure, logging, API and Streamlit scaffolding.
 
-Be concise. Ask **one question at a time**, and only when the answer genuinely changes the work. Do not lecture.
+Be concise. **Chat replies are short bullet points that stick to the task** — no long prose. He will say if he is confused. Ask **one question at a time**, and only when the answer changes the work. Do not lecture.
 
 ---
 
@@ -64,7 +64,7 @@ Be concise. Ask **one question at a time**, and only when the answer genuinely c
 
 **Every working session opens with a plan table** — invoke the `session-plan` skill before writing any code. Five columns: task, who does it (Kaloyan / Claude / Both), platform (Terminal, Spyder, Jupyter, DB Browser), and what Kaloyan will learn. 4–7 rows, fitted to the time he has, with deferrals stated.
 
-**Every working session closes by updating `docs/cv/CV_SECTIONS.md`** — the paste-ready CV content, gated by evidence. A line moves tier only when the work runs, is reproducible, and he could explain it unprompted.
+**Every working session closes by updating `docs/cv/CV_SECTIONS.md`** — the paste-ready CV draft (see §9; wording via the `humanizer` skill).
 
 Tooling available: **VS Code** (default editor; has Python, Pylance, Jupyter, rainbow-csv, parquet-viewer), Terminal, Spyder 6, Anaconda/Jupyter, DB Browser for SQLite. **Not installed:** `uv`, DuckDB CLI.
 
@@ -160,9 +160,13 @@ Details: `.claude/rules/testing.md`.
 
 ## 9. CV evidence
 
-CV claims are evidence-gated. `docs/cv/CV_EVIDENCE.md` is the ledger; `docs/cv/CV_SECTIONS.md` holds the paste-ready LaTeX for his CV template. Status is one of `TARGET`, `IN PROGRESS`, `VERIFIED`, `PORTFOLIO READY`.
+`docs/cv/CV_SECTIONS.md` holds the paste-ready LaTeX for his CV template; `docs/cv/CV_EVIDENCE.md` tracks status (`TARGET`, `IN PROGRESS`, `VERIFIED`, `PORTFOLIO READY`).
 
-Do not claim production deployment, statistical significance, model performance or engineering capability until it has been demonstrated with reproducible evidence in this repository. When a milestone genuinely becomes CV-worthy, proactively propose a concise bullet using only verified evidence.
+**The CV is a draft he does not plan to send yet.** The project demonstrates turning his interests into a project using agentic AI in his workflow. So:
+
+- Do not police who wrote what (Kaloyan vs Claude) — both count.
+- Do not block or warn about CV lines describing work not yet done. Keep the status column accurate, but draft freely.
+- Run all CV wording through the `humanizer` skill.
 
 ---
 

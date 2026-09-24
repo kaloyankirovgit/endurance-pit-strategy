@@ -51,7 +51,7 @@ At the end of the session, update `docs/cv/CV_SECTIONS.md`:
 
 Then update `docs/PROJECT_STATE.md`, and add to `DECISIONS.md` or `EXPERIMENT_LOG.md` if the session produced a decision or a finding.
 
-**The CV file is evidence-gated.** A row moves tier only when the work runs, is reproducible from the repository, and Kaloyan could explain it unprompted. Being present in the repo is not sufficient — if Claude wrote it and he cannot explain it, it stays where it is and becomes a learning target.
+**The CV file is a draft.** Keep tiers roughly accurate, but do not police authorship (Kaloyan vs Claude) or block lines for work not yet done — see `CLAUDE.md` §9. Run wording through the `humanizer` skill.
 
 ---
 

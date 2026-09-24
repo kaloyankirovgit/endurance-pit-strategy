@@ -4,6 +4,19 @@ How to run what exists so far, and how it works underneath.
 
 ## Running things
 
+Rebuild every table from the raw files:
+
+```bash
+python -m endurance_strategy.pipeline
+```
+
+That writes `data/interim/laps.parquet`, `data/processed/stints.parquet` and `data/processed/pit_stops.parquet`. Query them straight from DuckDB:
+
+```python
+import duckdb
+duckdb.sql("SELECT CLASS, COUNT(*) FROM 'data/interim/laps.parquet' GROUP BY 1")
+```
+
 ```bash
 cd endurance-pit-strategy-planner
 source .venv/bin/activate
@@ -37,6 +50,9 @@ corpus = add_stint_columns(load_corpus(WEC_DIR))
 | `src/endurance_strategy/io/download.py` | Downloads the weather for each race and records hashes |
 | `src/endurance_strategy/reconstruct/race_clock.py` | UTC time for each lap |
 | `src/endurance_strategy/features/weather.py` | Joins the latest weather reading to each lap |
+| `src/endurance_strategy/reconstruct/race_order.py` | Position and gaps at each crossing, in DuckDB SQL |
+| `src/endurance_strategy/validation/schema.py` | Pandera schema the lap table must pass before it's written |
+| `src/endurance_strategy/pipeline.py` | The one command that builds everything |
 | `src/endurance_strategy/features/clean_laps.py` | Flags for laps that shouldn't feed a pace model, plus a summary of what each rule removes |
 | `src/endurance_strategy/paths.py` | Absolute paths, so things work from any folder |
 | `tests/fixtures/synthetic_race.CSV` | A made-up race small enough to check by eye |
@@ -107,6 +123,5 @@ The lap's UTC time comes from `HOUR`, not `ELAPSED`. `ELAPSED` stops during a re
 
 ## What's next
 
-- Wrap everything below into one command that writes Parquet.
-- Build the pipeline properly: raw to interim to processed, in Parquet, with DuckDB for querying and Pandera for schema checks.
-- Race order and gaps at each timing line, which the traffic work sits on.
+- Check race order against the official classifications.
+- Start the traffic exposure work.

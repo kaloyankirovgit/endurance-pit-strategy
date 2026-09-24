@@ -11,6 +11,7 @@ Each entry says what I expected before looking and what I actually found — inc
 | E-003 | 2026-09-24 | What do the pit columns mean, and can stints be rebuilt? | Fully explained |
 | E-004 | 2026-09-24 | How many laps are clean enough for a pace model? | 139,283 (78%) |
 | E-005 | 2026-09-24 | Can weather be joined to laps, and which stops are garage visits? | Yes — 138,884 clean laps once rain is out |
+| E-006 | 2026-09-24 | Does the full pipeline run end to end, and does race order hold up? | Yes — 13 seconds, winners match |
 
 ---
 
@@ -212,3 +213,38 @@ Wet laps are now a clean-lap rule, and they're kept out of the slow-lap referenc
 - **Only rain is used so far.** Track temperature is joined to every lap, but no rule uses it yet.
 
 **Next:** the interim layer in Parquet, with all these flags in it.
+
+---
+
+## E-006 — Does the full pipeline run end to end, and does race order hold up?
+
+*2026-09-24 · complete*
+
+**Question:** can one command take the raw race and weather files to validated tables, and is the race order it rebuilds believable?
+
+**Method:** `python -m endurance_strategy.pipeline`. It chains everything so far, adds race order and gaps in DuckDB SQL, checks the result against a Pandera schema, then writes Parquet.
+
+**Found:**
+
+| Table | Rows |
+|---|---:|
+| `interim/laps.parquet` | 179,259 |
+| `processed/stints.parquet` | 10,577 |
+| `processed/pit_stops.parquet` | 9,746 |
+
+It runs in about 13 seconds on a laptop. On the synthetic fixture, two runs give identical output, and a test pins that.
+
+The schema check earned its place straight away. `RAIN` was coming through as whole numbers in races with no missing readings and as decimals otherwise, and the check failed on it before anything was written.
+
+**Race order:** position at each crossing ranks the cars that completed that lap by when they did it, so a lapped car sits behind. For each lap I also keep the gap to the car ahead in the race, and the gap to whichever car crossed the line just before on the road, along with its class. The road gap is what the traffic work will use.
+
+As a first check, the car in P1 on the final lap at Le Mans 2024 is #50 Ferrari AF Corse, and at Le Mans 2025 it's #83 AF Corse — both the actual winners.
+
+A first descriptive look: on clean laps, the median road gap at the line is about two seconds, and roughly half of clean laps cross within two seconds of another car. Traffic is everywhere, not an occasional thing. This is a description only, not a traffic effect.
+
+**What it doesn't show:**
+
+- **Order is only known at the line.** Between crossings there's no position data, so a pass mid-lap is invisible until the next crossing.
+- **It isn't checked against the official classifications yet.** Two known winners matching is a sanity check, not validation. The `03_Classification` files would do it properly.
+
+**Next:** validate race order against the official classifications, then start on traffic exposure.

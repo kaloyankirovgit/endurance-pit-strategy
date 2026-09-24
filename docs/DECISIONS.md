@@ -113,15 +113,21 @@ Lap times get a UTC timestamp from `HOUR` (local wall clock), the race date and 
 
 A stop is a garage visit if its `PIT_TIME` is over 3× the race median. The long stops under safety car stay as normal stops, because queueing at pit exit is part of what a stop costs. Evidence in E-005.
 
+## D-014 — One pipeline, validated on write
+
+*2026-09-24*
+
+`python -m endurance_strategy.pipeline` rebuilds everything from the raw files. The lap table is validated with a Pandera schema before it's written, so a bad row stops the run where it happens rather than three steps later. Race order uses DuckDB window functions — ranking within a lap and looking back along the road reads more clearly in SQL than in pandas. Outputs are Parquet, and none of them are committed, since they're derived from the timing data.
+
 ---
 
 ## Tools
 
 The rule of thumb is to use a few tools properly rather than a lot of them badly. A tool comes in when a real need shows up.
 
-**In use:** Python, pandas, pytest, Git, GitHub Actions.
+**In use:** Python, pandas, pytest, Git, GitHub Actions, Parquet (pyarrow), DuckDB, Pandera.
 
-**Coming when needed:** Parquet and DuckDB (Layer 1), Pandera for data contracts, statsmodels and SciPy for the mixed-effects and bootstrap work, Matplotlib for figures, then Streamlit and Docker at the end.
+**Coming when needed:** statsmodels and SciPy for the mixed-effects and bootstrap work, Matplotlib for figures, then Streamlit and Docker at the end.
 
 **Only if something calls for it:** Polars, FastAPI, scikit-learn or XGBoost as a comparison to a simpler baseline, a vector store for retrieval, Ruff.
 

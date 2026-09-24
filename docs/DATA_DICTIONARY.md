@@ -80,12 +80,23 @@ A car is identified by `event_key` plus `NUMBER`.
 | `is_slow_lap` | bool | Reconstructed | More than 7% slower than the class median at that race. The 7% is assumed (D-012). |
 | `is_usable_for_pace_model` | bool | Reconstructed | None of the flags above (E-004). |
 
+| `position` | int | Reconstructed | Race position at the line — ranked among cars completing the same lap. |
+| `gap_ahead_s` | float | Reconstructed | Seconds behind the car ahead in the race, at the line. |
+| `class_position`, `class_gap_ahead_s` | — | Reconstructed | The same, within the car's class. |
+| `road_gap_ahead_s` | float | Reconstructed | Seconds since any car last crossed the line, on any lap. |
+| `road_car_ahead`, `road_class_ahead` | str | Reconstructed | Which car that was, and its class. |
+
+### Processed tables
+
+| Table | One row per | Main columns |
+|---|---|---|
+| `stints.parquet` | Stint | driver, first and last lap, laps, clean laps, median clean lap, ended in pit, started from garage |
+| `pit_stops.parquet` | Out-lap | `PIT_TIME_S`, garage flag, flag at the line, incoming driver, whether the driver changed |
+
 ### Planned
 
 | Column | Label | Meaning |
 |---|---|---|
-| `race_position` | Reconstructed | Order by laps completed, then crossing time. Only valid at the timing line. |
-| `gap_ahead` | Reconstructed | Time to the car ahead at the line. |
 | `is_candidate_traffic` | Inferred | Likely running in slower-class traffic. **Not an observed overtake** (D-004). |
 | `lap_residual` | Inferred | Actual lap time minus expected clean pace. |
 | `tyre_state`, `fuel_state` | Assumed | Not in the data at all (D-005). |

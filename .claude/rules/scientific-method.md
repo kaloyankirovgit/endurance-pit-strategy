@@ -77,7 +77,7 @@ Do not adjust exclusions, feature definitions, thresholds or model choice in ord
 
 > Sector timing data provide evidence for an association between inferred multi-class traffic exposure and positive lap-time residuals, but the available data cannot uniquely identify individual overtakes or establish a causal per-overtake time loss.
 
-That is scientifically stronger, and more impressive in an interview, than a fabricated effect size.
+That is scientifically stronger, and more useful to anyone acting on it, than a fabricated effect size.
 
 ---
 
@@ -86,7 +86,7 @@ That is scientifically stronger, and more impressive in an interview, than a fab
 - No fabricated metrics, counts, p-values, effect sizes or performance numbers.
 - No citation of a paper, regulation or dataset that has not been retrieved and read.
 - No filling of an unknown field with a plausible value. Write `UNKNOWN: requires validation`.
-- No presentation of a planning estimate as a measurement. The data-volume figures in `Strategy.md` §8 are estimates and are labelled as such until measured counts replace them.
+- No presentation of a planning estimate as a measurement. Estimates stay labelled as estimates until measured counts replace them.
 
 If a number is needed and not available, say so and stop. An honest gap is recoverable; an invented number discovered later is not.
 

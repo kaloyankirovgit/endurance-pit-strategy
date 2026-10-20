@@ -1,13 +1,13 @@
 ---
 name: statistical-review
-description: Adversarially review a statistical result before it is reported or put on a CV - clustering, leakage, confounding, identifiability, uncertainty, validation design. Use after fitting a model or before writing up a finding.
+description: Adversarially review a statistical result before it is reported - clustering, leakage, confounding, identifiability, uncertainty, validation design. Use after fitting a model or before writing up a finding.
 ---
 
 # Statistical review
 
-Try to break the result. The purpose is to find the weakness before an interviewer does.
+Try to break the result. The purpose is to find the weakness before anyone else does.
 
-Run this **before** a finding is written up, and always before it becomes a CV claim.
+Run this **before** a finding is written up or reported anywhere.
 
 ---
 
@@ -86,4 +86,4 @@ Could this result be produced by noise alone? What would the analysis have shown
 
 Log it in `docs/EXPERIMENT_LOG.md`.
 
-**A finding of "not identifiable" is a successful review, not a failure.** It is also a legitimate project result and a defensible CV claim in its own right.
+**A finding of "not identifiable" is a successful review, not a failure.** It is also a legitimate project result in its own right.

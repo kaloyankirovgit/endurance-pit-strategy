@@ -48,9 +48,9 @@ State the criterion used for "usable clean lap": it is a modelling choice, not a
 
 ## 5. Replace estimates
 
-Compare measured counts against the planning estimates in `Strategy.md` §8 and record the difference. The discrepancy is useful engineering evidence: it shows the project replaced assumptions with measurement.
+Compare measured counts against any planning estimates and record the difference. The discrepancy is useful engineering evidence: it shows the project replaced assumptions with measurement.
 
-Update `Strategy.md` §8 to mark the estimates superseded, and update `PROJECT_STATE.md` known facts.
+Mark the estimates superseded, and update `PROJECT_STATE.md` known facts.
 
 ## 6. Quality findings
 

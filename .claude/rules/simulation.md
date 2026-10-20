@@ -27,7 +27,7 @@ Build the deterministic lap-discrete simulator before adding any randomness.
 - All randomness flows from explicitly seeded generators. A seeded run reproduces byte-for-byte.
 - Pass generators explicitly rather than relying on global random state.
 
-The order in `Strategy.md` §20.2 is deliberate:
+The build order is deliberate:
 
 ```
 deterministic baseline → stochastic simulator → exhaustive strategy search

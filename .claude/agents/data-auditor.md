@@ -31,4 +31,4 @@ Your job is to establish what a dataset actually contains, and to find what is w
 - Do not modify data files. You inspect; you do not clean.
 - Do not propose models, features or transformations.
 - Do not conclude that data is fine because nothing obvious failed. Say what you checked and what you could not check.
-- If the file contradicts a documented assumption in `Strategy.md` or `docs/`, say so explicitly: that contradiction is the most valuable thing you can find.
+- If the file contradicts a documented assumption in `docs/`, say so explicitly: that contradiction is the most valuable thing you can find.

@@ -27,7 +27,7 @@ The retrieval and explanation layer sits **around** the numerical system, never 
 
 **Every number in a generated answer must be traceable to a tool call or a retrieved document.** If a number appears that came from neither, that is a defect, and it should be detectable: log tool inputs and outputs alongside the generated text so the trace can be checked.
 
-This boundary is what separates this project from a chatbot with a racing theme. It is also the part an interviewer is most likely to probe, because it is where most LLM projects are weakest.
+This boundary is what separates this project from a chatbot with a racing theme. It is also the part a reviewer is most likely to probe, because it is where most LLM projects are weakest.
 
 ---
 
@@ -80,7 +80,7 @@ Retrieval quality is measured independently of answer quality. A fluent answer o
 - Report the metric with the question-set size. A recall figure over 12 questions is a different claim from one over 200, and the honest version states which.
 - Evaluate the failure cases specifically: near-miss clauses, superseded versions, and questions the corpus genuinely cannot answer.
 
-**A RAG claim on a CV is only defensible if retrieval was evaluated.** Calling an embedding API is not a RAG system.
+**A RAG claim is only defensible if retrieval was evaluated.** Calling an embedding API is not a RAG system.
 
 ---
 
@@ -145,4 +145,4 @@ Simplest thing that works, first:
 4. A vector store only if simple retrieval is measurably insufficient.
 5. An agent framework only if the workflow genuinely needs multi-step planning.
 
-Direct tool calls against a defined schema are more auditable, easier to test, and far easier to explain in an interview than a framework's abstractions.
+Direct tool calls against a defined schema are more auditable, easier to test, and far easier to explain to a reviewer than a framework's abstractions.

@@ -67,7 +67,7 @@ Build explicit "information available at time *t*" logic into feature constructi
   2. parameter tuning / model selection
   3. validation / calibration
   4. final demonstration
-- **Never tune and evaluate on the same races.** This is the direct carry-over from the BSE dissertation: parameter optimisation and policy evaluation are different activities with different data.
+- **Never tune and evaluate on the same races.** Parameter optimisation and policy evaluation are different activities with different data.
 
 ---
 

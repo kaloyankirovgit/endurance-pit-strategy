@@ -253,3 +253,41 @@ A first descriptive look: on clean laps, the median road gap at the line is abou
 - **It isn't checked against the official classifications yet.** Two known winners matching is a sanity check, not validation. The `03_Classification` files would do it properly.
 
 **Next:** validate race order against the official classifications, then start on traffic exposure.
+
+---
+
+## E-007: Does the rebuilt race order match the official classification?
+
+*2026-10-20 · complete*
+
+**Question:** for every car in the 21 races, does the order I rebuild from the lap timing agree with the official end-of-race classification?
+
+**Method:** downloaded the final-hour `03_Classification` CSV for each race, with hashes in a manifest (`io/download.py`). For each car I take the laps and elapsed time at its last crossing and rank by laps, then time. `python -m endurance_strategy.validation.classification` compares that with the official file car by car. Six tests on a synthetic race cover the comparison, including a penalised car, a lap difference and a retired car with no position.
+
+**Found:**
+
+| Check | Result |
+|---|---:|
+| Cars in both sources | 833 of 833 |
+| Lap count matches | 830 of 833 |
+| Finishing time matches to the millisecond | 782 of 833 |
+| Raw position matches, classified cars | 640 of 704 |
+| Order matches among classified cars with no time or lap difference | 654 of 654 |
+
+Every time difference has the official time longer than mine:
+
+- **48 cars** are out by a whole number of seconds on the same lap count (5, 10, 45, 95 and so on). That pattern fits time penalties the stewards added to the result.
+- **3 cars** are credited with one or two laps fewer than they crossed the line, which fits a lap penalty or a lap that wasn't counted.
+
+The raw position misses all come from these cars. One penalised car drops down the order and pushes everyone it passes up by one place. At Bahrain 2024, car #51 alone accounts for 12 of them.
+
+Two format quirks came up. The 2024 Spa file has a different column order and leaves retired cars without a position, so the reader picks columns by name. COTA 2026 names its file with a `_Final` suffix, so the downloader falls back to that name.
+
+**What it doesn't show:**
+
+- **The penalties are inferred, not confirmed.** Whole-second differences point to time penalties, but I haven't matched them against the stewards' decision documents.
+- **It checks the final order only.** Position at earlier laps comes from the same SQL, but no official source gives the order lap by lap, so that isn't checked directly.
+- **It isn't independent of the timing.** The classification comes from the same timing system, so this tests my rebuild logic, not whether the timing loops themselves are right.
+
+**Next:** race order can now feed the traffic work. Penalties applied after the finish don't change what happened on track, so they don't affect the road gaps used for traffic exposure.
+

@@ -19,7 +19,7 @@ Each event page links straight to its files. The ones that matter:
 | `23_Analysis_*` | Lap-by-lap timing, 29 columns. The core dataset. The highest-hour file covers the whole race. |
 | `23_AnalysisEnduranceWithSections_*` | The same, plus 15 timing points per lap. Only Le Mans (2025 and 2026) and COTA 2026. |
 | `26_Weather_*` | Weather every minute, for every race from 2023 on. Downloaded for all 21 corpus races with hashes (`io/download.py`). |
-| `03_Classification_*` | Hourly classification snapshots. |
+| `03_Classification_*` | Hourly classification snapshots. The final-hour one is the end-of-race result, downloaded for all 21 corpus races with hashes (`io/download.py`). COTA 2026 names it with a `_Final` suffix, and the 2024 Spa file has a different column order with no position for retired cars. |
 
 Lap charts and pit summaries also exist, but only as PDFs.
 

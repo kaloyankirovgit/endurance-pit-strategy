@@ -28,13 +28,13 @@ def test_no_data_files_are_tracked_by_git():
     assert not offenders, f"data files are tracked by git: {offenders}"
 
 
-def test_private_files_are_not_tracked_by_git():
+def test_no_ignored_files_are_tracked_by_git():
     tracked = subprocess.run(
-        ["git", "ls-files", "CV_work", "docs/cv", "Strategy.md"],
+        ["git", "ls-files", "--cached", "--ignored", "--exclude-standard"],
         cwd=REPO_ROOT,
         capture_output=True,
         text=True,
         check=False,
     ).stdout.split()
 
-    assert not tracked, f"private files are tracked by git: {tracked}"
+    assert not tracked, f"ignored files are tracked by git: {tracked}"

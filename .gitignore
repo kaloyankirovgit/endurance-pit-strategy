@@ -119,7 +119,7 @@ coverage.xml
 # Generated reports and figures
 #
 # reports/ holds generated output. Keep it out of Git by default; a small number
-# of final portfolio figures may be force-added (git add -f) once the README
+# of final figures may be force-added (git add -f) once the README
 # genuinely needs them.
 # ---------------------------------------------------------------------------
 reports/figures/**
@@ -144,7 +144,3 @@ desktop.ini
 # ---------------------------------------------------------------------------
 .claude/settings.local.json
 
-# Private working files, kept local
-Strategy.md
-CV_work/
-docs/cv/

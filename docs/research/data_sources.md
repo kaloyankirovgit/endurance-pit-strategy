@@ -2,7 +2,7 @@
 
 Where the data comes from and what I'm allowed to do with it.
 
-## FIA WEC timing (Al Kamel Systems) — the main source
+## FIA WEC timing (Al Kamel Systems), the main source
 
 <https://fiawec.alkamelsystems.com/>
 
@@ -27,14 +27,14 @@ Lap charts and pit summaries also exist, but only as PDFs.
 
 The site says the data is owned by Al Kamel Systems and can't be distributed without their permission. Downloading it to analyse locally is one thing, republishing it is another. So:
 
-- nothing from the source goes in this repo — raw files or anything derived from them;
+- nothing from the source goes in this repo, whether raw files or anything derived from them;
 - if there's ever a live demo, it shows model outputs, never source rows.
 
-Anyone who wants to reproduce this downloads the files themselves — the README says how.
+Anyone who wants to reproduce this downloads the files themselves. The README says how.
 
 ### A gotcha when downloading
 
-The event selector sometimes serves the **wrong event** — ask for Imola 2026 and occasionally you get Fuji 2026. If you trust it blindly, one race's laps end up labelled as another's, and no later check would notice. My downloader confirms the page's selected season and event match the request, and that the file path has the right event folder, retrying until it does.
+The event selector sometimes serves the **wrong event**. Ask for Imola 2026 and occasionally you get Fuji 2026. If you trust it blindly, one race's laps end up labelled as another's, and no later check would notice. My downloader confirms the page's selected season and event match the request, and that the file path has the right event folder, retrying until it does.
 
 ### The modern era, audited
 

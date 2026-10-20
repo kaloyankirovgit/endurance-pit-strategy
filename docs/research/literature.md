@@ -1,6 +1,6 @@
 # Reading list
 
-Papers and code I want to read before designing the parts they cover. Nothing here has been read properly yet — each entry just says why it's on the list. Once I've read one, I'll note what it actually changes for this project, or why it doesn't.
+Papers and code I want to read before designing the parts they cover. Nothing here has been read properly yet, so each entry just says why it's on the list. Once I've read one, I'll note what it actually changes for this project, or why it doesn't.
 
 | When | Source | For |
 |---|---|---|
@@ -14,7 +14,7 @@ Papers and code I want to read before designing the parts they cover. Nothing he
 
 ## Notes on each
 
-**Heilmeier et al. (2020), "Application of Monte Carlo Methods to Consider Probabilistic Effects in a Race Simulation for Circuit Motorsport".** [doi:10.3390/app10124229](https://doi.org/10.3390/app10124229). The closest thing to what I want the simulator to be — random lap times and pit stop variation, with safety cars on top. The one to read first.
+**Heilmeier et al. (2020), "Application of Monte Carlo Methods to Consider Probabilistic Effects in a Race Simulation for Circuit Motorsport".** [doi:10.3390/app10124229](https://doi.org/10.3390/app10124229). The closest thing to what I want the simulator to be, with random lap times and pit stop variation, with safety cars on top. The one to read first.
 
 **TUMFTM race-simulation.** <https://github.com/TUMFTM/race-simulation>. The code behind the paper above. It's built for F1, so I'll borrow ideas, not structure. Need to check the licence before reusing anything.
 
@@ -22,7 +22,7 @@ Papers and code I want to read before designing the parts they cover. Nothing he
 
 **Fieni et al. (2025), "Towards Learning-Based Formula 1 Race Strategies".** [arXiv:2512.21570](https://arxiv.org/abs/2512.21570). Compares mixed-integer optimisation with RL. Relevant to why I'm doing plain search first (D-007).
 
-**Sasikumar, Leema & Balakrishnan (2025), "Data-driven pit stop decision support for Formula 1".** [Frontiers in AI](https://www.frontiersin.org/journals/artificial-intelligence/articles/10.3389/frai.2025.1673148/full). About 100,000 laps and 3,000 pit stops. A useful comparison for scale — but laps from the same race aren't independent, so a big lap count isn't a big sample.
+**Sasikumar, Leema & Balakrishnan (2025), "Data-driven pit stop decision support for Formula 1".** [Frontiers in AI](https://www.frontiersin.org/journals/artificial-intelligence/articles/10.3389/frai.2025.1673148/full). About 100,000 laps and 3,000 pit stops. A useful comparison for scale, but laps from the same race aren't independent, so a big lap count isn't a big sample.
 
 **Boettinger & Klotz (2023), "Mastering Nordschleife".** [arXiv:2306.16088](https://arxiv.org/abs/2306.16088). RL strategy for GT endurance racing. Closer to WEC than the F1 papers.
 
@@ -30,4 +30,4 @@ Papers and code I want to read before designing the parts they cover. Nothing he
 
 ## Gaps
 
-I haven't found anything on traffic between classes specifically — almost all of this is single-class F1. If there really isn't much out there, that makes the traffic work the most original part of the project. I'm also looking for anything on picking out traffic effects from timing data alone, without GPS.
+I haven't found anything on traffic between classes specifically. Almost all of this is single-class F1. If there really isn't much out there, that makes the traffic work the most original part of the project. I'm also looking for anything on picking out traffic effects from timing data alone, without GPS.

@@ -18,14 +18,20 @@ The full log of what's been tried is in [`docs/EXPERIMENT_LOG.md`](docs/EXPERIME
 
 ## The plan
 
-The build goes in layers — each one has to work before the next one leans on it.
+The build goes in layers. Each one has to work before the next one leans on it.
 
-1. **Data pipeline** — raw files to clean, validated tables (Parquet and DuckDB).
-2. **Race order and traffic** — rebuild who was where on track, then look at how lap times change when a faster car is working through slower traffic.
-3. **Pace, stints and pit loss** — how pace fades through a stint, and what a stop actually costs.
-4. **Simulator** — a lap-by-lap race model, deterministic first, then with randomness added one piece at a time and checked against real races.
-5. **Optimiser** — search the legal pit windows and compare strategies with intervals rather than single numbers.
-6. **Regulation assistant** — an LLM that can look up the sporting regulations, call the simulator as a tool and explain the result with citations. It explains the answer — it never makes the numbers up.
+1. **Data pipeline**
+   - Raw files to clean, validated tables (Parquet and DuckDB).
+2. **Race order and traffic**
+   - Rebuild who was where on track, then look at how lap times change when a faster car is working through slower traffic.
+3. **Pace, stints and pit loss**
+   - How pace fades through a stint, and what a stop actually costs.
+4. **Simulator**
+   - A lap-by-lap race model, deterministic first, then with randomness added one piece at a time and checked against real races.
+5. **Optimiser**
+   - Search the legal pit windows and compare strategies with intervals rather than single numbers.
+6. **Regulation assistant**
+   - An LLM that can look up the sporting regulations, call the simulator as a tool and explain the result with citations. It explains the answer but never makes the numbers up.
 
 Reinforcement learning is a maybe for the very end, and only if the simulator holds up against real races first. An RL agent trained on a bad simulator just learns the simulator's mistakes.
 
@@ -51,7 +57,7 @@ The tests run on a small synthetic race in `tests/fixtures/`, so they don't need
 
 ## Getting the data
 
-The timing data belongs to Al Kamel Systems and can't be redistributed, so none of it is in this repo — not the raw files and not anything derived from them.
+The timing data belongs to Al Kamel Systems and can't be redistributed, so none of it is in this repo. That covers the raw files and anything derived from them.
 
 It's free to download for your own use from <https://fiawec.alkamelsystems.com/>. Pick a season and event, open the race session and grab the `23_Analysis_Race_Hour NN.CSV` file with the highest hour (it covers the whole race). Save it as `data/raw/wec/<YEAR>_<CIRCUIT>.CSV`, for example `2025_LE_MANS.CSV`, and then:
 
@@ -67,6 +73,6 @@ More detail on the source, including a quirk where the site sometimes serves the
 
 ## How it's built
 
-I'm building this with Claude Code as a pair programmer. The rules and review agents it works with live in [`.claude/`](.claude/) and [`CLAUDE.md`](CLAUDE.md) — they're part of the project too, since a lot of what I'm learning is how to run a workflow like this well.
+I'm building this with Claude Code as a pair programmer. The rules and review agents it works with live in [`.claude/`](.claude/) and [`CLAUDE.md`](CLAUDE.md). They're part of the project too. They set the standards Claude works to, and the reviews it runs before a result is reported.
 
 This is an independent project. It isn't affiliated with the FIA, the ACO, the WEC or Al Kamel Systems.

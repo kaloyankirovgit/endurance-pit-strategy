@@ -4,7 +4,7 @@ Nothing collected yet. This is the plan for when I do.
 
 ## Why they matter here
 
-A pit strategy is only useful if it's legal. Before the simulator runs anything, a separate check takes the strategy and returns whether it's allowed and which rules it breaks (D-006). That's also where the LLM layer earns its place later — pointing to the exact rule that ruled a strategy out, with a citation.
+A pit strategy is only useful if it's legal. Before the simulator runs anything, a separate check takes the strategy and returns whether it's allowed and which rules it breaks (D-006). That's also where the LLM layer earns its place later, by pointing to the exact rule that ruled a strategy out, with a citation.
 
 ## Ground rules
 
@@ -17,7 +17,7 @@ The PDFs stay local and aren't committed. This file keeps the record of what was
 
 | ID | Title | Season | Revision | Effective | Source | Retrieved |
 |---|---|---|---|---|---|---|
-| — | — | — | — | — | — | — |
+| | | | | | | |
 
 Source: <https://www.fiawec.com/en/page/regulations/18>
 

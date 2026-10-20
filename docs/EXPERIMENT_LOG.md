@@ -1,21 +1,21 @@
 # Experiment log
 
-Every time I ask the data a question, it goes here — including the checks that found nothing. A null result is still a result, and writing it down stops me running the same dead end twice.
+Every time I ask the data a question, it goes here, including the checks that found nothing. A null result is still a result, and writing it down stops me running the same dead end twice.
 
-Each entry says what I expected before looking and what I actually found — including what the result does *not* show.
+Each entry says what I expected before looking and what I actually found, including what the result does *not* show.
 
 | ID | Date | Question | Outcome |
 |---|---|---|---|
 | E-001 | 2026-09-22 | What's actually in the WEC timing archive? | Richer than expected |
-| E-002 | 2026-09-24 | Is the lap record structurally sound? | Yes — zero faults |
+| E-002 | 2026-09-24 | Is the lap record structurally sound? | Yes, zero faults |
 | E-003 | 2026-09-24 | What do the pit columns mean, and can stints be rebuilt? | Fully explained |
 | E-004 | 2026-09-24 | How many laps are clean enough for a pace model? | 139,283 (78%) |
-| E-005 | 2026-09-24 | Can weather be joined to laps, and which stops are garage visits? | Yes — 138,884 clean laps once rain is out |
-| E-006 | 2026-09-24 | Does the full pipeline run end to end, and does race order hold up? | Yes — 13 seconds, winners match |
+| E-005 | 2026-09-24 | Can weather be joined to laps, and which stops are garage visits? | Yes, 138,884 clean laps once rain is out |
+| E-006 | 2026-09-24 | Does the full pipeline run end to end, and does race order hold up? | Yes, 13 seconds and the winners match |
 
 ---
 
-## E-001 — What's actually in the WEC timing archive?
+## E-001: What's actually in the WEC timing archive?
 
 *2026-09-22 · descriptive*
 
@@ -25,7 +25,7 @@ Each entry says what I expected before looking and what I actually found — inc
 
 **Found:**
 
-- The archive is public — 121 events from 2011 to 2026, no login needed.
+- The archive is public, with 121 events from 2011 to 2026 and no login needed.
 - Each race publishes a race-wide lap-by-lap file, not just hourly snapshots.
 - The data is very complete. In 20,182 Le Mans laps there are no missing lap times, and only one lap is missing sector data.
 - Every lap carries the track status at the line (green, safety car, full-course yellow and so on).
@@ -38,7 +38,7 @@ Each entry says what I expected before looking and what I actually found — inc
 
 ---
 
-## E-002 — Is the lap record structurally sound?
+## E-002: Is the lap record structurally sound?
 
 *2026-09-24 · null result*
 
@@ -46,9 +46,9 @@ Each entry says what I expected before looking and what I actually found — inc
 
 **Expected:** some faults, mostly around retirements and cars coming back out of the garage.
 
-**Data:** all 21 races from 2024 to 2026 — 179,259 laps from 833 car entries. Nothing excluded.
+**Data:** all 21 races from 2024 to 2026, which is 179,259 laps from 833 car entries. Nothing excluded.
 
-**Method:** three checks in `validation/quality.py`. Each one groups the laps by car (event plus car number — car 7 races in every event) and compares every lap with the one before it.
+**Method:** three checks in `validation/quality.py`. Each one groups the laps by car (event plus car number, since car 7 races in every event) and compares every lap with the one before it.
 
 **Found:**
 
@@ -58,7 +58,7 @@ Each entry says what I expected before looking and what I actually found — inc
 | Elapsed time going backwards | 0 |
 | Gaps in lap numbers | 0 |
 
-**Why I trust the zeros:** a check that can never fail also returns zero. So I broke each one on purpose — removing the sort or grouping by driver as well as car, for example — and in five out of five cases the tests caught it.
+**Why I trust the zeros:** a check that can never fail also returns zero. So I broke each one on purpose, for example by removing the sort or grouping by driver as well as car. In five out of five cases the tests caught it.
 
 **What it doesn't show:** nothing about whether the lap times themselves make sense. A lap can be in the right place in the sequence and still have a bad value. It also can't spot a lap the timing system missed entirely if the numbering carried on as normal.
 
@@ -68,7 +68,7 @@ Each entry says what I expected before looking and what I actually found — inc
 
 ---
 
-## E-003 — What do the pit columns mean, and can stints be rebuilt?
+## E-003: What do the pit columns mean, and can stints be rebuilt?
 
 *2026-09-24 · complete*
 
@@ -76,23 +76,24 @@ Each entry says what I expected before looking and what I actually found — inc
 
 **Expected:** `B` to mark the out-lap, going by the column name ("crossing the finish line in the pit").
 
-**Found — the opposite:**
+**Found the opposite:**
 
 - **`B` is the in-lap.** Its final sector is slow because the car is heading into the pit lane.
-- **`PIT_TIME` is on the next lap**, the out-lap. Across the whole corpus, a lap has `PIT_TIME` exactly when the lap before it was `B` — with two exceptions, both on lap 1.
+- **`PIT_TIME` is on the next lap**, the out-lap. Across the whole corpus, a lap has `PIT_TIME` exactly when the lap before it was `B`
+  - With two exceptions, both on lap 1.
 
 I checked this by eye on several stops in the raw file as well as in code.
 
 **The count gap is fully explained.** Across 21 races there are 9,813 `B` laps and 9,746 `PIT_TIME` values:
 
-- 69 in-laps are a car's final lap — it pitted and never came back out;
+- 69 in-laps are a car's final lap, because it pitted and never came back out;
 - 2 cars have `PIT_TIME` on lap 1 because they started from the pit lane.
 
 9,813 − 69 + 2 = 9,746. Nothing is left over.
 
 **Stints:** with that settled, `reconstruct/stints.py` flags in-laps and out-laps and numbers each car's stints. Across the corpus that gives **10,577 stints** from 833 car entries. The median stint is 12 laps (middle half: 10 to 25), and every in-lap is the last lap of its stint.
 
-**A useful cross-check:** there are 3,478 driver changes in the corpus, and **every one of them happens on an out-lap.** That's independent evidence that the pit reading is right — drivers can only swap in the pits.
+**A useful cross-check:** there are 3,478 driver changes in the corpus, and **every one of them happens on an out-lap.** That's independent evidence that the pit reading is right, since drivers can only swap in the pits.
 
 **What `PIT_TIME` is:** the median is 80 seconds, with the middle half between 74 and 89. That's too long for time stationary alone, so it's time spent in the pit lane including the stop. But 94 values are over ten minutes, the longest around 17 hours. Those are cars sitting in the garage for repairs, not normal stops.
 
@@ -102,7 +103,7 @@ I checked this by eye on several stops in the raw file as well as in code.
 
 ---
 
-## E-004 — How many laps are clean enough for a pace model?
+## E-004: How many laps are clean enough for a pace model?
 
 *2026-09-24 · complete*
 
@@ -112,10 +113,10 @@ I checked this by eye on several stops in the raw file as well as in code.
 
 **The rules** (`features/clean_laps.py`, D-012). A lap is left out if it's:
 
-- the car's first lap — standing start, cold tyres, a pack of cars;
+- the car's first lap, with its standing start and cold tyres in a pack of cars;
 - an in-lap or out-lap;
 - run under anything other than green at the line;
-- the lap straight after a caution — the flag is read at the line, so a lap that went green halfway round still shows as green;
+- the lap straight after a caution, because the flag is read at the line, so a lap that went green halfway round still shows as green;
 - missing its lap time or a sector;
 - more than 7% slower than the median clean lap for its class at that race.
 
@@ -144,20 +145,22 @@ Most rules overlap a lot. The slow-lap rule catches the most, but four in five o
 
 Going from 3% to 15% changes the count by about 5%. So the choice matters, but not dramatically.
 
-**It varies a lot by race.** São Paulo 2026 keeps 94% of its laps. Le Mans 2024 keeps only 43%, and COTA 2025 only 51% — both lost a large share to caution periods.
+**It varies a lot by race.** São Paulo 2026 keeps 94% of its laps. Le Mans 2024 keeps only 43%, and COTA 2025 only 51%. Both lost a large share to caution periods.
 
 **What it doesn't show:**
 
 - **Rain isn't handled yet.** A wet lap under green passes every rule unless it's slow against the race median, and in a mostly wet race the median is wet too. That needs the weather join.
-- **The reference uses the whole race.** Fine for cleaning historical data, but it can't be used for a decision during a race — that would be using the future.
+- **The reference uses the whole race.** Fine for cleaning historical data, but it can't be used for a decision during a race
+  - That would be using the future.
 - **7% is my choice**, not something measured. Anything built on these laps should be re-run at a couple of other thresholds.
-- **Traffic laps are mostly still in.** That's on purpose — traffic is what the next layer measures, so it can't be filtered out here. Only the very worst cases get caught by the slow-lap rule.
+- **Traffic laps are mostly still in.** That's on purpose
+  - Traffic is what the next layer measures, so it can't be filtered out here. Only the very worst cases get caught by the slow-lap rule.
 
 **Next:** separate garage visits from normal stops, then build the interim layer with these flags in it.
 
 ---
 
-## E-005 — Can weather be joined to laps, and which stops are garage visits?
+## E-005: Can weather be joined to laps, and which stops are garage visits?
 
 *2026-09-24 · complete*
 
@@ -167,8 +170,10 @@ Going from 3% to 15% changes the count by about 5%. So the choice matters, but n
 
 The weather files use UTC. The laps use local wall-clock time (`HOUR`) plus race time (`ELAPSED`). I expected to line them up with `ELAPSED` from the scheduled start in the session folder name. Two races showed that was wrong:
 
-- **Spa 2024** — `HOUR` minus `ELAPSED` jumps by nearly two hours partway through. `ELAPSED` stops during a red flag, and the wall clock doesn't. The weather file runs about two hours past the `ELAPSED`-based finish, which fits.
-- **COTA 2025** — the folder says 13:30, but every lap puts the start at 13:00. The weather file agrees with 13:00.
+- **Spa 2024**
+  - `HOUR` minus `ELAPSED` jumps by nearly two hours partway through. `ELAPSED` stops during a red flag, and the wall clock doesn't. The weather file runs about two hours past the `ELAPSED`-based finish, which fits.
+- **COTA 2025**
+  - The folder says 13:30, but every lap puts the start at 13:00. The weather file agrees with 13:00.
 
 So each lap's UTC time comes from `HOUR`, the race date and the circuit's time zone (`reconstruct/race_clock.py`), with a day added once a race passes midnight. Then `merge_asof` gives each lap the latest reading at or before it crossed the line, within five minutes.
 
@@ -195,7 +200,7 @@ There's no clean break in the pit-time distribution, so I looked at it relative 
 | 4× median | 133 |
 | 6× median | 107 |
 
-Most stops at 2–3× the median happen under safety car (182 of 219) — that looks like queueing at pit exit behind the safety car, which is a real race cost, not a repair. Above 3× it's mostly green flag. So a **garage visit is a stop over 3× the race median** (about four minutes). That gives 185 stops across 19 races, 86 hours of garage time in total, with a median of 11 minutes.
+Most stops at 2–3× the median happen under safety car (182 of 219). That looks like queueing at pit exit behind the safety car, which is a real race cost, not a repair. Above 3× it's mostly green flag. So a **garage visit is a stop over 3× the race median** (about four minutes). That gives 185 stops across 19 races, 86 hours of garage time in total, with a median of 11 minutes.
 
 ### Clean laps with rain added
 
@@ -216,7 +221,7 @@ Wet laps are now a clean-lap rule, and they're kept out of the slow-lap referenc
 
 ---
 
-## E-006 — Does the full pipeline run end to end, and does race order hold up?
+## E-006: Does the full pipeline run end to end, and does race order hold up?
 
 *2026-09-24 · complete*
 
@@ -238,7 +243,7 @@ The schema check earned its place straight away. `RAIN` was coming through as wh
 
 **Race order:** position at each crossing ranks the cars that completed that lap by when they did it, so a lapped car sits behind. For each lap I also keep the gap to the car ahead in the race, and the gap to whichever car crossed the line just before on the road, along with its class. The road gap is what the traffic work will use.
 
-As a first check, the car in P1 on the final lap at Le Mans 2024 is #50 Ferrari AF Corse, and at Le Mans 2025 it's #83 AF Corse — both the actual winners.
+As a first check, the car in P1 on the final lap at Le Mans 2024 is #50 Ferrari AF Corse, and at Le Mans 2025 it's #83 AF Corse. Both are the actual winners.
 
 A first descriptive look: on clean laps, the median road gap at the line is about two seconds, and roughly half of clean laps cross within two seconds of another car. Traffic is everywhere, not an occasional thing. This is a description only, not a traffic effect.
 

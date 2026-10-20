@@ -37,7 +37,7 @@ quality.find_lap_number_breaks(laps)
 corpus = add_stint_columns(load_corpus(WEC_DIR))
 ```
 
-`load_corpus` loads 2024 to 2026 by default. For quick poking around there's `notebooks/exploration/explore_quality.py` — open it in VS Code and hit "Run Cell".
+`load_corpus` loads 2024 to 2026 by default. For quick poking around there's `notebooks/exploration/explore_quality.py`. Open it in VS Code and hit "Run Cell".
 
 ## What's where
 
@@ -59,7 +59,7 @@ corpus = add_stint_columns(load_corpus(WEC_DIR))
 
 ## The loader
 
-The raw files have a few traps. There's a BOM at the start, and the first 15 headers begin with a space, so `df["DRIVER_NUMBER"]` silently finds nothing unless they're stripped. Durations come in two formats (`3:54.555` and `0:01:15.964`) — `parse_duration` splits on the colons and works from the right, so it doesn't need to know which one it has. Car numbers are read as strings, because `007` and `7` are different cars.
+The raw files have a few traps. There's a BOM at the start, and the first 15 headers begin with a space, so `df["DRIVER_NUMBER"]` silently finds nothing unless they're stripped. Durations come in two formats (`3:54.555` and `0:01:15.964`), and `parse_duration` splits on the colons and works from the right, so it doesn't need to know which one it has. Car numbers are read as strings, because `007` and `7` are different cars.
 
 Nothing is renamed or dropped. The parsed columns are added alongside the originals with an `_S` suffix, so the raw values are always there to check against.
 
@@ -67,7 +67,7 @@ Nothing is renamed or dropped. The parsed columns are added alongside the origin
 
 All three work the same way: group the laps by car in lap order, then compare each lap with the one before it.
 
-**A car is `event_key` plus `NUMBER`.** Car 7 races in every event, so the number alone would compare Fuji's lap 40 with Le Mans' lap 39. The driver isn't part of the key — a car's laps carry straight on through a driver change.
+**A car is `event_key` plus `NUMBER`.** Car 7 races in every event, so the number alone would compare Fuji's lap 40 with Le Mans' lap 39. The driver isn't part of the key, because a car's laps carry straight on through a driver change.
 
 **Sorting happens inside the function.** `.diff()` compares against whatever row happens to be above, so it can't rely on the input already being sorted.
 
@@ -94,13 +94,13 @@ In the source, `B` in `CROSSING_FINISH_LINE_IN_PIT` marks the in-lap and `PIT_TI
 - A car starting from the pit lane has an out-lap on lap 1. That's skipped when counting, so it's still stint 1.
 - `stint_lap` is `cumcount() + 1` within each car and stint.
 
-The tests cover the awkward cases — a pit-lane start, a car retiring in the pits, two cars with the same number in different events, and shuffled input.
+The tests cover the awkward cases: a pit-lane start, a car retiring in the pits, two cars with the same number in different events, and shuffled input.
 
 ## Clean laps
 
 `add_clean_lap_flags` runs after `add_stint_columns` and adds one column per reason a lap might be left out, plus `is_usable_for_pace_model` for laps with none of them. Nothing is deleted, so a different model can pick a different combination.
 
-The slow-lap rule compares each lap with the median green, non-pit lap for its class at that race. Pit and caution laps are kept out of that median — otherwise a long safety car would drag it up and hide slow laps. `exclusion_summary` shows how many laps each rule catches, and how many only that rule catches.
+The slow-lap rule compares each lap with the median green, non-pit lap for its class at that race. Pit and caution laps are kept out of that median. Otherwise a long safety car would drag it up and hide slow laps. `exclusion_summary` shows how many laps each rule catches, and how many only that rule catches.
 
 ## Weather and garage stops
 

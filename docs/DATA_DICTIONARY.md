@@ -4,14 +4,18 @@ What each column means, and how sure I am about it. The schema is identical acro
 
 Each field has a label for where it comes from:
 
-- **Observed** — straight from the source file.
-- **Reconstructed** — calculated from observed data by a fixed rule.
-- **Inferred** — estimated statistically, with uncertainty.
-- **Assumed** — chosen because the data can't tell us.
+- **Observed**
+  - Straight from the source file.
+- **Reconstructed**
+  - Calculated from observed data by a fixed rule.
+- **Inferred**
+  - Estimated statistically, with uncertainty.
+- **Assumed**
+  - Chosen because the data can't tell us.
 
 ## The race file
 
-`23_Analysis_Race_Hour NN.CSV` — one row per lap per car, 29 columns. Semicolon-separated, UTF-8 with a BOM. The first 15 header names start with a space, and there's an empty column at the end from a trailing semicolon. The loader handles both.
+`23_Analysis_Race_Hour NN.CSV` has one row per lap per car, 29 columns. Semicolon-separated, UTF-8 with a BOM. The first 15 header names start with a space, and there's an empty column at the end from a trailing semicolon. The loader handles both.
 
 ### Who
 
@@ -43,7 +47,7 @@ Each field has a label for where it comes from:
 
 | Column | Meaning | Notes |
 |---|---|---|
-| `CROSSING_FINISH_LINE_IN_PIT` | `B` on the **in-lap** — the lap ending in the pit lane | Verified across the corpus (E-003, D-011). |
+| `CROSSING_FINISH_LINE_IN_PIT` | `B` on the **in-lap**, the lap ending in the pit lane | Verified across the corpus (E-003, D-011). |
 | `PIT_TIME` | Time in the pit lane, on the **out-lap** | Includes the stop. Median 80 s, but some are hours of garage time. |
 | `FLAG_AT_FL` | Track status at the line | `GF` green, `SF` safety car, `FCY` full-course yellow, `FF` finish, `RF` red. The meanings are my reading of the codes, not an official list. |
 
@@ -69,7 +73,7 @@ A car is identified by `event_key` plus `NUMBER`.
 | `stint_lap` | int | Reconstructed | Lap within the stint, from 1. The in-lap is the last lap of its stint. |
 | `is_garage_stop` | bool | Reconstructed | An out-lap whose `PIT_TIME` is over 3× the race median. The 3× is assumed (D-013). |
 | `lap_end_utc` | datetime | Reconstructed | UTC time the lap crossed the line, from `HOUR`, race date and circuit time zone. |
-| `AIR_TEMP`, `TRACK_TEMP`, `RAIN`… | — | Observed | The weather reading joined to the lap (E-005). |
+| `AIR_TEMP`, `TRACK_TEMP`, `RAIN`… | float | Observed | The weather reading joined to the lap (E-005). |
 
 | `is_first_lap` | bool | Reconstructed | The car's first lap. |
 | `is_pit_lap` | bool | Reconstructed | An in-lap or out-lap. |
@@ -80,9 +84,9 @@ A car is identified by `event_key` plus `NUMBER`.
 | `is_slow_lap` | bool | Reconstructed | More than 7% slower than the class median at that race. The 7% is assumed (D-012). |
 | `is_usable_for_pace_model` | bool | Reconstructed | None of the flags above (E-004). |
 
-| `position` | int | Reconstructed | Race position at the line — ranked among cars completing the same lap. |
+| `position` | int | Reconstructed | Race position at the line, ranked among cars completing the same lap. |
 | `gap_ahead_s` | float | Reconstructed | Seconds behind the car ahead in the race, at the line. |
-| `class_position`, `class_gap_ahead_s` | — | Reconstructed | The same, within the car's class. |
+| `class_position`, `class_gap_ahead_s` | int, float | Reconstructed | The same, within the car's class. |
 | `road_gap_ahead_s` | float | Reconstructed | Seconds since any car last crossed the line, on any lap. |
 | `road_car_ahead`, `road_class_ahead` | str | Reconstructed | Which car that was, and its class. |
 
@@ -103,9 +107,9 @@ A car is identified by `event_key` plus `NUMBER`.
 
 ## Other files
 
-**`23_AnalysisEnduranceWithSections_*`** — the same laps with 15 timing points each, for Le Mans (2025 and 2026) and COTA 2026 only. At Le Mans the point names look like track landmarks (`PORIN`/`POROUT` for the Porsche Curves, `FORDOUT` for the Ford chicanes), but I haven't found an official map of them.
+**`23_AnalysisEnduranceWithSections_*`** has the same laps with 15 timing points each, for Le Mans (2025 and 2026) and COTA 2026 only. At Le Mans the point names look like track landmarks (`PORIN`/`POROUT` for the Porsche Curves, `FORDOUT` for the Ford chicanes), but I haven't found an official map of them.
 
-**`26_Weather_*`** — one row a minute: air and track temperature, humidity, pressure, wind, rain. It's in UTC, while laps use local clock time. The join goes through each circuit's time zone (E-005). `RAIN` is mostly 0 or 1 but reaches 9 at Le Mans 2024. The scale isn't documented.
+**`26_Weather_*`** has one row a minute: air and track temperature, humidity, pressure, wind, rain. It's in UTC, while laps use local clock time. The join goes through each circuit's time zone (E-005). `RAIN` is mostly 0 or 1 but reaches 9 at Le Mans 2024. The scale isn't documented.
 
 ## Still open
 

@@ -13,6 +13,18 @@ Early. The data side is in place and tested, and nothing is modelled yet.
 
 What works right now:
 
+- **One command builds everything**
+  - `python -m endurance_strategy.pipeline` takes the raw race and weather files to a validated lap table plus stint and pit-stop tables, in Parquet, in about 13 seconds.
+- **21 races from 2024 to 2026**
+  - 179,259 laps from 833 car entries, split into 10,577 stints. 138,884 laps pass the clean-lap rules.
+- **Pit stops and stints**
+  - In-laps, out-laps and driver changes are flagged, and garage visits are kept apart from normal stops.
+- **Weather on every lap**
+  - Joined by the time of day rather than the race clock, because the race clock stops during red flags. At Spa 2024 that would have put the weather two hours out.
+- **Race order and gaps**
+  - Rebuilt at every timing-line crossing in DuckDB SQL, including the gap to the car ahead on track and its class. Not yet checked against the official classification.
+- **67 tests on a synthetic race**
+  - They run in GitHub Actions on every push, with no real data needed.
 
 The full log of what's been tried is in [`docs/EXPERIMENT_LOG.md`](docs/EXPERIMENT_LOG.md), and the reasoning behind the bigger choices is in [`docs/DECISIONS.md`](docs/DECISIONS.md).
 

@@ -143,13 +143,14 @@ Flag these if the project starts drifting:
 
 ---
 
-## 10. Future automation (not yet implemented)
+## 10. Automation
 
-Deliberately deferred. Candidate hooks once the pipeline exists: a decision to adopt any of these belongs in `docs/DECISIONS.md`:
+**In place** (D-016): `scripts/guard_commit.py` blocks any commit that would include a git-ignored file. It runs as a Claude Code `PreToolUse` hook (`.claude/settings.json`, exit code 2 blocks the command) and as the git `pre-commit` hook (`.githooks/`, enabled with `git config core.hooksPath .githooks`). The Claude hook also blocks `--no-verify`. Do not work around either.
+
+**Deferred.** A decision to adopt any of these belongs in `docs/DECISIONS.md`:
 
 | Trigger | Hook idea | Why deferred |
 |---|---|---|
-| `PreToolUse` on Bash `git commit`/`git add` | Block paths under `data/raw|interim|processed` and any `*.csv` over a size threshold | Highest-value hook; implement as soon as real data lands locally |
 | `PostToolUse` on Edit/Write to `*.py` | Run formatter + linter on the changed file | No formatter adopted yet |
 | `PostToolUse` on Edit/Write to `src/**` | Run the affected test module | No meaningful test suite yet |
 | `Stop` | Warn if `PROJECT_STATE.md` is stale relative to committed changes | Needs the workflow to stabilise first |

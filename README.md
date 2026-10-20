@@ -22,8 +22,8 @@ What works right now:
 - **Weather on every lap**
   - Joined by the time of day rather than the race clock, because the race clock stops during red flags. At Spa 2024 that would have put the weather two hours out.
 - **Race order and gaps**
-  - Rebuilt at every timing-line crossing in DuckDB SQL, including the gap to the car ahead on track and its class. Not yet checked against the official classification.
-- **67 tests on a synthetic race**
+  - Rebuilt at every timing-line crossing in DuckDB SQL, including the gap to the car ahead on track and its class. The final order matches the official classification for every car without a post-race penalty.
+- **80 tests on a synthetic race**
   - They run in GitHub Actions on every push, with no real data needed.
 
 The full log of what's been tried is in [`docs/EXPERIMENT_LOG.md`](docs/EXPERIMENT_LOG.md), and the reasoning behind the bigger choices is in [`docs/DECISIONS.md`](docs/DECISIONS.md).
@@ -62,8 +62,11 @@ git clone https://github.com/kaloyankirovgit/endurance-pit-strategy.git
 cd endurance-pit-strategy
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
+git config core.hooksPath .githooks
 pytest -q
 ```
+
+The `git config` line turns on a pre-commit hook that stops anything git-ignored from being committed, which matters here because the timing data can't be shared.
 
 The tests run on a small synthetic race in `tests/fixtures/`, so they don't need the real data.
 

@@ -121,6 +121,31 @@ A stop is a garage visit if its `PIT_TIME` is over 3× the race median. The long
 
 ---
 
+## D-015: Race order is checked against the classification, and AI evidence comes before the traffic work
+
+*2026-10-20*
+
+Race order is compared with the official end-of-race classification car by car. A raw position match would undersell it, because one post-race penalty shifts every car it passes. So each difference gets a label (time penalty, fewer official laps, or unexplained), and the order is also compared among cars with no difference at all (E-007).
+
+The work order after this changes. Hooks and evals for the review agents come next, then the regulation retrieval part of Layer 6, and only then the traffic baseline. Retrieval doesn't depend on the simulator, so only the order changes. The cost is that the first traffic result comes later.
+
+---
+
+## D-016: The no-data rule is enforced by hooks, not just written down
+
+*2026-10-20*
+
+The rule that nothing ignored gets committed used to live in `CLAUDE.md` and in a test. The instruction can be skipped, and the test only catches a mistake after it's committed. Now one script, `scripts/guard_commit.py`, blocks the commit itself, in two places:
+
+- **As a Claude Code `PreToolUse` hook.** It runs before any Bash command Claude makes, and blocks a `git commit` (exit code 2) if an ignored file is staged or tracked, or if the commit tries to skip the git hook with `--no-verify`.
+- **As the git `pre-commit` hook.** It runs on every commit made outside Claude, from the terminal or VS Code.
+
+Both run the same check, `git ls-files --cached --ignored --exclude-standard`. Private paths sit in `.git/info/exclude`, so the guard covers them without the public repo naming them. Seven tests run it against a throwaway repo.
+
+The first version matched the words "git commit" anywhere in a command, and it blocked a harmless command that only had the phrase in some text. It now matches only a real `git commit` at the start of a command, and a test pins that. Anyone cloning has to run `git config core.hooksPath .githooks` once to turn the git hook on.
+
+---
+
 ## Tools
 
 The rule of thumb is to use a few tools properly rather than a lot of them badly. A tool comes in when a real need shows up.

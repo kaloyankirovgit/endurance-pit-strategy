@@ -2,11 +2,11 @@
 
 Where things are right now. Updated at the end of each working session.
 
-*Last updated: 2026-09-24*
+*Last updated: 2026-10-20*
 
 ## Current stage
 
-Layer 1 is done. One command takes the raw race and weather files to a validated lap table and two processed tables, in Parquet. Race order and gaps are rebuilt. Nothing is modelled yet. The traffic work is next.
+Layer 1 is done and the race order is now checked against the official classifications. Nothing is modelled yet. A commit guard now enforces the no-data rule (D-016). Next come evals for the review agents, then regulation retrieval, then the traffic work (D-015).
 
 ## Done
 
@@ -20,14 +20,19 @@ Layer 1 is done. One command takes the raw race and weather files to a validated
 - `features/clean_laps.py` flags laps unfit for pace modelling, rain included. 138,884 of 179,259 laps are usable (E-004, E-005).
 - `pipeline.py` runs everything in about 13 seconds: raw CSVs to `interim/laps.parquet`, plus `processed/stints.parquet` and `processed/pit_stops.parquet`. Pandera validates the lap table on write (E-006, D-014).
 - `reconstruct/race_order.py` adds position and gaps at each crossing in DuckDB SQL, including the road gap and class of the car ahead on track.
-- 67 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
+- Race order checked against the official `03_Classification` files for all 21 races. Lap counts match for 830 of 833 cars, and among the 654 classified cars with no penalty the order matches every time. The differences fit post-race penalties (E-007).
+- A commit guard blocks any commit that includes a git-ignored file, both as a Claude Code hook and as the git pre-commit hook (D-016).
+- 80 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
 
 ## Next
 
-1. **Validate race order** against the official `03_Classification` files.
-2. **Traffic exposure (Layer 2)**
+1. **Evals for the review agents**
+   - Plant known flaws in small synthetic write-ups and measure how many the `statistical-reviewer` catches.
+2. **Regulation retrieval (Layer 6, retrieval side)**
+   - Versioned regulations, structural chunks, a hand-built question set, recall@k and refusal tests.
+3. **Traffic exposure (Layer 2)**
    - Define when a car is running into slower-class traffic from the road gap and class ahead, then compare lap residuals with and without it.
-3. **Drying track**
+4. **Drying track**
    - Find a way to catch laps on a wet track after the rain sensor reads zero.
 
 ## Key facts
@@ -58,8 +63,9 @@ Layer 1 is done. One command takes the raw race and weather files to a validated
 | Clean-lap flags | Built and run on the full corpus |
 | Weather join and garage flag | Built and run on the full corpus |
 | Interim / processed layers | Built as one command, writing schema-checked Parquet |
-| Race order and gaps | Built, not yet checked against official classifications |
+| Race order and gaps | Built, and the final order checked against the official classifications (E-007) |
 | Traffic, pace and pit-loss models | Not started |
 | Simulator and optimiser | Not started |
 | Regulations and LLM layer | Not started |
 | CI | Running on GitHub Actions, passing |
+| Commit guard hooks | Built and tested (D-016) |

@@ -46,6 +46,14 @@ First run, 2026-10-23 (full write-up in E-009 of `docs/EXPERIMENT_LOG.md`):
 - **When retrieval missed:** 12 refusals and 6 honest partial answers, out of 18 runs.
 - **Unanswerable questions:** all 18 runs were sent to "out of scope" by the router, so the answerer's own refusal still needs in-scope test questions.
 
+## Car class (E-012)
+
+`python scripts/run_answer_eval.py --questions questions_class.json --no-routing` runs 5 questions once per class plus 3 LMP2 questions. The class is passed in as a choice, not read from the question.
+
+- **Chosen class's fact present:** 30 of 30 runs. The other class's fact showed up in 1 of 24 checked runs (a correct answer that also named the Hypercar rule).
+- **LMP2:** refused in code in 9 of 9 runs, because the WEC regulations cover only Hypercar and LMGT3.
+- Retrieval ignores the class. A clause that names one class often applies to all, and adding the class to the query cost recall.
+
 ## Embeddings against BM25 (E-011)
 
 `python scripts/run_retrieval_comparison.py` compares BM25, a local embedding model and a hybrid on `questions.json` and on `questions_heldout.json`. The held-out questions were written before any embedding ran.

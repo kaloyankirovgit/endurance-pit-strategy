@@ -454,3 +454,43 @@ Question by question on the held-out set:
 - **26 of the 855 chunks run past the model's roughly 512-token limit** and are cut off when embedded. They include the long appendices.
 - **One embedding model, untuned.** A larger model or one tuned for retrieval might do better, and that would be a separate comparison.
 
+
+---
+
+## E-012: Can answers follow the car class the user picks?
+
+*2026-10-24 · complete*
+
+**Question:** a strategy tool is used for one class at a time. If the user picks Hypercar or LMGT3, does the answer use that class's rules and figures, and is a class the corpus doesn't cover refused?
+
+**Checked first: should retrieval filter by class?** I tagged each 2026 chunk by the classes its text names: 198 name none, 69 only Hypercar, 4 only LMGT3, 21 both.
+
+- **A tag says which class a clause names, not which class it applies to.** 6.5.5 (at most 3 tyre sets at the front of the garage) applies to all competitors, but one sentence about Hypercar submissions tags it Hypercar-only. 4.1.4 (high-voltage safety) is the same. A class filter would hide these from an LMGT3 user.
+- **Adding the class to the BM25 query costs recall and gains nothing.** On the original 30 questions recall@5 went from 24 to 23 with "Hypercar" added and to 22 with "LMGT3", losing q10 and q28. On the held-out 30 it stayed at 27.
+- So retrieval stays class-blind. The class goes to the answer step only.
+
+**Method:** the class is an explicit input (`Hypercar`, `LMGT3` or `LMP2`), as it would be in a menu, not read from the question. The answer prompt gets the class and is told to use only that class's figures. LMP2 is refused in code after routing, because the corpus is the WEC sporting regulations, which cover Hypercar and LMGT3 only (6.1.1). LMP2 races only at Le Mans, under ACO regulations that aren't collected.
+
+The question set is `questions_class.json`: 5 questions asked once per class (10 runs where the right answer differs by class) plus 3 LMP2 questions. Each answerable question has a key fact for its class and, where it applies, "wrong facts" from the other class that must not appear in the answer. Numbers match as whole tokens, so "18" doesn't match inside "1812km". Run `20261023T233848Z`, 3 repeats, BM25 top 5 with the season filter. It took 97 seconds.
+
+**Found:**
+
+| Measure | Result |
+|---|---:|
+| Right clause in the top 3, class-blind retrieval | 10 of 10 questions |
+| Answered and citing the right clause | 30 of 30 runs |
+| Key fact for the chosen class present | 30 of 30 runs |
+| Other class's fact shown, where checked | 1 of 24 runs |
+| LMP2 routed to the regulations path, then refused in code | 9 of 9 runs |
+
+- **The one flagged run was correct but broke the instruction.** For LMGT3 licences (c06) it said "at least Grade B" and added "Grade A is only required in the Hypercar category." That's true, but it states the other class's rule.
+- **The prompt change didn't move the original set.** Rerun on `questions.json` with routing (`20261023T234349Z`, 301 seconds): 72 of 72 retrieval hits cited the right clause, key facts 54 of 63, routing 18 of 18, all as in E-010. After retrieval misses it refused 14 and gave partial answers 4 times (12 and 6 in E-010), which is within run-to-run variation at 18 runs.
+- **A code review before this run found three grading faults, fixed first:** a refusal would have counted as a wrong-class answer, c09 had no wrong facts, so an answer reading the LMGT3 table could pass, and "18" matched inside "1812km". Rescoring the E-010 answers with the new matcher still gives 54 of 63.
+
+**What it doesn't show:**
+
+- **It tests reading the right row, not retrieval.** Every paired question had its clause in the top 3.
+- **There's no comparator.** I didn't run the paired set without the class, so this doesn't show how often the model mixes classes when it isn't told one.
+- **The LMP2 refusal is guaranteed by code.** What's measured is that the router sends those questions down the regulations path.
+- **5 pairs from one author,** written after reading the clauses. 2 of the 5 read from the 6.5.4 tyre table, whose header comes out of the PDF scrambled. The answers still took the right row, but that's 2 questions on one table, and fixing the table extraction is a separate open job.
+- **The game the strategy tool is aimed at may not follow the real regulations,** and nothing here tests that.

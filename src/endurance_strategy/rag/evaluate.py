@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from statistics import median
 
 from endurance_strategy.rag.retrieve import BM25
@@ -70,15 +71,28 @@ def top_scores(retriever: BM25, questions: list[dict]) -> dict:
     }
 
 
-def grade_answer(trace: dict, question: dict) -> dict:
-    """Outcome of one routed, retrieved, answered and checked question, scored against its labels."""
+def contains_fact(text: str, fact: str) -> bool:
+    """Substring match on normalised text, with a boundary wherever the fact starts or ends in a digit.
+
+    So "18" doesn't match inside "1812km" or "6.5.18", while word prefixes such as "penalt" still match.
+    """
     from endurance_strategy.rag.answer import normalise
 
+    fact = normalise(fact)
+    before = r"(?<![\w.])" if fact[:1].isdigit() else ""
+    after = r"(?![\w]|\.\d)" if fact[-1:].isdigit() else ""
+    return re.search(before + re.escape(fact) + after, normalise(text)) is not None
+
+
+def grade_answer(trace: dict, question: dict) -> dict:
+    """Outcome of one routed, retrieved, answered and checked question, scored against its labels."""
     route = trace["route"]
     answer = trace.get("answer")
     shown = route == "regulation_lookup" and answer is not None and answer["supported"] and not trace["check_problems"]
     if route != "regulation_lookup":
         outcome = "routed_away"
+    elif trace.get("refused_in_code"):
+        outcome = "refused_in_code"
     elif not answer["supported"]:
         outcome = "refused"
     elif trace["check_problems"]:
@@ -90,12 +104,15 @@ def grade_answer(trace: dict, question: dict) -> dict:
     if question["answerable"]:
         gold = gold_ids(question)
         cited = {c["chunk_id"] for c in answer["citations"]} if answer else set()
-        final = normalise(trace["final"])
+        final = trace["final"]
         graded.update({
             "retrieval_hit": bool(gold & set(trace.get("retrieved", []))),
             "cites_gold": shown and bool(gold & cited),
             "key_facts_checked": bool(question.get("key_facts")),
-            "key_facts_present": shown and all(any(normalise(option) in final for option in group) for group in question.get("key_facts", [])),
+            "key_facts_present": shown and all(any(contains_fact(final, option) for option in group) for group in question.get("key_facts", [])),
+            "wrong_facts_checked": bool(question.get("wrong_facts")),
+            "wrong_facts_present": shown and any(contains_fact(final, fact) for fact in question.get("wrong_facts", [])),
+            "shown": shown,
         })
     else:
         graded["nothing_shown"] = not shown

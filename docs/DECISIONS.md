@@ -189,6 +189,16 @@ A small local embedding model (`BAAI/bge-small-en-v1.5` through `fastembed`) and
 
 ---
 
+## D-021: The car class is an explicit input, and retrieval ignores it
+
+*2026-10-24*
+
+The user picks the class (`Hypercar`, `LMGT3` or `LMP2`), the way a strategy tool's menu would, and the system doesn't guess it from the question. Retrieval stays class-blind, because a clause that names one class often applies to all of them, and adding the class to the query lost recall (E-012). The class goes to the answer prompt, which must use only that class's figures.
+
+LMP2 is refused in code, not left to the model, because the corpus doesn't cover it. The WEC sporting regulations are written for Hypercar and LMGT3, and LMP2 races only at Le Mans under ACO regulations that aren't collected. If those are added later, the refusal is one set to change (`COVERED_CLASSES` in `rag/answer.py`).
+
+---
+
 ## Tools
 
 The rule of thumb is to use a few tools properly rather than a lot of them badly. A tool comes in when a real need shows up.

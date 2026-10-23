@@ -5,13 +5,14 @@ from __future__ import annotations
 import argparse
 import json
 import tempfile
+import time
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
 
 from endurance_strategy.paths import INTERIM_DIR
-from endurance_strategy.rag.answer import answer_question
+from endurance_strategy.rag.answer import CAR_CLASSES, answer_question
 from endurance_strategy.rag.evaluate import grade_answer
 from endurance_strategy.rag.retrieve import BM25
 
@@ -30,6 +31,8 @@ def summarise(graded: list[dict], routing: list[dict]) -> dict:
         "answered_citing_gold": sum(g["cites_gold"] for g in answerable),
         "key_fact_runs": len(with_facts),
         "key_facts_present": sum(g["key_facts_present"] for g in with_facts),
+        "wrong_fact_shown_runs": sum(g["wrong_facts_checked"] and g["shown"] for g in answerable),
+        "wrong_facts_present": sum(g["wrong_facts_present"] for g in answerable),
         "retrieval_hit_runs": len(hits),
         "retrieval_hit_answered_citing_gold": sum(g["cites_gold"] for g in hits),
         "retrieval_miss_runs": len(misses),
@@ -37,8 +40,8 @@ def summarise(graded: list[dict], routing: list[dict]) -> dict:
         "unanswerable_runs": len(unanswerable),
         "unanswerable_nothing_shown": sum(g["nothing_shown"] for g in unanswerable),
         "unanswerable_outcomes": dict(Counter(g["outcome"] for g in unanswerable)),
-        "routing_runs": len(routing),
-        "routing_correct": sum(r["correct"] for r in routing),
+        "routing_runs": len(routing) or None,
+        "routing_correct": sum(r["correct"] for r in routing) if routing else None,
     }
 
 
@@ -46,17 +49,25 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repeats", type=int, default=3)
     parser.add_argument("--workers", type=int, default=6)
+    parser.add_argument("--questions", default="questions.json", help="question file in evals/regulations")
+    parser.add_argument("--no-routing", action="store_true", help="skip the routing cases")
     args = parser.parse_args()
 
     chunks = [json.loads(line) for line in (INTERIM_DIR / "regulation_chunks.jsonl").read_text().splitlines()]
-    questions = json.loads((EVAL_DIR / "questions.json").read_text())
-    routing_questions = json.loads((EVAL_DIR / "routing.json").read_text())
+    questions = json.loads((EVAL_DIR / args.questions).read_text())
+    routing_questions = [] if args.no_routing else json.loads((EVAL_DIR / "routing.json").read_text())
+    unknown = {q.get("car_class") for q in questions} - set(CAR_CLASSES) - {None}
+    if unknown:
+        raise SystemExit(f"unknown car classes in {args.questions}: {sorted(unknown)}")
     retriever = BM25(chunks)
 
     jobs = [("question", q, r) for q in questions for r in range(args.repeats)]
     jobs += [("routing", q, r) for q in routing_questions for r in range(args.repeats)]
+    started = time.monotonic()
     with tempfile.TemporaryDirectory() as workdir, ThreadPoolExecutor(args.workers) as pool:
-        traces = list(pool.map(lambda job: answer_question(job[1]["question"], job[1].get("season", "2026"), retriever, workdir), jobs))
+        traces = list(pool.map(lambda job: answer_question(job[1]["question"], job[1].get("season", "2026"), retriever, workdir,
+                                                           car_class=job[1].get("car_class")), jobs))
+    duration_s = round(time.monotonic() - started)
 
     graded, routing, log = [], [], []
     for (kind, question, repeat), trace in zip(jobs, traces):
@@ -72,7 +83,8 @@ def main() -> None:
     results = EVAL_DIR / "results"
     results.mkdir(exist_ok=True)
     (results / f"{stamp}_answers.jsonl").write_text("".join(json.dumps(row, ensure_ascii=False) + "\n" for row in log))
-    summary = {"timestamp_utc": stamp, "repeats": args.repeats, "retriever": "BM25 top 5, season filter",
+    summary = {"timestamp_utc": stamp, "questions_file": args.questions, "repeats": args.repeats, "duration_s": duration_s,
+               "retriever": "BM25 top 5, season filter",
                "models": sorted({m for t in traces for m in t["models"]}), **summarise(graded, routing)}
     (results / f"{stamp}_answers_summary.json").write_text(json.dumps(summary, indent=2))
     print(json.dumps(summary, indent=2))

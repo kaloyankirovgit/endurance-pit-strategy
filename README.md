@@ -31,7 +31,7 @@ What works right now:
   - A router sends strategy questions away, because pit timing has to come from the simulator. Rules questions get an answer drawn only from the retrieved clauses, with word-for-word quotes.
   - A plain-code checker rejects any answer whose citations, quotes or numbers don't trace back to those clauses.
   - When retrieval found the right clause, the answer cited it in all 72 runs.
-- **111 tests on synthetic data**
+- **124 tests on synthetic data**
   - They run in GitHub Actions on every push, with no real data needed.
 
 The full log of what's been tried is in [`docs/EXPERIMENT_LOG.md`](docs/EXPERIMENT_LOG.md), and the reasoning behind the bigger choices is in [`docs/DECISIONS.md`](docs/DECISIONS.md).

@@ -1,0 +1,34 @@
+{
+  "timestamp_utc": "20261023T234349Z",
+  "questions_file": "questions.json",
+  "repeats": 3,
+  "duration_s": 301,
+  "retriever": "BM25 top 5, season filter",
+  "models": [
+    "claude-opus-5-5"
+  ],
+  "answerable_runs": 90,
+  "answerable_outcomes": {
+    "answered": 76,
+    "refused": 14
+  },
+  "answered_citing_gold": 72,
+  "key_fact_runs": 63,
+  "key_facts_present": 54,
+  "wrong_fact_shown_runs": 0,
+  "wrong_facts_present": 0,
+  "retrieval_hit_runs": 72,
+  "retrieval_hit_answered_citing_gold": 72,
+  "retrieval_miss_runs": 18,
+  "retrieval_miss_outcomes": {
+    "answered": 4,
+    "refused": 14
+  },
+  "unanswerable_runs": 18,
+  "unanswerable_nothing_shown": 18,
+  "unanswerable_outcomes": {
+    "routed_away": 18
+  },
+  "routing_runs": 18,
+  "routing_correct": 18
+}

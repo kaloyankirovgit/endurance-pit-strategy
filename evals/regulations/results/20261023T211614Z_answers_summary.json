@@ -1,0 +1,30 @@
+{
+  "timestamp_utc": "20261023T211614Z",
+  "repeats": 3,
+  "retriever": "BM25 top 5, season filter",
+  "models": [
+    "claude-opus-5-5"
+  ],
+  "answerable_runs": 90,
+  "answerable_outcomes": {
+    "answered": 78,
+    "refused": 12
+  },
+  "answered_citing_gold": 72,
+  "key_fact_runs": 63,
+  "key_facts_present": 51,
+  "retrieval_hit_runs": 72,
+  "retrieval_hit_answered_citing_gold": 72,
+  "retrieval_miss_runs": 18,
+  "retrieval_miss_outcomes": {
+    "answered": 6,
+    "refused": 12
+  },
+  "unanswerable_runs": 18,
+  "unanswerable_nothing_shown": 18,
+  "unanswerable_outcomes": {
+    "routed_away": 18
+  },
+  "routing_runs": 18,
+  "routing_correct": 18
+}

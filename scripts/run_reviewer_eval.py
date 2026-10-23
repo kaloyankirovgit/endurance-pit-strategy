@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import subprocess
 import tempfile
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
@@ -22,6 +21,7 @@ from endurance_strategy.evals.reviewer import (
     grade_run,
     summarise,
 )
+from endurance_strategy.llm import claude_json
 
 ROOT = Path(__file__).resolve().parents[1]
 AGENT = ROOT / ".claude" / "agents" / "statistical-reviewer.md"
@@ -29,21 +29,8 @@ EVAL_DIR = ROOT / "evals" / "statistical_reviewer"
 
 
 def review(case_file: Path, system_prompt: str, workdir: str) -> dict:
-    result = subprocess.run(
-        [
-            "claude", "-p", REVIEW_INSTRUCTIONS + case_text(case_file),
-            "--system-prompt", system_prompt,
-            "--tools", "",
-            "--json-schema", json.dumps(REVIEW_SCHEMA),
-            "--output-format", "json",
-            "--no-session-persistence",
-        ],
-        cwd=workdir, capture_output=True, text=True, timeout=600,
-    )
-    payload = json.loads(result.stdout)
-    if payload.get("is_error") or "structured_output" not in payload:
-        raise RuntimeError(f"{case_file.name}: {payload.get('result')}")
-    return {"review": payload["structured_output"], "models": sorted(payload.get("modelUsage", {}))}
+    result = claude_json(REVIEW_INSTRUCTIONS + case_text(case_file), system_prompt, REVIEW_SCHEMA, workdir)
+    return {"review": result["output"], "models": result["models"]}
 
 
 def main() -> None:

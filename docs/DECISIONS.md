@@ -167,11 +167,33 @@ A case set that has been used to change an agent's prompt can't then be used to 
 
 ---
 
+## D-019: Regulation answers are routed, grounded and checked in code
+
+*2026-10-23*
+
+Every question goes through three steps, each one inspectable on its own:
+
+- **Router:** an LLM call with a fixed list of routes (regulation lookup, simulation request, out of scope). Strategy questions are declined, because pit timing comes from the simulator, never from prose (`rag.md`).
+- **Answerer:** the model sees only the retrieved extracts. It must cite chunk IDs with word-for-word quotes, or refuse and say what's missing.
+- **Checker:** plain Python, no LLM. Every citation must be a retrieved chunk, every quote must appear in that chunk, and every number in the answer must appear in a cited extract (D-008). An answer that fails isn't shown.
+
+The calls run headless through `claude -p` with a JSON schema, using the same helper as the reviewer eval (`src/endurance_strategy/llm.py`). The full trace (route, retrieved chunks, raw answer, check result) is logged for every question, so a wrong answer can be traced to retrieval or to generation.
+
+---
+
+## D-020: Embeddings stay a candidate, BM25 stays the default
+
+*2026-10-23*
+
+A small local embedding model (`BAAI/bge-small-en-v1.5` through `fastembed`) and a hybrid (reciprocal rank fusion of BM25 and embeddings) were compared with BM25 on the original questions and on 30 fresh ones written before any embedding ran (E-011). Both look better, but on the held-out set the gap is a few questions: at rank 1, embeddings won 4 and lost 1 against BM25. That's inside what 30 questions can resolve, so by the baseline rule BM25 stays the default. The hybrid never did worse than BM25 in the top 5 on either set (5 wins, 0 losses), which makes it the first thing to confirm on a larger question set.
+
+---
+
 ## Tools
 
 The rule of thumb is to use a few tools properly rather than a lot of them badly. A tool comes in when a real need shows up.
 
-**In use:** Python, pandas, pytest, Git, GitHub Actions, Parquet (pyarrow), DuckDB, Pandera, pypdf (regulation text, D-018).
+**In use:** Python, pandas, pytest, Git, GitHub Actions, Parquet (pyarrow), DuckDB, Pandera, pypdf (regulation text, D-018), fastembed (embedding comparison only, D-020).
 
 **Coming when needed:** statsmodels and SciPy for the mixed-effects and bootstrap work, Matplotlib for figures, then Streamlit and Docker at the end.
 

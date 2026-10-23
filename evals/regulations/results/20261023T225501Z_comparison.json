@@ -1,0 +1,2408 @@
+{
+  "timestamp_utc": "20261023T225501Z",
+  "embedding_model": "BAAI/bge-small-en-v1.5",
+  "chunks_over_about_512_tokens": 26,
+  "chunks": 855,
+  "results": {
+    "original/bm25": {
+      "questions": 30,
+      "filter_season": true,
+      "recall@1": 15,
+      "recall@3": 20,
+      "recall@5": 24,
+      "top1_right_article_wrong_season": 0,
+      "per_question": [
+        {
+          "id": "q01",
+          "rank": 3,
+          "top": "WEC-SR-2026:13.3.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:13.3.3",
+            "WEC-SR-2026:10.1.2",
+            "WEC-SR-2026:13.2.3",
+            "WEC-SR-2026:9.1.1",
+            "WEC-SR-2026:13.3.2"
+          ]
+        },
+        {
+          "id": "q02",
+          "rank": 4,
+          "top": "WEC-SR-2026:APPENDIX 5",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:APPENDIX 5",
+            "WEC-SR-2026:13.2.5",
+            "WEC-SR-2026:13.3.3",
+            "WEC-SR-2026:13.2.3",
+            "WEC-SR-2026:3.1.6"
+          ]
+        },
+        {
+          "id": "q03",
+          "rank": null,
+          "top": "WEC-SR-2026:14.4.1",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.4.1",
+            "WEC-SR-2026:13.2.3",
+            "WEC-SR-2026:7.3.3",
+            "WEC-SR-2026:9.1.3",
+            "WEC-SR-2026:APPENDIX 5"
+          ]
+        },
+        {
+          "id": "q04",
+          "rank": null,
+          "top": "WEC-SR-2026:7.4.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:7.4.4",
+            "WEC-SR-2026:7.4.5",
+            "WEC-SR-2026:5.1.2",
+            "WEC-SR-2026:12.2.1",
+            "WEC-SR-2026:6.3.1"
+          ]
+        },
+        {
+          "id": "q05",
+          "rank": 3,
+          "top": "WEC-SR-2026:13.2.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:13.2.2",
+            "WEC-SR-2026:9.1.2",
+            "WEC-SR-2026:13.2.4",
+            "WEC-SR-2026:13.2.5",
+            "WEC-SR-2026:13.2.3"
+          ]
+        },
+        {
+          "id": "q06",
+          "rank": 1,
+          "top": "WEC-SR-2026:13.3.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:13.3.2",
+            "WEC-SR-2026:13.3.3",
+            "WEC-SR-2026:10.1.2",
+            "WEC-SR-2026:13.2.3",
+            "WEC-SR-2026:14.3.1"
+          ]
+        },
+        {
+          "id": "q07",
+          "rank": 1,
+          "top": "WEC-SR-2026:13.3.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:13.3.3",
+            "WEC-SR-2026:13.3.2",
+            "WEC-SR-2026:15.4.1",
+            "WEC-SR-2026:4.2.4",
+            "WEC-SR-2026:APPENDIX 5"
+          ]
+        },
+        {
+          "id": "q08",
+          "rank": 3,
+          "top": "WEC-SR-2026:14.5.1",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.5.1",
+            "WEC-SR-2026:14.5.4",
+            "WEC-SR-2026:14.5.2",
+            "WEC-SR-2026:15.3.4",
+            "WEC-SR-2026:14.5.3"
+          ]
+        },
+        {
+          "id": "q09",
+          "rank": 1,
+          "top": "WEC-SR-2026:14.5.1",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.5.1",
+            "WEC-SR-2026:14.7.1",
+            "WEC-SR-2026:14.5.2",
+            "WEC-SR-2026:14.5.4",
+            "WEC-SR-2026:14.2.1"
+          ]
+        },
+        {
+          "id": "q10",
+          "rank": 5,
+          "top": "WEC-SR-2026:14.6.11",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.6.11",
+            "WEC-SR-2026:14.6.9",
+            "WEC-SR-2026:14.7.1",
+            "WEC-SR-2026:14.7.3",
+            "WEC-SR-2026:14.7.2"
+          ]
+        },
+        {
+          "id": "q11",
+          "rank": 2,
+          "top": "WEC-SR-2026:7.4.9",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:7.4.9",
+            "WEC-SR-2026:14.6.5",
+            "WEC-SR-2026:14.6.10",
+            "WEC-SR-2026:14.6.9",
+            "WEC-SR-2026:14.7.1"
+          ]
+        },
+        {
+          "id": "q12",
+          "rank": 1,
+          "top": "WEC-SR-2026:14.6.5",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.6.5",
+            "WEC-SR-2026:14.5.2",
+            "WEC-SR-2026:14.4.4",
+            "WEC-SR-2026:APPENDIX 8/6.2",
+            "WEC-SR-2026:12.2.1"
+          ]
+        },
+        {
+          "id": "q13",
+          "rank": 1,
+          "top": "WEC-SR-2026:12.1.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:12.1.4",
+            "WEC-SR-2026:14.7.2",
+            "WEC-SR-2026:14.6.6",
+            "WEC-SR-2026:11.2.2",
+            "WEC-SR-2026:14.5.2"
+          ]
+        },
+        {
+          "id": "q14",
+          "rank": 4,
+          "top": "WEC-SR-2026:4.4.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:4.4.2",
+            "WEC-SR-2026:APPENDIX 8/6.3",
+            "WEC-SR-2026:APPENDIX 6",
+            "WEC-SR-2026:12.3.1",
+            "WEC-SR-2026:APPENDIX 8"
+          ]
+        },
+        {
+          "id": "q15",
+          "rank": 1,
+          "top": "WEC-SR-2026:12.3.1",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:12.3.1",
+            "WEC-SR-2026:4.4.2",
+            "WEC-SR-2026:4.2.3",
+            "WEC-SR-2026:4.2.4",
+            "WEC-SR-2026:10.2.3"
+          ]
+        },
+        {
+          "id": "q16",
+          "rank": null,
+          "top": "WEC-SR-2026:9.1.6",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:9.1.6",
+            "WEC-SR-2026:9.2.3",
+            "WEC-SR-2026:12.2.2",
+            "WEC-SR-2026:14.3.2",
+            "WEC-SR-2026:12.3.2"
+          ]
+        },
+        {
+          "id": "q17",
+          "rank": null,
+          "top": "WEC-SR-2026:15.3.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:15.3.3",
+            "WEC-SR-2026:11.2.4",
+            "WEC-SR-2026:6.5.5",
+            "WEC-SR-2026:14.3.3",
+            "WEC-SR-2026:14.6.8"
+          ]
+        },
+        {
+          "id": "q18",
+          "rank": 1,
+          "top": "WEC-SR-2026:15.1.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:15.1.4",
+            "WEC-SR-2026:15.1.6",
+            "WEC-SR-2026:15.4.2",
+            "WEC-SR-2026:15.3.5",
+            "WEC-SR-2026:4.4.1"
+          ]
+        },
+        {
+          "id": "q19",
+          "rank": 1,
+          "top": "WEC-SR-2026:15.3.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:15.3.4",
+            "WEC-SR-2026:15.2.3",
+            "WEC-SR-2026:15.3.2",
+            "WEC-SR-2026:15.4.1",
+            "WEC-SR-2026:15.2.2"
+          ]
+        },
+        {
+          "id": "q20",
+          "rank": 1,
+          "top": "WEC-SR-2026:15.1.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:15.1.2",
+            "WEC-SR-2026:15.1.1",
+            "WEC-SR-2026:9.1.13",
+            "WEC-SR-2026:15.1.4",
+            "WEC-SR-2026:15.1.5"
+          ]
+        },
+        {
+          "id": "q21",
+          "rank": 1,
+          "top": "WEC-SR-2026:7.4.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:7.4.4",
+            "WEC-SR-2026:7.4.6",
+            "WEC-SR-2026:7.4.10",
+            "WEC-SR-2026:7.4.9",
+            "WEC-SR-2026:7.4.5"
+          ]
+        },
+        {
+          "id": "q22",
+          "rank": 1,
+          "top": "WEC-SR-2026:6.5.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:6.5.4",
+            "WEC-SR-2026:APPENDIX 9/2.3",
+            "WEC-SR-2026:APPENDIX 9/2.2",
+            "WEC-SR-2026:6.5.3",
+            "WEC-SR-2026:6.5.5"
+          ]
+        },
+        {
+          "id": "q23",
+          "rank": null,
+          "top": "WEC-SR-2026:7.1",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:7.1",
+            "WEC-SR-2026:1.1",
+            "WEC-SR-2026:8.2.2",
+            "WEC-SR-2026:3.1.3",
+            "WEC-SR-2026:APPENDIX 9/1.8"
+          ]
+        },
+        {
+          "id": "q24",
+          "rank": 1,
+          "top": "WEC-SR-2026:7.4.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:7.4.2",
+            "WEC-SR-2026:7.4.10",
+            "WEC-SR-2026:9.1.1",
+            "WEC-SR-2026:13.2.5",
+            "WEC-SR-2026:12.1.4"
+          ]
+        },
+        {
+          "id": "q25",
+          "rank": 1,
+          "top": "WEC-SR-2026:7.4.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:7.4.3",
+            "WEC-SR-2026:7.4.5",
+            "WEC-SR-2026:7.4.4",
+            "WEC-SR-2026:APPENDIX 4",
+            "WEC-SR-2026:7.4.10"
+          ]
+        },
+        {
+          "id": "q26",
+          "rank": 1,
+          "top": "WEC-SR-2026:11.3.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:11.3.2",
+            "WEC-SR-2026:11.2.6",
+            "WEC-SR-2026:9.2.1",
+            "WEC-SR-2026:11.2.2",
+            "WEC-SR-2026:1.4.1"
+          ]
+        },
+        {
+          "id": "q27",
+          "rank": null,
+          "top": "WEC-SR-2026:APPENDIX 9/2.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:APPENDIX 9/2.2",
+            "WEC-SR-2026:APPENDIX 1/11.2",
+            "WEC-SR-2026:APPENDIX 9/2.3",
+            "WEC-SR-2026:6.5.5",
+            "WEC-SR-2026:4.2.3"
+          ]
+        },
+        {
+          "id": "q28",
+          "rank": 5,
+          "top": "WEC-SR-2026:9.1.8",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:9.1.8",
+            "WEC-SR-2026:11.1.4",
+            "WEC-SR-2026:9.1.3",
+            "WEC-SR-2026:APPENDIX 8/6.3",
+            "WEC-SR-2026:12.2.2"
+          ]
+        },
+        {
+          "id": "q29",
+          "rank": 1,
+          "top": "WEC-SR-2026:14.4.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.4.3",
+            "WEC-SR-2026:14.3.3",
+            "WEC-SR-2026:7.4.9",
+            "WEC-SR-2026:14.6.11",
+            "WEC-SR-2026:14.4.4"
+          ]
+        },
+        {
+          "id": "q30",
+          "rank": 2,
+          "top": "WEC-SR-2026:10.2.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:10.2.2",
+            "WEC-SR-2026:APPENDIX 7",
+            "WEC-SR-2026:9.1.2",
+            "WEC-SR-2026:APPENDIX 9/5.3",
+            "WEC-SR-2026:APPENDIX 9/1.4"
+          ]
+        }
+      ]
+    },
+    "original/embeddings": {
+      "questions": 30,
+      "filter_season": true,
+      "recall@1": 22,
+      "recall@3": 27,
+      "recall@5": 27,
+      "top1_right_article_wrong_season": 0,
+      "per_question": [
+        {
+          "id": "q01",
+          "rank": 2,
+          "top": "WEC-SR-2026:13.3.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:13.3.3",
+            "WEC-SR-2026:13.2.3",
+            "WEC-SR-2026:10.1.2",
+            "WEC-SR-2026:1.4.1",
+            "WEC-SR-2026:6.3.1"
+          ]
+        },
+        {
+          "id": "q02",
+          "rank": 1,
+          "top": "WEC-SR-2026:13.2.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:13.2.3",
+            "WEC-SR-2026:APPENDIX 9/7.2",
+            "WEC-SR-2026:10.2.2",
+            "WEC-SR-2026:13.2.5",
+            "WEC-SR-2026:APPENDIX 9/4.8"
+          ]
+        },
+        {
+          "id": "q03",
+          "rank": 1,
+          "top": "WEC-SR-2026:13.2.5",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:13.2.5",
+            "WEC-SR-2026:13.2.3",
+            "WEC-SR-2026:10.2.5",
+            "WEC-SR-2026:6.4.3",
+            "WEC-SR-2026:7.4.2"
+          ]
+        },
+        {
+          "id": "q04",
+          "rank": 1,
+          "top": "WEC-SR-2026:13.2.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:13.2.2",
+            "WEC-SR-2026:7.4.4",
+            "WEC-SR-2026:7.4.3",
+            "WEC-SR-2026:11.2.3",
+            "WEC-SR-2026:13.2.5"
+          ]
+        },
+        {
+          "id": "q05",
+          "rank": 1,
+          "top": "WEC-SR-2026:13.2.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:13.2.4",
+            "WEC-SR-2026:13.2.5",
+            "WEC-SR-2026:7.3.5",
+            "WEC-SR-2026:7.2.2",
+            "WEC-SR-2026:9.1.3"
+          ]
+        },
+        {
+          "id": "q06",
+          "rank": 1,
+          "top": "WEC-SR-2026:13.3.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:13.3.2",
+            "WEC-SR-2026:3.2.3",
+            "WEC-SR-2026:15.3.6",
+            "WEC-SR-2026:15.3.5",
+            "WEC-SR-2026:3.1.6"
+          ]
+        },
+        {
+          "id": "q07",
+          "rank": 1,
+          "top": "WEC-SR-2026:13.3.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:13.3.3",
+            "WEC-SR-2026:13.2.3",
+            "WEC-SR-2026:3.2.4",
+            "WEC-SR-2026:6.1.1",
+            "WEC-SR-2026:9.2.3"
+          ]
+        },
+        {
+          "id": "q08",
+          "rank": 2,
+          "top": "WEC-SR-2026:14.5.1",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.5.1",
+            "WEC-SR-2026:14.5.2",
+            "WEC-SR-2026:14.5.4",
+            "WEC-SR-2026:14.6.11",
+            "WEC-SR-2026:APPENDIX 1/11.4"
+          ]
+        },
+        {
+          "id": "q09",
+          "rank": 1,
+          "top": "WEC-SR-2026:14.5.1",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.5.1",
+            "WEC-SR-2026:14.5.2",
+            "WEC-SR-2026:14.5.4",
+            "WEC-SR-2026:13.2.5",
+            "WEC-SR-2026:7.4.2"
+          ]
+        },
+        {
+          "id": "q10",
+          "rank": null,
+          "top": "WEC-SR-2026:14.7.1",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.7.1",
+            "WEC-SR-2026:14.6.11",
+            "WEC-SR-2026:14.6.4",
+            "WEC-SR-2026:9.1.6",
+            "WEC-SR-2026:12.1.1"
+          ]
+        },
+        {
+          "id": "q11",
+          "rank": 1,
+          "top": "WEC-SR-2026:14.6.5",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.6.5",
+            "WEC-SR-2026:14.6.6",
+            "WEC-SR-2026:14.4.4",
+            "WEC-SR-2026:14.6.10",
+            "WEC-SR-2026:12.2.1"
+          ]
+        },
+        {
+          "id": "q12",
+          "rank": 1,
+          "top": "WEC-SR-2026:14.6.5",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.6.5",
+            "WEC-SR-2026:12.2.1",
+            "WEC-SR-2026:14.4.4",
+            "WEC-SR-2026:14.5.2",
+            "WEC-SR-2026:12.2.2"
+          ]
+        },
+        {
+          "id": "q13",
+          "rank": 1,
+          "top": "WEC-SR-2026:12.1.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:12.1.4",
+            "WEC-SR-2026:12.1.2",
+            "WEC-SR-2026:12.1.3",
+            "WEC-SR-2026:14.7.2",
+            "WEC-SR-2026:14.5.2"
+          ]
+        },
+        {
+          "id": "q14",
+          "rank": 2,
+          "top": "WEC-SR-2026:APPENDIX 8",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:APPENDIX 8",
+            "WEC-SR-2026:12.3.1",
+            "WEC-SR-2026:APPENDIX 8/6.3",
+            "WEC-SR-2026:4.4.2",
+            "WEC-SR-2026:10.2.3"
+          ]
+        },
+        {
+          "id": "q15",
+          "rank": null,
+          "top": "WEC-SR-2026:10.2.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:10.2.3",
+            "WEC-SR-2026:APPENDIX 4",
+            "WEC-SR-2026:9.1.1",
+            "WEC-SR-2026:10.1.2",
+            "WEC-SR-2026:3.1.2"
+          ]
+        },
+        {
+          "id": "q16",
+          "rank": null,
+          "top": "WEC-SR-2026:9.1.8",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:9.1.8",
+            "WEC-SR-2026:9.1.3",
+            "WEC-SR-2026:12.2.2",
+            "WEC-SR-2026:15.1.3",
+            "WEC-SR-2026:11.2.4"
+          ]
+        },
+        {
+          "id": "q17",
+          "rank": 1,
+          "top": "WEC-SR-2026:APPENDIX 8/6.1",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:APPENDIX 8/6.1",
+            "WEC-SR-2026:APPENDIX 8/6.2",
+            "WEC-SR-2026:APPENDIX 8/6.3",
+            "WEC-SR-2026:12.3.1",
+            "WEC-SR-2026:9.1.12"
+          ]
+        },
+        {
+          "id": "q18",
+          "rank": 1,
+          "top": "WEC-SR-2026:15.1.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:15.1.4",
+            "WEC-SR-2026:15.3.5",
+            "WEC-SR-2026:15.4.1",
+            "WEC-SR-2026:15.3.6",
+            "WEC-SR-2026:15.1.6"
+          ]
+        },
+        {
+          "id": "q19",
+          "rank": 1,
+          "top": "WEC-SR-2026:15.3.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:15.3.4",
+            "WEC-SR-2026:15.3.3",
+            "WEC-SR-2026:14.3.1",
+            "WEC-SR-2026:10.2.4",
+            "WEC-SR-2026:15.1.1"
+          ]
+        },
+        {
+          "id": "q20",
+          "rank": 1,
+          "top": "WEC-SR-2026:15.1.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:15.1.2",
+            "WEC-SR-2026:15.1.1",
+            "WEC-SR-2026:9.1.13",
+            "WEC-SR-2026:15.1.4",
+            "WEC-SR-2026:15.1.5"
+          ]
+        },
+        {
+          "id": "q21",
+          "rank": 1,
+          "top": "WEC-SR-2026:7.4.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:7.4.4",
+            "WEC-SR-2026:12.2.1",
+            "WEC-SR-2026:7.4.9",
+            "WEC-SR-2026:12.1.4",
+            "WEC-SR-2026:12.2.2"
+          ]
+        },
+        {
+          "id": "q22",
+          "rank": 1,
+          "top": "WEC-SR-2026:6.5.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:6.5.4",
+            "WEC-SR-2026:APPENDIX 9/2.2",
+            "WEC-SR-2026:6.5.3",
+            "WEC-SR-2026:APPENDIX 9/2.3",
+            "WEC-SR-2026:6.5.5"
+          ]
+        },
+        {
+          "id": "q23",
+          "rank": 1,
+          "top": "WEC-SR-2026:1.2.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:1.2.4",
+            "WEC-SR-2026:APPENDIX 9/1.8",
+            "WEC-SR-2026:6.2.2",
+            "WEC-SR-2026:1.1",
+            "WEC-SR-2026:3.1.3"
+          ]
+        },
+        {
+          "id": "q24",
+          "rank": 1,
+          "top": "WEC-SR-2026:7.4.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:7.4.2",
+            "WEC-SR-2026:13.2.5",
+            "WEC-SR-2026:14.6.4",
+            "WEC-SR-2026:7.4.3",
+            "WEC-SR-2026:13.2.3"
+          ]
+        },
+        {
+          "id": "q25",
+          "rank": 2,
+          "top": "WEC-SR-2026:7.4.5",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:7.4.5",
+            "WEC-SR-2026:7.4.3",
+            "WEC-SR-2026:7.4.10",
+            "WEC-SR-2026:9.1.6",
+            "WEC-SR-2026:7.4.2"
+          ]
+        },
+        {
+          "id": "q26",
+          "rank": 1,
+          "top": "WEC-SR-2026:11.3.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:11.3.2",
+            "WEC-SR-2026:11.2.6",
+            "WEC-SR-2026:14.6.5",
+            "WEC-SR-2026:14.6.7",
+            "WEC-SR-2026:14.6.11"
+          ]
+        },
+        {
+          "id": "q27",
+          "rank": 1,
+          "top": "WEC-SR-2026:6.5.6",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:6.5.6",
+            "WEC-SR-2026:6.5.7",
+            "WEC-SR-2026:APPENDIX 9/2.2",
+            "WEC-SR-2026:APPENDIX 9/9.2",
+            "WEC-SR-2026:6.5.1"
+          ]
+        },
+        {
+          "id": "q28",
+          "rank": 3,
+          "top": "WEC-SR-2026:9.1.8",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:9.1.8",
+            "WEC-SR-2026:6.4.6",
+            "WEC-SR-2026:12.2.2",
+            "WEC-SR-2026:9.1.12",
+            "WEC-SR-2026:7.4.3"
+          ]
+        },
+        {
+          "id": "q29",
+          "rank": 1,
+          "top": "WEC-SR-2026:14.4.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.4.3",
+            "WEC-SR-2026:14.4.4",
+            "WEC-SR-2026:14.3.3",
+            "WEC-SR-2026:7.4.9",
+            "WEC-SR-2026:11.1.3"
+          ]
+        },
+        {
+          "id": "q30",
+          "rank": 1,
+          "top": "WEC-SR-2026:APPENDIX 7",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:APPENDIX 7",
+            "WEC-SR-2026:APPENDIX 9/5.1",
+            "WEC-SR-2026:APPENDIX 9/1.4",
+            "WEC-SR-2026:1.4.3",
+            "WEC-SR-2026:APPENDIX 9/5.3"
+          ]
+        }
+      ]
+    },
+    "original/hybrid": {
+      "questions": 30,
+      "filter_season": true,
+      "recall@1": 18,
+      "recall@3": 25,
+      "recall@5": 27,
+      "top1_right_article_wrong_season": 0,
+      "per_question": [
+        {
+          "id": "q01",
+          "rank": 3,
+          "top": "WEC-SR-2026:13.3.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:13.3.3",
+            "WEC-SR-2026:10.1.2",
+            "WEC-SR-2026:13.2.3",
+            "WEC-SR-2026:1.4.1",
+            "WEC-SR-2026:6.3.1"
+          ]
+        },
+        {
+          "id": "q02",
+          "rank": 1,
+          "top": "WEC-SR-2026:13.2.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:13.2.3",
+            "WEC-SR-2026:13.2.5",
+            "WEC-SR-2026:10.2.2",
+            "WEC-SR-2026:13.3.2",
+            "WEC-SR-2026:13.3.3"
+          ]
+        },
+        {
+          "id": "q03",
+          "rank": 2,
+          "top": "WEC-SR-2026:13.2.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:13.2.3",
+            "WEC-SR-2026:13.2.5",
+            "WEC-SR-2026:9.1.3",
+            "WEC-SR-2026:13.2.2",
+            "WEC-SR-2026:10.1.2"
+          ]
+        },
+        {
+          "id": "q04",
+          "rank": null,
+          "top": "WEC-SR-2026:7.4.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:7.4.4",
+            "WEC-SR-2026:7.4.3",
+            "WEC-SR-2026:7.4.5",
+            "WEC-SR-2026:12.2.1",
+            "WEC-SR-2026:5.1.2"
+          ]
+        },
+        {
+          "id": "q05",
+          "rank": 1,
+          "top": "WEC-SR-2026:13.2.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:13.2.4",
+            "WEC-SR-2026:13.2.5",
+            "WEC-SR-2026:9.1.2",
+            "WEC-SR-2026:9.1.3",
+            "WEC-SR-2026:13.3.1"
+          ]
+        },
+        {
+          "id": "q06",
+          "rank": 1,
+          "top": "WEC-SR-2026:13.3.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:13.3.2",
+            "WEC-SR-2026:13.2.3",
+            "WEC-SR-2026:10.1.2",
+            "WEC-SR-2026:15.3.5",
+            "WEC-SR-2026:13.3.3"
+          ]
+        },
+        {
+          "id": "q07",
+          "rank": 1,
+          "top": "WEC-SR-2026:13.3.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:13.3.3",
+            "WEC-SR-2026:13.2.3",
+            "WEC-SR-2026:6.1.1",
+            "WEC-SR-2026:3.2.4",
+            "WEC-SR-2026:10.1.2"
+          ]
+        },
+        {
+          "id": "q08",
+          "rank": 2,
+          "top": "WEC-SR-2026:14.5.1",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.5.1",
+            "WEC-SR-2026:14.5.2",
+            "WEC-SR-2026:14.5.4",
+            "WEC-SR-2026:14.7.2",
+            "WEC-SR-2026:14.5.3"
+          ]
+        },
+        {
+          "id": "q09",
+          "rank": 1,
+          "top": "WEC-SR-2026:14.5.1",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.5.1",
+            "WEC-SR-2026:14.5.2",
+            "WEC-SR-2026:14.5.4",
+            "WEC-SR-2026:14.5.3",
+            "WEC-SR-2026:14.2.1"
+          ]
+        },
+        {
+          "id": "q10",
+          "rank": 3,
+          "top": "WEC-SR-2026:14.6.11",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.6.11",
+            "WEC-SR-2026:14.7.1",
+            "WEC-SR-2026:14.7.2",
+            "WEC-SR-2026:14.7.3",
+            "WEC-SR-2026:12.2.2"
+          ]
+        },
+        {
+          "id": "q11",
+          "rank": 1,
+          "top": "WEC-SR-2026:14.6.5",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.6.5",
+            "WEC-SR-2026:14.6.10",
+            "WEC-SR-2026:14.6.6",
+            "WEC-SR-2026:14.6.9",
+            "WEC-SR-2026:14.4.4"
+          ]
+        },
+        {
+          "id": "q12",
+          "rank": 1,
+          "top": "WEC-SR-2026:14.6.5",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.6.5",
+            "WEC-SR-2026:14.5.2",
+            "WEC-SR-2026:14.4.4",
+            "WEC-SR-2026:12.2.1",
+            "WEC-SR-2026:APPENDIX 8/6.2"
+          ]
+        },
+        {
+          "id": "q13",
+          "rank": 1,
+          "top": "WEC-SR-2026:12.1.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:12.1.4",
+            "WEC-SR-2026:14.7.2",
+            "WEC-SR-2026:14.5.2",
+            "WEC-SR-2026:12.1.2",
+            "WEC-SR-2026:12.1.3"
+          ]
+        },
+        {
+          "id": "q14",
+          "rank": 4,
+          "top": "WEC-SR-2026:4.4.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:4.4.2",
+            "WEC-SR-2026:APPENDIX 8/6.3",
+            "WEC-SR-2026:APPENDIX 8",
+            "WEC-SR-2026:12.3.1",
+            "WEC-SR-2026:10.2.3"
+          ]
+        },
+        {
+          "id": "q15",
+          "rank": 4,
+          "top": "WEC-SR-2026:10.2.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:10.2.3",
+            "WEC-SR-2026:APPENDIX 9/1.8",
+            "WEC-SR-2026:APPENDIX 9/5.3",
+            "WEC-SR-2026:12.3.1",
+            "WEC-SR-2026:14.6.1"
+          ]
+        },
+        {
+          "id": "q16",
+          "rank": null,
+          "top": "WEC-SR-2026:12.2.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:12.2.2",
+            "WEC-SR-2026:9.1.3",
+            "WEC-SR-2026:7.2.4",
+            "WEC-SR-2026:12.2.1",
+            "WEC-SR-2026:APPENDIX 8/6.1"
+          ]
+        },
+        {
+          "id": "q17",
+          "rank": null,
+          "top": "WEC-SR-2026:APPENDIX 8/6.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:APPENDIX 8/6.3",
+            "WEC-SR-2026:14.3.3",
+            "WEC-SR-2026:9.1.3",
+            "WEC-SR-2026:9.1.12",
+            "WEC-SR-2026:10.1.2"
+          ]
+        },
+        {
+          "id": "q18",
+          "rank": 1,
+          "top": "WEC-SR-2026:15.1.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:15.1.4",
+            "WEC-SR-2026:15.3.5",
+            "WEC-SR-2026:15.1.6",
+            "WEC-SR-2026:15.4.2",
+            "WEC-SR-2026:15.1.5"
+          ]
+        },
+        {
+          "id": "q19",
+          "rank": 1,
+          "top": "WEC-SR-2026:15.3.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:15.3.4",
+            "WEC-SR-2026:15.3.3",
+            "WEC-SR-2026:15.2.3",
+            "WEC-SR-2026:14.3.1",
+            "WEC-SR-2026:15.4.2"
+          ]
+        },
+        {
+          "id": "q20",
+          "rank": 1,
+          "top": "WEC-SR-2026:15.1.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:15.1.2",
+            "WEC-SR-2026:15.1.1",
+            "WEC-SR-2026:9.1.13",
+            "WEC-SR-2026:15.1.4",
+            "WEC-SR-2026:15.1.5"
+          ]
+        },
+        {
+          "id": "q21",
+          "rank": 1,
+          "top": "WEC-SR-2026:7.4.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:7.4.4",
+            "WEC-SR-2026:7.4.9",
+            "WEC-SR-2026:12.2.1",
+            "WEC-SR-2026:7.4.6",
+            "WEC-SR-2026:7.4.3"
+          ]
+        },
+        {
+          "id": "q22",
+          "rank": 1,
+          "top": "WEC-SR-2026:6.5.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:6.5.4",
+            "WEC-SR-2026:APPENDIX 9/2.2",
+            "WEC-SR-2026:APPENDIX 9/2.3",
+            "WEC-SR-2026:6.5.3",
+            "WEC-SR-2026:6.5.5"
+          ]
+        },
+        {
+          "id": "q23",
+          "rank": 2,
+          "top": "WEC-SR-2026:1.1",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:1.1",
+            "WEC-SR-2026:1.2.4",
+            "WEC-SR-2026:APPENDIX 9/1.8",
+            "WEC-SR-2026:3.1.3",
+            "WEC-SR-2026:8.2.2"
+          ]
+        },
+        {
+          "id": "q24",
+          "rank": 1,
+          "top": "WEC-SR-2026:7.4.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:7.4.2",
+            "WEC-SR-2026:13.2.5",
+            "WEC-SR-2026:7.4.10",
+            "WEC-SR-2026:9.1.1",
+            "WEC-SR-2026:12.3.2"
+          ]
+        },
+        {
+          "id": "q25",
+          "rank": 1,
+          "top": "WEC-SR-2026:7.4.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:7.4.3",
+            "WEC-SR-2026:7.4.5",
+            "WEC-SR-2026:7.4.10",
+            "WEC-SR-2026:7.4.4",
+            "WEC-SR-2026:APPENDIX 4"
+          ]
+        },
+        {
+          "id": "q26",
+          "rank": 1,
+          "top": "WEC-SR-2026:11.3.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:11.3.2",
+            "WEC-SR-2026:11.2.6",
+            "WEC-SR-2026:14.6.7",
+            "WEC-SR-2026:11.1.3",
+            "WEC-SR-2026:11.2.1"
+          ]
+        },
+        {
+          "id": "q27",
+          "rank": 2,
+          "top": "WEC-SR-2026:APPENDIX 9/2.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:APPENDIX 9/2.2",
+            "WEC-SR-2026:6.5.6",
+            "WEC-SR-2026:APPENDIX 9/2.3",
+            "WEC-SR-2026:6.5.5",
+            "WEC-SR-2026:6.5.1"
+          ]
+        },
+        {
+          "id": "q28",
+          "rank": 2,
+          "top": "WEC-SR-2026:9.1.8",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:9.1.8",
+            "WEC-SR-2026:12.2.2",
+            "WEC-SR-2026:9.1.3",
+            "WEC-SR-2026:7.4.3",
+            "WEC-SR-2026:5.1.2"
+          ]
+        },
+        {
+          "id": "q29",
+          "rank": 1,
+          "top": "WEC-SR-2026:14.4.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.4.3",
+            "WEC-SR-2026:14.3.3",
+            "WEC-SR-2026:14.4.4",
+            "WEC-SR-2026:7.4.9",
+            "WEC-SR-2026:14.6.11"
+          ]
+        },
+        {
+          "id": "q30",
+          "rank": 1,
+          "top": "WEC-SR-2026:APPENDIX 7",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:APPENDIX 7",
+            "WEC-SR-2026:APPENDIX 9/1.4",
+            "WEC-SR-2026:APPENDIX 9/5.3",
+            "WEC-SR-2026:9.1.2",
+            "WEC-SR-2026:6.5.4"
+          ]
+        }
+      ]
+    },
+    "heldout/bm25": {
+      "questions": 30,
+      "filter_season": true,
+      "recall@1": 19,
+      "recall@3": 25,
+      "recall@5": 27,
+      "top1_right_article_wrong_season": 0,
+      "per_question": [
+        {
+          "id": "h01",
+          "rank": 1,
+          "top": "WEC-SR-2026:4.3.1",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:4.3.1",
+            "WEC-SR-2026:4.3.2",
+            "WEC-SR-2026:APPENDIX 9/2.2",
+            "WEC-SR-2026:7.3.6",
+            "WEC-SR-2026:9.2.1"
+          ]
+        },
+        {
+          "id": "h02",
+          "rank": 1,
+          "top": "WEC-SR-2026:6.2.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:6.2.2",
+            "WEC-SR-2026:4.2.4",
+            "WEC-SR-2026:3.1.3",
+            "WEC-SR-2026:1.2.4",
+            "WEC-SR-2026:APPENDIX 9/1.8"
+          ]
+        },
+        {
+          "id": "h03",
+          "rank": 1,
+          "top": "WEC-SR-2026:6.4.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:6.4.2",
+            "WEC-SR-2026:APPENDIX 5",
+            "WEC-SR-2026:6.4.1",
+            "WEC-SR-2026:10.2.2",
+            "WEC-SR-2026:14.6.4"
+          ]
+        },
+        {
+          "id": "h04",
+          "rank": 1,
+          "top": "WEC-SR-2026:6.5.7",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:6.5.7",
+            "WEC-SR-2026:APPENDIX 9/2.3",
+            "WEC-SR-2026:6.5.3",
+            "WEC-SR-2026:6.5.5",
+            "WEC-SR-2026:APPENDIX 9/2.2"
+          ]
+        },
+        {
+          "id": "h05",
+          "rank": 1,
+          "top": "WEC-SR-2026:7.4.5",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:7.4.5",
+            "WEC-SR-2026:7.4.6",
+            "WEC-SR-2026:12.3.2",
+            "WEC-SR-2026:7.4.3",
+            "WEC-SR-2026:7.4.4"
+          ]
+        },
+        {
+          "id": "h06",
+          "rank": 1,
+          "top": "WEC-SR-2026:7.4.7",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:7.4.7",
+            "WEC-SR-2026:7.4.10",
+            "WEC-SR-2026:11.3.1",
+            "WEC-SR-2026:15.3.4",
+            "WEC-SR-2026:11.2.2"
+          ]
+        },
+        {
+          "id": "h07",
+          "rank": 2,
+          "top": "WEC-SR-2026:7.4.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:7.4.2",
+            "WEC-SR-2026:7.4.9",
+            "WEC-SR-2026:7.4.10",
+            "WEC-SR-2026:9.1.1",
+            "WEC-SR-2026:14.6.8"
+          ]
+        },
+        {
+          "id": "h08",
+          "rank": 2,
+          "top": "WEC-SR-2026:14.6.10",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.6.10",
+            "WEC-SR-2026:7.4.10",
+            "WEC-SR-2026:7.4.7",
+            "WEC-SR-2026:15.1.4",
+            "WEC-SR-2026:15.1.1"
+          ]
+        },
+        {
+          "id": "h09",
+          "rank": null,
+          "top": "WEC-SR-2026:APPENDIX 6",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:APPENDIX 6",
+            "WEC-SR-2026:9.1.8",
+            "WEC-SR-2026:9.1.14",
+            "WEC-SR-2026:9.2.2",
+            "WEC-SR-2026:9.1.9"
+          ]
+        },
+        {
+          "id": "h10",
+          "rank": 2,
+          "top": "WEC-SR-2026:9.1.12",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:9.1.12",
+            "WEC-SR-2026:9.1.4",
+            "WEC-SR-2026:14.4.4",
+            "WEC-SR-2026:12.2.1",
+            "WEC-SR-2026:6.4.3"
+          ]
+        },
+        {
+          "id": "h11",
+          "rank": null,
+          "top": "WEC-SR-2026:14.4.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.4.4",
+            "WEC-SR-2026:14.5.2",
+            "WEC-SR-2026:14.6.5",
+            "WEC-SR-2026:14.6.6",
+            "WEC-SR-2026:10.2.3"
+          ]
+        },
+        {
+          "id": "h12",
+          "rank": 1,
+          "top": "WEC-SR-2026:9.1.12",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:9.1.12",
+            "WEC-SR-2026:13.2.2",
+            "WEC-SR-2026:6.5.6",
+            "WEC-SR-2026:5.1.2",
+            "WEC-SR-2026:6.4.3"
+          ]
+        },
+        {
+          "id": "h13",
+          "rank": null,
+          "top": "WEC-SR-2026:15.1.5",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:15.1.5",
+            "WEC-SR-2026:14.6.9",
+            "WEC-SR-2026:15.1.1",
+            "WEC-SR-2026:14.4.5",
+            "WEC-SR-2026:15.1.2"
+          ]
+        },
+        {
+          "id": "h14",
+          "rank": 1,
+          "top": "WEC-SR-2026:10.2.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:10.2.4",
+            "WEC-SR-2026:14.2.1",
+            "WEC-SR-2026:14.2.4",
+            "WEC-SR-2026:10.2.1",
+            "WEC-SR-2026:APPENDIX 4"
+          ]
+        },
+        {
+          "id": "h15",
+          "rank": 2,
+          "top": "WEC-SR-2026:15.4.1",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:15.4.1",
+            "WEC-SR-2026:11.1.3",
+            "WEC-SR-2026:11.1.6",
+            "WEC-SR-2026:10.2.2",
+            "WEC-SR-2026:11.2.2"
+          ]
+        },
+        {
+          "id": "h16",
+          "rank": 1,
+          "top": "WEC-SR-2026:11.2.6",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:11.2.6",
+            "WEC-SR-2026:11.2.1",
+            "WEC-SR-2026:11.2.8",
+            "WEC-SR-2026:11.1.6",
+            "WEC-SR-2026:11.2.7"
+          ]
+        },
+        {
+          "id": "h17",
+          "rank": 1,
+          "top": "WEC-SR-2026:11.3.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:11.3.3",
+            "WEC-SR-2026:14.6.6",
+            "WEC-SR-2026:14.6.11",
+            "WEC-SR-2026:14.6.4",
+            "WEC-SR-2026:14.4.4"
+          ]
+        },
+        {
+          "id": "h18",
+          "rank": 1,
+          "top": "WEC-SR-2026:12.1.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:12.1.3",
+            "WEC-SR-2026:9.1.4",
+            "WEC-SR-2026:11.2.4",
+            "WEC-SR-2026:14.6.11",
+            "WEC-SR-2026:11.2.2"
+          ]
+        },
+        {
+          "id": "h19",
+          "rank": 2,
+          "top": "WEC-SR-2026:APPENDIX 8/6.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:APPENDIX 8/6.2",
+            "WEC-SR-2026:12.3.2",
+            "WEC-SR-2026:7.2.4",
+            "WEC-SR-2026:APPENDIX 8",
+            "WEC-SR-2026:APPENDIX 9/9.4"
+          ]
+        },
+        {
+          "id": "h20",
+          "rank": 2,
+          "top": "WEC-SR-2026:14.5.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.5.2",
+            "WEC-SR-2026:14.5.3",
+            "WEC-SR-2026:14.5.1",
+            "WEC-SR-2026:14.5.4",
+            "WEC-SR-2026:14.6.2"
+          ]
+        },
+        {
+          "id": "h21",
+          "rank": 1,
+          "top": "WEC-SR-2026:14.5.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.5.4",
+            "WEC-SR-2026:14.5.2",
+            "WEC-SR-2026:14.5.1",
+            "WEC-SR-2026:7.4.9",
+            "WEC-SR-2026:14.6.11"
+          ]
+        },
+        {
+          "id": "h22",
+          "rank": 1,
+          "top": "WEC-SR-2026:14.6.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.6.2",
+            "WEC-SR-2026:7.4.9",
+            "WEC-SR-2026:14.7.2",
+            "WEC-SR-2026:14.6.5",
+            "WEC-SR-2026:14.4.4"
+          ]
+        },
+        {
+          "id": "h23",
+          "rank": 1,
+          "top": "WEC-SR-2026:14.6.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.6.4",
+            "WEC-SR-2026:14.4.2",
+            "WEC-SR-2026:14.4.3",
+            "WEC-SR-2026:10.2.3",
+            "WEC-SR-2026:14.4.4"
+          ]
+        },
+        {
+          "id": "h24",
+          "rank": 5,
+          "top": "WEC-SR-2026:14.6.11",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.6.11",
+            "WEC-SR-2026:14.4.4",
+            "WEC-SR-2026:14.6.2",
+            "WEC-SR-2026:14.7.2",
+            "WEC-SR-2026:14.6.6"
+          ]
+        },
+        {
+          "id": "h25",
+          "rank": 1,
+          "top": "WEC-SR-2026:14.7.1",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.7.1",
+            "WEC-SR-2026:14.7.3",
+            "WEC-SR-2026:14.5.4",
+            "WEC-SR-2026:14.7.2",
+            "WEC-SR-2026:15.3.4"
+          ]
+        },
+        {
+          "id": "h26",
+          "rank": 4,
+          "top": "WEC-SR-2026:APPENDIX 4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:APPENDIX 4",
+            "WEC-SR-2026:7.4.3",
+            "WEC-SR-2026:9.1.6",
+            "WEC-SR-2026:15.1.3",
+            "WEC-SR-2026:14.3.3"
+          ]
+        },
+        {
+          "id": "h27",
+          "rank": 1,
+          "top": "WEC-SR-2026:15.3.1",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:15.3.1",
+            "WEC-SR-2026:3.1.3",
+            "WEC-SR-2026:APPENDIX 9/1.8",
+            "WEC-SR-2026:1.2.4",
+            "WEC-SR-2026:8.2.2"
+          ]
+        },
+        {
+          "id": "h28",
+          "rank": 1,
+          "top": "WEC-SR-2026:15.3.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:15.3.2",
+            "WEC-SR-2026:11.1.2",
+            "WEC-SR-2026:APPENDIX 1/11.3",
+            "WEC-SR-2026:15.3.1",
+            "WEC-SR-2026:2.3.1"
+          ]
+        },
+        {
+          "id": "h29",
+          "rank": 1,
+          "top": "WEC-SR-2026:7.2.6",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:7.2.6",
+            "WEC-SR-2026:14.2.3",
+            "WEC-SR-2026:APPENDIX 9/1.6",
+            "WEC-SR-2026:14.5.1",
+            "WEC-SR-2026:12.1.3"
+          ]
+        },
+        {
+          "id": "h30",
+          "rank": 1,
+          "top": "WEC-SR-2026:6.5.5",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:6.5.5",
+            "WEC-SR-2026:4.4.2",
+            "WEC-SR-2026:APPENDIX 9/2.3",
+            "WEC-SR-2026:9.1.6",
+            "WEC-SR-2026:12.3.2"
+          ]
+        }
+      ]
+    },
+    "heldout/embeddings": {
+      "questions": 30,
+      "filter_season": true,
+      "recall@1": 22,
+      "recall@3": 26,
+      "recall@5": 27,
+      "top1_right_article_wrong_season": 0,
+      "per_question": [
+        {
+          "id": "h01",
+          "rank": 1,
+          "top": "WEC-SR-2026:4.3.1",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:4.3.1",
+            "WEC-SR-2026:4.3.3",
+            "WEC-SR-2026:4.3.2",
+            "WEC-SR-2026:4.2.1",
+            "WEC-SR-2026:APPENDIX 9/1.4"
+          ]
+        },
+        {
+          "id": "h02",
+          "rank": 1,
+          "top": "WEC-SR-2026:6.2.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:6.2.2",
+            "WEC-SR-2026:6.1.1",
+            "WEC-SR-2026:APPENDIX 9/1.8",
+            "WEC-SR-2026:6.4.5",
+            "WEC-SR-2026:14.4.2"
+          ]
+        },
+        {
+          "id": "h03",
+          "rank": 1,
+          "top": "WEC-SR-2026:6.4.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:6.4.2",
+            "WEC-SR-2026:6.4.1",
+            "WEC-SR-2026:6.4.6",
+            "WEC-SR-2026:11.3.1",
+            "WEC-SR-2026:6.4.5"
+          ]
+        },
+        {
+          "id": "h04",
+          "rank": 1,
+          "top": "WEC-SR-2026:6.5.7",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:6.5.7",
+            "WEC-SR-2026:6.5.4",
+            "WEC-SR-2026:APPENDIX 9/2.3",
+            "WEC-SR-2026:6.5.3",
+            "WEC-SR-2026:APPENDIX 9/2.2"
+          ]
+        },
+        {
+          "id": "h05",
+          "rank": 1,
+          "top": "WEC-SR-2026:7.4.5",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:7.4.5",
+            "WEC-SR-2026:7.4.3",
+            "WEC-SR-2026:9.1.6",
+            "WEC-SR-2026:9.1.3",
+            "WEC-SR-2026:7.4.8"
+          ]
+        },
+        {
+          "id": "h06",
+          "rank": 1,
+          "top": "WEC-SR-2026:7.4.7",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:7.4.7",
+            "WEC-SR-2026:7.4.10",
+            "WEC-SR-2026:10.2.4",
+            "WEC-SR-2026:7.4.6",
+            "WEC-SR-2026:APPENDIX 4"
+          ]
+        },
+        {
+          "id": "h07",
+          "rank": null,
+          "top": "WEC-SR-2026:14.6.11",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.6.11",
+            "WEC-SR-2026:14.6.4",
+            "WEC-SR-2026:7.4.2",
+            "WEC-SR-2026:14.6.2",
+            "WEC-SR-2026:12.1.1"
+          ]
+        },
+        {
+          "id": "h08",
+          "rank": 1,
+          "top": "WEC-SR-2026:7.4.10",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:7.4.10",
+            "WEC-SR-2026:13.2.5",
+            "WEC-SR-2026:7.4.9",
+            "WEC-SR-2026:7.4.7",
+            "WEC-SR-2026:APPENDIX 4"
+          ]
+        },
+        {
+          "id": "h09",
+          "rank": 2,
+          "top": "WEC-SR-2026:9.1.13",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:9.1.13",
+            "WEC-SR-2026:9.1.2",
+            "WEC-SR-2026:APPENDIX 4",
+            "WEC-SR-2026:9.1.11",
+            "WEC-SR-2026:9.1.4"
+          ]
+        },
+        {
+          "id": "h10",
+          "rank": 5,
+          "top": "WEC-SR-2026:12.2.1",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:12.2.1",
+            "WEC-SR-2026:12.2.2",
+            "WEC-SR-2026:12.1.3",
+            "WEC-SR-2026:14.6.11",
+            "WEC-SR-2026:9.1.4"
+          ]
+        },
+        {
+          "id": "h11",
+          "rank": null,
+          "top": "WEC-SR-2026:9.1.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:9.1.3",
+            "WEC-SR-2026:14.4.4",
+            "WEC-SR-2026:9.1.10",
+            "WEC-SR-2026:7.4.3",
+            "WEC-SR-2026:12.2.1"
+          ]
+        },
+        {
+          "id": "h12",
+          "rank": 1,
+          "top": "WEC-SR-2026:9.1.12",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:9.1.12",
+            "WEC-SR-2026:10.1.2",
+            "WEC-SR-2026:9.1.3",
+            "WEC-SR-2026:13.2.5",
+            "WEC-SR-2026:6.4.3"
+          ]
+        },
+        {
+          "id": "h13",
+          "rank": 1,
+          "top": "WEC-SR-2026:9.1.13",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:9.1.13",
+            "WEC-SR-2026:15.1.1",
+            "WEC-SR-2026:14.6.9",
+            "WEC-SR-2026:15.1.2",
+            "WEC-SR-2026:10.2.4"
+          ]
+        },
+        {
+          "id": "h14",
+          "rank": 1,
+          "top": "WEC-SR-2026:10.2.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:10.2.4",
+            "WEC-SR-2026:14.2.1",
+            "WEC-SR-2026:14.3.1",
+            "WEC-SR-2026:14.4.2",
+            "WEC-SR-2026:14.3.3"
+          ]
+        },
+        {
+          "id": "h15",
+          "rank": 1,
+          "top": "WEC-SR-2026:11.1.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:11.1.3",
+            "WEC-SR-2026:14.3.3",
+            "WEC-SR-2026:10.2.2",
+            "WEC-SR-2026:10.2.3",
+            "WEC-SR-2026:11.1.6"
+          ]
+        },
+        {
+          "id": "h16",
+          "rank": 1,
+          "top": "WEC-SR-2026:11.2.6",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:11.2.6",
+            "WEC-SR-2026:11.2.7",
+            "WEC-SR-2026:11.2.2",
+            "WEC-SR-2026:11.2.1",
+            "WEC-SR-2026:11.2.4"
+          ]
+        },
+        {
+          "id": "h17",
+          "rank": 1,
+          "top": "WEC-SR-2026:11.3.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:11.3.3",
+            "WEC-SR-2026:14.6.11",
+            "WEC-SR-2026:14.6.6",
+            "WEC-SR-2026:14.4.3",
+            "WEC-SR-2026:11.1.6"
+          ]
+        },
+        {
+          "id": "h18",
+          "rank": 1,
+          "top": "WEC-SR-2026:12.1.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:12.1.3",
+            "WEC-SR-2026:12.2.2",
+            "WEC-SR-2026:12.1.2",
+            "WEC-SR-2026:4.2.2",
+            "WEC-SR-2026:12.2.1"
+          ]
+        },
+        {
+          "id": "h19",
+          "rank": 1,
+          "top": "WEC-SR-2026:12.3.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:12.3.2",
+            "WEC-SR-2026:12.2.2",
+            "WEC-SR-2026:14.6.11",
+            "WEC-SR-2026:12.3.1",
+            "WEC-SR-2026:12.2.1"
+          ]
+        },
+        {
+          "id": "h20",
+          "rank": 2,
+          "top": "WEC-SR-2026:14.5.1",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.5.1",
+            "WEC-SR-2026:14.5.3",
+            "WEC-SR-2026:14.5.2",
+            "WEC-SR-2026:14.5.4",
+            "WEC-SR-2026:14.6.3"
+          ]
+        },
+        {
+          "id": "h21",
+          "rank": 2,
+          "top": "WEC-SR-2026:14.5.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.5.2",
+            "WEC-SR-2026:14.5.4",
+            "WEC-SR-2026:14.6.5",
+            "WEC-SR-2026:12.2.1",
+            "WEC-SR-2026:14.4.4"
+          ]
+        },
+        {
+          "id": "h22",
+          "rank": 1,
+          "top": "WEC-SR-2026:14.6.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.6.2",
+            "WEC-SR-2026:14.6.4",
+            "WEC-SR-2026:11.3.2",
+            "WEC-SR-2026:14.6.1",
+            "WEC-SR-2026:9.1.1"
+          ]
+        },
+        {
+          "id": "h23",
+          "rank": 1,
+          "top": "WEC-SR-2026:14.6.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.6.4",
+            "WEC-SR-2026:9.1.6",
+            "WEC-SR-2026:14.6.2",
+            "WEC-SR-2026:7.4.2",
+            "WEC-SR-2026:9.1.1"
+          ]
+        },
+        {
+          "id": "h24",
+          "rank": 2,
+          "top": "WEC-SR-2026:14.6.11",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.6.11",
+            "WEC-SR-2026:14.6.6",
+            "WEC-SR-2026:12.2.1",
+            "WEC-SR-2026:14.4.4",
+            "WEC-SR-2026:14.6.10"
+          ]
+        },
+        {
+          "id": "h25",
+          "rank": 1,
+          "top": "WEC-SR-2026:14.7.1",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.7.1",
+            "WEC-SR-2026:14.7.3",
+            "WEC-SR-2026:14.7.2",
+            "WEC-SR-2026:14.6.1",
+            "WEC-SR-2026:14.6.11"
+          ]
+        },
+        {
+          "id": "h26",
+          "rank": null,
+          "top": "WEC-SR-2026:14.3.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.3.3",
+            "WEC-SR-2026:14.4.2",
+            "WEC-SR-2026:14.3.2",
+            "WEC-SR-2026:14.6.9",
+            "WEC-SR-2026:9.1.6"
+          ]
+        },
+        {
+          "id": "h27",
+          "rank": 1,
+          "top": "WEC-SR-2026:15.3.1",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:15.3.1",
+            "WEC-SR-2026:6.2.2",
+            "WEC-SR-2026:15.2.3",
+            "WEC-SR-2026:3.1.3",
+            "WEC-SR-2026:13.2.3"
+          ]
+        },
+        {
+          "id": "h28",
+          "rank": 1,
+          "top": "WEC-SR-2026:15.3.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:15.3.2",
+            "WEC-SR-2026:APPENDIX 1/11.3",
+            "WEC-SR-2026:11.1.2",
+            "WEC-SR-2026:10.2.2",
+            "WEC-SR-2026:10.2.3"
+          ]
+        },
+        {
+          "id": "h29",
+          "rank": 1,
+          "top": "WEC-SR-2026:7.2.6",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:7.2.6",
+            "WEC-SR-2026:9.1.10",
+            "WEC-SR-2026:3.1.2",
+            "WEC-SR-2026:14.2.3",
+            "WEC-SR-2026:11.1.4"
+          ]
+        },
+        {
+          "id": "h30",
+          "rank": 1,
+          "top": "WEC-SR-2026:6.5.5",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:6.5.5",
+            "WEC-SR-2026:APPENDIX 9/2.2",
+            "WEC-SR-2026:APPENDIX 9/2.3",
+            "WEC-SR-2026:APPENDIX 9/5.5",
+            "WEC-SR-2026:12.3.1"
+          ]
+        }
+      ]
+    },
+    "heldout/hybrid": {
+      "questions": 30,
+      "filter_season": true,
+      "recall@1": 21,
+      "recall@3": 29,
+      "recall@5": 29,
+      "top1_right_article_wrong_season": 0,
+      "per_question": [
+        {
+          "id": "h01",
+          "rank": 1,
+          "top": "WEC-SR-2026:4.3.1",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:4.3.1",
+            "WEC-SR-2026:4.3.2",
+            "WEC-SR-2026:7.3.6",
+            "WEC-SR-2026:APPENDIX 9/4.4",
+            "WEC-SR-2026:4.3.3"
+          ]
+        },
+        {
+          "id": "h02",
+          "rank": 1,
+          "top": "WEC-SR-2026:6.2.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:6.2.2",
+            "WEC-SR-2026:APPENDIX 9/1.8",
+            "WEC-SR-2026:6.1.1",
+            "WEC-SR-2026:1.1",
+            "WEC-SR-2026:3.1.3"
+          ]
+        },
+        {
+          "id": "h03",
+          "rank": 1,
+          "top": "WEC-SR-2026:6.4.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:6.4.2",
+            "WEC-SR-2026:6.4.1",
+            "WEC-SR-2026:10.2.2",
+            "WEC-SR-2026:11.2.6",
+            "WEC-SR-2026:APPENDIX 6"
+          ]
+        },
+        {
+          "id": "h04",
+          "rank": 1,
+          "top": "WEC-SR-2026:6.5.7",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:6.5.7",
+            "WEC-SR-2026:APPENDIX 9/2.3",
+            "WEC-SR-2026:6.5.3",
+            "WEC-SR-2026:6.5.4",
+            "WEC-SR-2026:6.5.5"
+          ]
+        },
+        {
+          "id": "h05",
+          "rank": 1,
+          "top": "WEC-SR-2026:7.4.5",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:7.4.5",
+            "WEC-SR-2026:7.4.3",
+            "WEC-SR-2026:12.3.2",
+            "WEC-SR-2026:7.4.10",
+            "WEC-SR-2026:7.4.4"
+          ]
+        },
+        {
+          "id": "h06",
+          "rank": 1,
+          "top": "WEC-SR-2026:7.4.7",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:7.4.7",
+            "WEC-SR-2026:7.4.10",
+            "WEC-SR-2026:15.3.4",
+            "WEC-SR-2026:7.4.6",
+            "WEC-SR-2026:11.2.2"
+          ]
+        },
+        {
+          "id": "h07",
+          "rank": 3,
+          "top": "WEC-SR-2026:7.4.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:7.4.2",
+            "WEC-SR-2026:14.6.11",
+            "WEC-SR-2026:7.4.9",
+            "WEC-SR-2026:14.6.6",
+            "WEC-SR-2026:12.1.1"
+          ]
+        },
+        {
+          "id": "h08",
+          "rank": 1,
+          "top": "WEC-SR-2026:7.4.10",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:7.4.10",
+            "WEC-SR-2026:7.4.7",
+            "WEC-SR-2026:7.4.9",
+            "WEC-SR-2026:15.1.1",
+            "WEC-SR-2026:14.6.9"
+          ]
+        },
+        {
+          "id": "h09",
+          "rank": 2,
+          "top": "WEC-SR-2026:9.1.13",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:9.1.13",
+            "WEC-SR-2026:9.1.2",
+            "WEC-SR-2026:9.1.4",
+            "WEC-SR-2026:9.1.11",
+            "WEC-SR-2026:9.1.5"
+          ]
+        },
+        {
+          "id": "h10",
+          "rank": 2,
+          "top": "WEC-SR-2026:12.2.1",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:12.2.1",
+            "WEC-SR-2026:9.1.4",
+            "WEC-SR-2026:12.1.3",
+            "WEC-SR-2026:14.4.4",
+            "WEC-SR-2026:12.2.2"
+          ]
+        },
+        {
+          "id": "h11",
+          "rank": null,
+          "top": "WEC-SR-2026:14.4.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.4.4",
+            "WEC-SR-2026:12.2.1",
+            "WEC-SR-2026:14.6.5",
+            "WEC-SR-2026:14.4.2",
+            "WEC-SR-2026:14.5.2"
+          ]
+        },
+        {
+          "id": "h12",
+          "rank": 1,
+          "top": "WEC-SR-2026:9.1.12",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:9.1.12",
+            "WEC-SR-2026:6.4.3",
+            "WEC-SR-2026:10.1.2",
+            "WEC-SR-2026:13.2.2",
+            "WEC-SR-2026:9.1.3"
+          ]
+        },
+        {
+          "id": "h13",
+          "rank": 3,
+          "top": "WEC-SR-2026:14.6.9",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.6.9",
+            "WEC-SR-2026:15.1.1",
+            "WEC-SR-2026:9.1.13",
+            "WEC-SR-2026:15.1.2",
+            "WEC-SR-2026:15.1.4"
+          ]
+        },
+        {
+          "id": "h14",
+          "rank": 1,
+          "top": "WEC-SR-2026:10.2.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:10.2.4",
+            "WEC-SR-2026:14.2.1",
+            "WEC-SR-2026:14.3.1",
+            "WEC-SR-2026:14.2.4",
+            "WEC-SR-2026:14.4.3"
+          ]
+        },
+        {
+          "id": "h15",
+          "rank": 1,
+          "top": "WEC-SR-2026:11.1.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:11.1.3",
+            "WEC-SR-2026:10.2.2",
+            "WEC-SR-2026:11.1.6",
+            "WEC-SR-2026:14.3.3",
+            "WEC-SR-2026:11.2.4"
+          ]
+        },
+        {
+          "id": "h16",
+          "rank": 1,
+          "top": "WEC-SR-2026:11.2.6",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:11.2.6",
+            "WEC-SR-2026:11.2.1",
+            "WEC-SR-2026:11.2.7",
+            "WEC-SR-2026:11.2.2",
+            "WEC-SR-2026:11.1.6"
+          ]
+        },
+        {
+          "id": "h17",
+          "rank": 1,
+          "top": "WEC-SR-2026:11.3.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:11.3.3",
+            "WEC-SR-2026:14.6.11",
+            "WEC-SR-2026:14.6.6",
+            "WEC-SR-2026:14.4.3",
+            "WEC-SR-2026:14.4.4"
+          ]
+        },
+        {
+          "id": "h18",
+          "rank": 1,
+          "top": "WEC-SR-2026:12.1.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:12.1.3",
+            "WEC-SR-2026:12.1.2",
+            "WEC-SR-2026:14.6.11",
+            "WEC-SR-2026:9.1.4",
+            "WEC-SR-2026:4.2.2"
+          ]
+        },
+        {
+          "id": "h19",
+          "rank": 1,
+          "top": "WEC-SR-2026:12.3.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:12.3.2",
+            "WEC-SR-2026:APPENDIX 8/6.2",
+            "WEC-SR-2026:12.1.1",
+            "WEC-SR-2026:14.6.5",
+            "WEC-SR-2026:12.3.1"
+          ]
+        },
+        {
+          "id": "h20",
+          "rank": 3,
+          "top": "WEC-SR-2026:14.5.1",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.5.1",
+            "WEC-SR-2026:14.5.2",
+            "WEC-SR-2026:14.5.3",
+            "WEC-SR-2026:14.5.4",
+            "WEC-SR-2026:14.6.2"
+          ]
+        },
+        {
+          "id": "h21",
+          "rank": 2,
+          "top": "WEC-SR-2026:14.5.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.5.2",
+            "WEC-SR-2026:14.5.4",
+            "WEC-SR-2026:14.5.1",
+            "WEC-SR-2026:14.6.5",
+            "WEC-SR-2026:12.2.1"
+          ]
+        },
+        {
+          "id": "h22",
+          "rank": 1,
+          "top": "WEC-SR-2026:14.6.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.6.2",
+            "WEC-SR-2026:14.6.5",
+            "WEC-SR-2026:12.1.1",
+            "WEC-SR-2026:14.6.4",
+            "WEC-SR-2026:APPENDIX 6"
+          ]
+        },
+        {
+          "id": "h23",
+          "rank": 1,
+          "top": "WEC-SR-2026:14.6.4",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.6.4",
+            "WEC-SR-2026:14.4.2",
+            "WEC-SR-2026:9.1.6",
+            "WEC-SR-2026:9.1.1",
+            "WEC-SR-2026:9.1.11"
+          ]
+        },
+        {
+          "id": "h24",
+          "rank": 3,
+          "top": "WEC-SR-2026:14.6.11",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.6.11",
+            "WEC-SR-2026:14.4.4",
+            "WEC-SR-2026:14.6.6",
+            "WEC-SR-2026:12.1.2",
+            "WEC-SR-2026:14.7.2"
+          ]
+        },
+        {
+          "id": "h25",
+          "rank": 1,
+          "top": "WEC-SR-2026:14.7.1",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.7.1",
+            "WEC-SR-2026:14.7.3",
+            "WEC-SR-2026:14.7.2",
+            "WEC-SR-2026:14.5.4",
+            "WEC-SR-2026:14.6.7"
+          ]
+        },
+        {
+          "id": "h26",
+          "rank": 3,
+          "top": "WEC-SR-2026:14.3.3",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:14.3.3",
+            "WEC-SR-2026:9.1.6",
+            "WEC-SR-2026:15.1.3",
+            "WEC-SR-2026:14.4.2",
+            "WEC-SR-2026:14.4.3"
+          ]
+        },
+        {
+          "id": "h27",
+          "rank": 1,
+          "top": "WEC-SR-2026:15.3.1",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:15.3.1",
+            "WEC-SR-2026:3.1.3",
+            "WEC-SR-2026:1.2.4",
+            "WEC-SR-2026:6.2.2",
+            "WEC-SR-2026:APPENDIX 1"
+          ]
+        },
+        {
+          "id": "h28",
+          "rank": 1,
+          "top": "WEC-SR-2026:15.3.2",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:15.3.2",
+            "WEC-SR-2026:11.1.2",
+            "WEC-SR-2026:APPENDIX 1/11.3",
+            "WEC-SR-2026:10.2.3",
+            "WEC-SR-2026:15.3.3"
+          ]
+        },
+        {
+          "id": "h29",
+          "rank": 1,
+          "top": "WEC-SR-2026:7.2.6",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:7.2.6",
+            "WEC-SR-2026:14.2.3",
+            "WEC-SR-2026:15.1.4",
+            "WEC-SR-2026:4.2.3",
+            "WEC-SR-2026:4.1.6"
+          ]
+        },
+        {
+          "id": "h30",
+          "rank": 1,
+          "top": "WEC-SR-2026:6.5.5",
+          "top_wrong_season_same_article": false,
+          "retrieved": [
+            "WEC-SR-2026:6.5.5",
+            "WEC-SR-2026:APPENDIX 9/2.3",
+            "WEC-SR-2026:APPENDIX 9/2.2",
+            "WEC-SR-2026:4.4.2",
+            "WEC-SR-2026:12.3.1"
+          ]
+        }
+      ]
+    }
+  }
+}

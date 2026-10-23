@@ -27,7 +27,11 @@ What works right now:
   - 16 synthetic write-ups with planted flaws and clean controls, run headless through Claude Code and scored against labels. It caught 11 of the 12 planted flaws. See [`evals/statistical_reviewer/`](evals/statistical_reviewer/).
 - **Regulation retrieval**
   - The 2024 to 2026 sporting regulations, split into article-level chunks with season and page, searched with BM25. It finds the right 2026 clause in the top 5 for 24 of 30 hand-written questions. See [`evals/regulations/`](evals/regulations/).
-- **100 tests on synthetic data**
+- **Grounded answers about the rules**
+  - A router sends strategy questions away, because pit timing has to come from the simulator. Rules questions get an answer drawn only from the retrieved clauses, with word-for-word quotes.
+  - A plain-code checker rejects any answer whose citations, quotes or numbers don't trace back to those clauses.
+  - When retrieval found the right clause, the answer cited it in all 72 runs.
+- **111 tests on synthetic data**
   - They run in GitHub Actions on every push, with no real data needed.
 
 The full log of what's been tried is in [`docs/EXPERIMENT_LOG.md`](docs/EXPERIMENT_LOG.md), and the reasoning behind the bigger choices is in [`docs/DECISIONS.md`](docs/DECISIONS.md).

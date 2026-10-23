@@ -1,0 +1,334 @@
+[
+  {
+    "id": "h01",
+    "season": "2026",
+    "question": "Which language do drivers and engineers have to use on the team radio?",
+    "gold_articles": [
+      "4.3.1"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h02",
+    "season": "2026",
+    "question": "Is there a success ballast system, and does it apply at Le Mans?",
+    "gold_articles": [
+      "6.2.2"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h03",
+    "season": "2026",
+    "question": "When does the rear rain lamp have to be on?",
+    "gold_articles": [
+      "6.4.2"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h04",
+    "season": "2026",
+    "question": "Who sets the reference tyre pressures and camber for dry tyres?",
+    "gold_articles": [
+      "6.5.7"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h05",
+    "season": "2026",
+    "question": "What does a Stop and Hold penalty involve, and can the driver get out of the car?",
+    "gold_articles": [
+      "7.4.5"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h06",
+    "season": "2026",
+    "question": "Can a post-race time penalty that is longer than a lap be turned into lost laps?",
+    "gold_articles": [
+      "7.4.7"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h07",
+    "season": "2026",
+    "question": "Can a drive-through be served while the safety car is out?",
+    "gold_articles": [
+      "7.4.9"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h08",
+    "season": "2026",
+    "question": "What happens if a penalty is shown in the final few laps and the car never serves it?",
+    "gold_articles": [
+      "7.4.10"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h09",
+    "season": "2026",
+    "question": "What is the punishment for repeatedly running wide past the white lines in the race?",
+    "gold_articles": [
+      "9.1.2"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h10",
+    "season": "2026",
+    "question": "Is a driver allowed to push the car back to the pits after it stops?",
+    "gold_articles": [
+      "9.1.4"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h11",
+    "season": "2026",
+    "question": "If the car stalls on track, who is allowed to get it going again?",
+    "gold_articles": [
+      "9.1.8"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h12",
+    "season": "2026",
+    "question": "What happens to a driver who is suffering from heat exhaustion after a stint?",
+    "gold_articles": [
+      "9.1.12"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h13",
+    "season": "2026",
+    "question": "Can a car do another lap after it has taken the chequered flag?",
+    "gold_articles": [
+      "9.1.13"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h14",
+    "season": "2026",
+    "question": "If our car brings out a red flag in qualifying, do we keep our lap times?",
+    "gold_articles": [
+      "10.2.4"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h15",
+    "season": "2026",
+    "question": "What do we have to do if our car can't take its grid slot?",
+    "gold_articles": [
+      "11.1.3"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h16",
+    "season": "2026",
+    "question": "If we lose places on the formation lap, can we get them back before the start?",
+    "gold_articles": [
+      "11.2.6"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h17",
+    "season": "2026",
+    "question": "When can a car waiting in the pit lane join the field if the race starts behind the safety car?",
+    "gold_articles": [
+      "11.3.3"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h18",
+    "season": "2026",
+    "question": "How many crew members may push the car in the pit lane, and can it use reverse gear there?",
+    "gold_articles": [
+      "12.1.3"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h19",
+    "season": "2026",
+    "question": "Can the driver fix the car out on the circuit using spare parts from the pits?",
+    "gold_articles": [
+      "12.3.2"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h20",
+    "season": "2026",
+    "question": "Once the yellow is lifted after an FCY, can cars overtake straight away?",
+    "gold_articles": [
+      "14.5.3"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h21",
+    "season": "2026",
+    "question": "If an FCY turns into a safety car, is the pit entry closure shorter?",
+    "gold_articles": [
+      "14.5.4"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h22",
+    "season": "2026",
+    "question": "Under the safety car, in which situations is passing another car allowed?",
+    "gold_articles": [
+      "14.6.2"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h23",
+    "season": "2026",
+    "question": "What is the penalty for doing a pass-around under the safety car when the car isn't eligible?",
+    "gold_articles": [
+      "14.6.4"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h24",
+    "season": "2026",
+    "question": "After stopping under the safety car, when can a car leave the pit lane?",
+    "gold_articles": [
+      "14.6.6"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h25",
+    "season": "2026",
+    "question": "Is a VSC always followed by a full safety car?",
+    "gold_articles": [
+      "14.7.1"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h26",
+    "season": "2026",
+    "question": "After the flag, where must the cars go, and can mechanics touch them?",
+    "gold_articles": [
+      "15.1.3"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h27",
+    "season": "2026",
+    "question": "How many points does the winner get at Le Mans compared with a six-hour race?",
+    "gold_articles": [
+      "15.3.1"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h28",
+    "season": "2026",
+    "question": "Is there a bonus point for taking pole?",
+    "gold_articles": [
+      "15.3.2"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h29",
+    "season": "2026",
+    "question": "How much money has to be put down to lodge a protest?",
+    "gold_articles": [
+      "7.2.6"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "h30",
+    "season": "2026",
+    "question": "How many tyre sets may be kept at the front of the garage?",
+    "gold_articles": [
+      "6.5.5"
+    ],
+    "answerable": true,
+    "key_facts": []
+  },
+  {
+    "id": "hu01",
+    "season": "2026",
+    "question": "What fuel tank capacity is a Porsche 963 allowed at Sebring?",
+    "gold_articles": [],
+    "answerable": false,
+    "key_facts": []
+  },
+  {
+    "id": "hu02",
+    "season": "2026",
+    "question": "Which team had the fastest pit stop at the 6 Hours of Imola?",
+    "gold_articles": [],
+    "answerable": false,
+    "key_facts": []
+  },
+  {
+    "id": "hu03",
+    "season": "2026",
+    "question": "How much does an LMGT3 Ferrari weigh after the latest BoP update?",
+    "gold_articles": [],
+    "answerable": false,
+    "key_facts": []
+  },
+  {
+    "id": "hu04",
+    "season": "2026",
+    "question": "What time does the 2026 Fuji race start in local time?",
+    "gold_articles": [],
+    "answerable": false,
+    "key_facts": []
+  }
+]

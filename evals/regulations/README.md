@@ -20,7 +20,7 @@ python -c "from endurance_strategy.rag.regulations import build_chunks; from end
 python scripts/run_retrieval_eval.py
 ```
 
-- The PDFs and the chunks stay local, like the timing data. Only the questions, the code and the scores (chunk IDs, not regulation text) are committed.
+- The PDFs and the chunks stay local, like the timing data. Only the questions, the code and the scores (chunk IDs, not regulation text) are committed. Raw answer logs quote the regulations, so they stay local too, and only their summaries are committed.
 - Scoring is recall@k: does an answering chunk appear in the top *k*? It's reported as a count with the number of questions.
 
 ## Results
@@ -36,6 +36,26 @@ First run, 2026-10-23 (full write-up in E-009 of `docs/EXPERIMENT_LOG.md`):
 - Most misses come from different words for the same thing ("top up" and "replenishment").
 - Without the season filter, the right article from the wrong year comes out on top for 30 of 82 questions.
 - Unanswerable questions score as high as answerable ones, so refusal can't rely on a score cut-off.
+
+## Answers (E-010)
+
+`python scripts/run_answer_eval.py` runs every question through the router, the answerer and the checker in `src/endurance_strategy/rag/answer.py`, 3 times each. It also runs the 6 routing cases in `routing.json`. Key facts in `questions.json` (short strings such as "60") are checked in the final answer.
+
+- **Routing:** 18 of 18 runs sent the right way.
+- **When retrieval found the right clause:** the answer cited it in 72 of 72 runs.
+- **When retrieval missed:** 12 refusals and 6 honest partial answers, out of 18 runs.
+- **Unanswerable questions:** all 18 runs were sent to "out of scope" by the router, so the answerer's own refusal still needs in-scope test questions.
+
+## Embeddings against BM25 (E-011)
+
+`python scripts/run_retrieval_comparison.py` compares BM25, a local embedding model and a hybrid on `questions.json` and on `questions_heldout.json`. The held-out questions were written before any embedding ran.
+
+| Set | BM25 recall@5 | Embeddings recall@5 | Hybrid recall@5 |
+|---|---:|---:|---:|
+| Original (30) | 24 | 27 | 27 |
+| Held-out (30) | 27 | 27 | 29 |
+
+On the held-out set the differences come down to a few questions, which 30 can't settle, so BM25 stays the default (D-020).
 
 ## What it can't show
 

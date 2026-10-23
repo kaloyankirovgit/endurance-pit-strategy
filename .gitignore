@@ -144,3 +144,6 @@ desktop.ini
 # ---------------------------------------------------------------------------
 .claude/settings.local.json
 
+
+# Raw answer logs quote regulation text; only the summaries are committed
+evals/regulations/results/*_answers.jsonl

@@ -68,3 +68,35 @@ def top_scores(retriever: BM25, questions: list[dict]) -> dict:
         "answerable": {"n": len(scores[True]), "median": median(scores[True]), "min": min(scores[True])},
         "unanswerable": {"n": len(scores[False]), "median": median(scores[False]), "max": max(scores[False])} if scores[False] else None,
     }
+
+
+def grade_answer(trace: dict, question: dict) -> dict:
+    """Outcome of one routed, retrieved, answered and checked question, scored against its labels."""
+    from endurance_strategy.rag.answer import normalise
+
+    route = trace["route"]
+    answer = trace.get("answer")
+    shown = route == "regulation_lookup" and answer is not None and answer["supported"] and not trace["check_problems"]
+    if route != "regulation_lookup":
+        outcome = "routed_away"
+    elif not answer["supported"]:
+        outcome = "refused"
+    elif trace["check_problems"]:
+        outcome = "rejected_by_check"
+    else:
+        outcome = "answered"
+
+    graded = {"id": question["id"], "answerable": question["answerable"], "outcome": outcome, "route": route}
+    if question["answerable"]:
+        gold = gold_ids(question)
+        cited = {c["chunk_id"] for c in answer["citations"]} if answer else set()
+        final = normalise(trace["final"])
+        graded.update({
+            "retrieval_hit": bool(gold & set(trace.get("retrieved", []))),
+            "cites_gold": shown and bool(gold & cited),
+            "key_facts_checked": bool(question.get("key_facts")),
+            "key_facts_present": shown and all(any(normalise(option) in final for option in group) for group in question.get("key_facts", [])),
+        })
+    else:
+        graded["nothing_shown"] = not shown
+    return graded

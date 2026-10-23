@@ -6,7 +6,7 @@ Where things are right now. Updated at the end of each working session.
 
 ## Current stage
 
-Layer 1 is done and the race order is now checked against the official classifications. Nothing is modelled yet. A commit guard now enforces the no-data rule (D-016). The statistical-reviewer agent has an eval (E-008), and regulation retrieval has a measured BM25 baseline (E-009). The order of the next pieces (retrieval's second round or the traffic work) is up for review.
+Layer 1 is done and the race order is now checked against the official classifications. Nothing is modelled yet. A commit guard now enforces the no-data rule (D-016). The statistical-reviewer agent has an eval (E-008), and regulation retrieval and grounded answers are built and measured (E-009 to E-011). The order of the next pieces (retrieval's second round or the traffic work) is up for review.
 
 ## Done
 
@@ -24,12 +24,13 @@ Layer 1 is done and the race order is now checked against the official classific
 - A commit guard blocks any commit that includes a git-ignored file, both as a Claude Code hook and as the git pre-commit hook (D-016).
 - An eval for the `statistical-reviewer` agent: 16 synthetic cases, each run 3 times. It caught 11 of 12 planted flaws and raised no majority false alarm on the 4 controls. One control alarm turned out to be a real flaw in E-007, now corrected (E-008).
 - The 2024 to 2026 sporting regulations are downloaded with hashes and split into 855 article-level chunks. Keyword retrieval (BM25) finds the right 2026 clause in the top 5 for 24 of 30 hand-written questions (E-009).
-- 100 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
+- Regulation answers are routed, grounded and checked in code (D-019). When retrieval finds the right clause, the answer cites it in 72 of 72 runs, and strategy questions are declined (E-010). Embeddings and a hybrid were compared with BM25 on a fresh question set, and the gap is too small to settle with 30 questions, so BM25 stays the default (E-011, D-020).
+- 111 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
 
 ## Next
 
-1. **Regulation retrieval, second round**
-   - Embeddings against the BM25 baseline on a fresh question set, then answers with citations and refusal tests.
+1. **Season and class-aware regulations**
+   - Pick the right rules for the race and class being asked about (to discuss), then in-scope refusal tests and a larger question set to settle BM25 against the hybrid.
 2. **Traffic exposure (Layer 2)**
    - Define when a car is running into slower-class traffic from the road gap and class ahead, then compare lap residuals with and without it.
 3. **Drying track**
@@ -68,7 +69,7 @@ Layer 1 is done and the race order is now checked against the official classific
 | Race order and gaps | Built, and the final order checked against the official classifications (E-007) |
 | Traffic, pace and pit-loss models | Not started |
 | Simulator and optimiser | Not started |
-| Regulations and LLM layer | Retrieval built and measured (E-009), no answer generation yet |
+| Regulations and LLM layer | Retrieval (E-009, E-011) and grounded answers with a code checker (E-010) built and measured; no simulator tool yet |
 | CI | Running on GitHub Actions, passing |
 | Commit guard hooks | Built and tested (D-016) |
 | Review-agent evals | statistical-reviewer evaluated, 16 cases × 3 runs (E-008) |

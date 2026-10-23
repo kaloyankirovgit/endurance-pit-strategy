@@ -366,3 +366,91 @@ Two format quirks came up. The 2024 Spa file has a different column order and le
 
 **Next:** embeddings against this BM25 baseline on a fresh question set, then answer generation with citations and refusal tests.
 
+---
+
+## E-010: Do the regulation answers stay grounded, and does the system refuse when it should?
+
+*2026-10-23 · complete*
+
+**Question:** with BM25 retrieval underneath, does the answer step cite the right clause, keep the facts right, refuse when the extracts don't cover the question, and keep strategy questions out?
+
+**Method:** the router, answerer and checker from D-019, run 3 times on each of the 36 questions from E-009 and 6 routing cases (3 strategy questions, 3 off-topic). The model was `claude-opus-5-5` through `claude -p`, and retrieval was the BM25 top 5 with the season filter. Scoring is against labels, with no LLM judge:
+
+- does the answer cite an answering chunk?
+- does it contain the key fact? (Set for 21 of the 30 answerable questions, such as "60" for the pit-lane limit.)
+- does an unanswerable question get no answer?
+
+Run `20261023T211614Z`.
+
+**Found:**
+
+| Measure | Result |
+|---|---:|
+| Routing cases sent the right way | 18 of 18 runs |
+| Answerable runs answered and citing an answering chunk | 72 of 90 |
+| ...of runs where retrieval found the answering chunk | 72 of 72 |
+| Runs where retrieval missed: refused / answered anyway | 12 / 6 of 18 |
+| Key fact present (after one label fix, see below) | 54 of 63 runs |
+| Answers rejected by the checker | 0 of 78 |
+| Unanswerable runs with nothing shown | 18 of 18 |
+
+- **Every miss traces to retrieval.** When the right clause was retrieved, the answer cited it, passed the checker and, where a key fact was set, contained it. The 6 runs answered after a retrieval miss were honest partial answers. One said "Article 13.2.5 isn't in the extracts, so the actual penalties can't be stated."
+- **One label was wrong.** q08's key fact accepted "closed" but not "closes", and the answer said "the pit lane entry closes". As first scored, the key fact was present in 51 of 63 runs. With the label fixed and the saved answers rescored, with no new model calls, it's 54 of 63. All 9 remaining misses are on three questions where retrieval missed.
+- **The checker didn't fire in this run.** All 78 answers quoted their extracts word for word and kept their numbers traceable. It's tested on synthetic cases, and it caught its own bug in a smoke run (it rejected a correct answer over "2026", which was in the extract header but not the clause, now fixed).
+
+**What it doesn't show:**
+
+- **The unanswerable questions never reached the answerer.** The router sent all of them to "out of scope", because its instructions name Balance of Performance and results as out of scope. The answerer's own refusal was only tested on the 12 runs after a retrieval miss. In-scope questions that the regulations don't answer are needed to test refusal properly.
+- **Key facts cover 21 questions and are short strings.** A wrong answer containing the right number would pass, and a right answer worded differently can fail, as q08 did.
+- **The same model family helped write the questions and answers them.**
+- **3 runs per question.** No run-to-run differences changed any question's outcome here, but that's a small sample of the variance.
+
+---
+
+## E-011: Do embeddings beat BM25 on a fresh question set?
+
+*2026-10-23 · complete*
+
+**Question:** E-009's misses were mostly vocabulary. Does an embedding model fix that, and does it hold on questions written after the decision to try it?
+
+**Method:**
+
+- **Retrievers:** BM25 (E-009), embeddings from `BAAI/bge-small-en-v1.5` run locally through `fastembed`, and a hybrid that fuses the two rankings (reciprocal rank fusion, constant 60). None were tuned.
+- **Question sets:**
+  - the 30 original questions;
+  - 30 fresh ones in `questions_heldout.json` (plus 4 unanswerable), on different articles, written before any embedding was run.
+- **Settings:** season filter on throughout. `python scripts/run_retrieval_comparison.py`.
+
+**Found:**
+
+| Set | Retriever | recall@1 | recall@3 | recall@5 |
+|---|---|---:|---:|---:|
+| Original (30) | BM25 | 15 | 20 | 24 |
+| Original (30) | Embeddings | 22 | 27 | 27 |
+| Original (30) | Hybrid | 18 | 25 | 27 |
+| Held-out (30) | BM25 | 19 | 25 | 27 |
+| Held-out (30) | Embeddings | 22 | 26 | 27 |
+| Held-out (30) | Hybrid | 21 | 29 | 29 |
+
+Question by question on the held-out set:
+
+| Comparison | First wins | Second wins |
+|---|---:|---:|
+| Embeddings against BM25, rank 1 | 4 | 1 |
+| Embeddings against BM25, top 5 | 2 | 2 |
+| Hybrid against BM25, top 5 | 2 | 0 |
+
+- **The big gain on the original set shrinks on the fresh set.** That's what a held-out set is for. The original questions were the ones whose misses motivated trying embeddings.
+- **The hybrid never did worse than BM25 in the top 5**, across both sets: 5 wins and 0 losses. A sign test on 5 against 0 gives p ≈ 0.06, so it's suggestive and not established.
+- **Embeddings fixed some vocabulary misses but not all.** "Stay seated" (q17), "warm the tyres" (q27) and "which rules win" (q23) went from outside the top 5 to rank 1. "Top up fluids" (q16) is still missed by every retriever.
+- **They also lost questions BM25 got right:**
+  - q15 and q10 on the original set;
+  - h07 and h26 on the held-out set.
+
+**What it doesn't show:**
+
+- **30 questions per set can't separate retrievers that differ by a few questions.** By the baseline rule, BM25 stays the default (D-020).
+- **The held-out questions were written after reading the clauses**, like the originals, so their wording may sit close to the regulation's. BM25 scored higher on them (19 against 15 at rank 1), which fits that.
+- **26 of the 855 chunks run past the model's roughly 512-token limit** and are cut off when embedded. They include the long appendices.
+- **One embedding model, untuned.** A larger model or one tuned for retrieval might do better, and that would be a separate comparison.
+

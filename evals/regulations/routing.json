@@ -1,0 +1,32 @@
+[
+  {
+    "id": "r01",
+    "question": "When should car 7 pit during the next Full Course Yellow at Spa?",
+    "expected_route": "simulation_request"
+  },
+  {
+    "id": "r02",
+    "question": "Is a three-stop or a four-stop strategy faster at Fuji?",
+    "expected_route": "simulation_request"
+  },
+  {
+    "id": "r03",
+    "question": "How many laps should our LMGT3 car stay out before its next stop?",
+    "expected_route": "simulation_request"
+  },
+  {
+    "id": "r04",
+    "question": "Who won the 24 Hours of Le Mans in 2025?",
+    "expected_route": "out_of_scope"
+  },
+  {
+    "id": "r05",
+    "question": "Write me a short poem about endurance racing.",
+    "expected_route": "out_of_scope"
+  },
+  {
+    "id": "r06",
+    "question": "What's the weather forecast for the 6 Hours of Spa?",
+    "expected_route": "out_of_scope"
+  }
+]

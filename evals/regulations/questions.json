@@ -6,7 +6,16 @@
     "gold_articles": [
       "13.2.3"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": [
+      [
+        "1h45",
+        "1 hour 45",
+        "one hour 45",
+        "105 minutes",
+        "1 h 45"
+      ]
+    ]
   },
   {
     "id": "q02",
@@ -15,7 +24,13 @@
     "gold_articles": [
       "13.2.3"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": [
+      [
+        "45 minutes",
+        "45 min"
+      ]
+    ]
   },
   {
     "id": "q03",
@@ -24,7 +39,12 @@
     "gold_articles": [
       "13.2.5"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": [
+      [
+        "penalt"
+      ]
+    ]
   },
   {
     "id": "q04",
@@ -33,7 +53,17 @@
     "gold_articles": [
       "13.2.2"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": [
+      [
+        "pit lane exit",
+        "pit exit"
+      ],
+      [
+        "pit lane entry",
+        "pit entry"
+      ]
+    ]
   },
   {
     "id": "q05",
@@ -42,7 +72,8 @@
     "gold_articles": [
       "13.2.4"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": []
   },
   {
     "id": "q06",
@@ -51,7 +82,8 @@
     "gold_articles": [
       "13.3.2"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": []
   },
   {
     "id": "q07",
@@ -60,7 +92,15 @@
     "gold_articles": [
       "13.3.3"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": [
+      [
+        "bronze"
+      ],
+      [
+        "silver"
+      ]
+    ]
   },
   {
     "id": "q08",
@@ -69,7 +109,14 @@
     "gold_articles": [
       "14.5.2"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": [
+      [
+        "closed",
+        "closes",
+        "close"
+      ]
+    ]
   },
   {
     "id": "q09",
@@ -78,7 +125,12 @@
     "gold_articles": [
       "14.5.1"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": [
+      [
+        "80"
+      ]
+    ]
   },
   {
     "id": "q10",
@@ -87,7 +139,12 @@
     "gold_articles": [
       "14.7.2"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": [
+      [
+        "open"
+      ]
+    ]
   },
   {
     "id": "q11",
@@ -96,7 +153,13 @@
     "gold_articles": [
       "14.6.5"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": [
+      [
+        "three",
+        "3"
+      ]
+    ]
   },
   {
     "id": "q12",
@@ -108,7 +171,14 @@
       "14.6.5",
       "14.4.4"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": [
+      [
+        "8 seconds",
+        "eight seconds",
+        "8 s"
+      ]
+    ]
   },
   {
     "id": "q13",
@@ -117,7 +187,12 @@
     "gold_articles": [
       "12.1.4"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": [
+      [
+        "60"
+      ]
+    ]
   },
   {
     "id": "q14",
@@ -126,7 +201,8 @@
     "gold_articles": [
       "12.3.1"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": []
   },
   {
     "id": "q15",
@@ -135,7 +211,19 @@
     "gold_articles": [
       "12.3.1"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": [
+      [
+        "engine"
+      ],
+      [
+        "gearbox"
+      ],
+      [
+        "chassis",
+        "survival cell"
+      ]
+    ]
   },
   {
     "id": "q16",
@@ -144,7 +232,15 @@
     "gold_articles": [
       "9.1.5"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": [
+      [
+        "prohibited",
+        "not allowed",
+        "forbidden",
+        "not permitted"
+      ]
+    ]
   },
   {
     "id": "q17",
@@ -153,7 +249,13 @@
     "gold_articles": [
       "APPENDIX 8/6.1"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": [
+      [
+        "remain",
+        "stay"
+      ]
+    ]
   },
   {
     "id": "q18",
@@ -162,7 +264,12 @@
     "gold_articles": [
       "15.1.4"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": [
+      [
+        "70"
+      ]
+    ]
   },
   {
     "id": "q19",
@@ -171,7 +278,15 @@
     "gold_articles": [
       "15.3.4"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": [
+      [
+        "half"
+      ],
+      [
+        "75"
+      ]
+    ]
   },
   {
     "id": "q20",
@@ -180,7 +295,8 @@
     "gold_articles": [
       "15.1.2"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": []
   },
   {
     "id": "q21",
@@ -189,7 +305,8 @@
     "gold_articles": [
       "7.4.4"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": []
   },
   {
     "id": "q22",
@@ -198,7 +315,12 @@
     "gold_articles": [
       "6.5.4"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": [
+      [
+        "18"
+      ]
+    ]
   },
   {
     "id": "q23",
@@ -207,7 +329,8 @@
     "gold_articles": [
       "1.2.4"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": []
   },
   {
     "id": "q24",
@@ -216,7 +339,12 @@
     "gold_articles": [
       "7.4.2"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": [
+      [
+        "without stopping"
+      ]
+    ]
   },
   {
     "id": "q25",
@@ -225,7 +353,12 @@
     "gold_articles": [
       "7.4.3"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": [
+      [
+        "working area"
+      ]
+    ]
   },
   {
     "id": "q26",
@@ -234,7 +367,8 @@
     "gold_articles": [
       "11.3.2"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": []
   },
   {
     "id": "q27",
@@ -243,7 +377,8 @@
     "gold_articles": [
       "6.5.6"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": []
   },
   {
     "id": "q28",
@@ -252,7 +387,16 @@
     "gold_articles": [
       "12.2.2"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": [
+      [
+        "engine off",
+        "engine is off",
+        "engine must be off",
+        "engine switched off",
+        "engine stopped"
+      ]
+    ]
   },
   {
     "id": "q29",
@@ -261,7 +405,14 @@
     "gold_articles": [
       "14.4.3"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": [
+      [
+        "15 minute",
+        "15-minute",
+        "fifteen minute"
+      ]
+    ]
   },
   {
     "id": "q30",
@@ -271,48 +422,55 @@
       "APPENDIX 7",
       "4.1.7"
     ],
-    "answerable": true
+    "answerable": true,
+    "key_facts": []
   },
   {
     "id": "u01",
     "season": "2026",
     "question": "What is the Balance of Performance minimum weight for the Ferrari 499P at Spa?",
     "gold_articles": [],
-    "answerable": false
+    "answerable": false,
+    "key_facts": []
   },
   {
     "id": "u02",
     "season": "2026",
     "question": "How much fuel energy per stint was Toyota allowed at Le Mans?",
     "gold_articles": [],
-    "answerable": false
+    "answerable": false,
+    "key_facts": []
   },
   {
     "id": "u03",
     "season": "2026",
     "question": "How many pit stops did the winning car make at the Bahrain race?",
     "gold_articles": [],
-    "answerable": false
+    "answerable": false,
+    "key_facts": []
   },
   {
     "id": "u04",
     "season": "2026",
     "question": "Which tyre compounds did Michelin bring to the Fuji round?",
     "gold_articles": [],
-    "answerable": false
+    "answerable": false,
+    "key_facts": []
   },
   {
     "id": "u05",
     "season": "2026",
     "question": "What did the stewards decide about the collision at Imola?",
     "gold_articles": [],
-    "answerable": false
+    "answerable": false,
+    "key_facts": []
   },
   {
     "id": "u06",
     "season": "2026",
     "question": "What is the lap record at Circuit of the Americas?",
     "gold_articles": [],
-    "answerable": false
+    "answerable": false,
+    "key_facts": []
   }
 ]

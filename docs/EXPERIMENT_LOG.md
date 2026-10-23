@@ -272,12 +272,13 @@ A first descriptive look: on clean laps, the median road gap at the line is abou
 | Lap count matches | 830 of 833 |
 | Finishing time matches to the millisecond | 782 of 833 |
 | Raw position matches, classified cars | 640 of 704 |
-| Order matches among classified cars with no time or lap difference | 654 of 654 |
 
 Every time difference has the official time longer than mine:
 
 - **48 cars** are out by a whole number of seconds on the same lap count (5, 10, 45, 95 and so on). That pattern fits time penalties the stewards added to the result.
 - **3 cars** are credited with one or two laps fewer than they crossed the line, which fits a lap penalty or a lap that wasn't counted.
+
+> **Correction (2026-10-20, found by the reviewer eval in E-008).** This entry first reported that the order matched for all 654 classified cars with no time or lap difference. That check was circular. The official order is laps then time, so once a car's laps and time match, its order has to match, and the 654 of 654 couldn't have come out any other way. The evidence is the per-car match of laps and finishing time in the table above. The circular metric has been removed from the code.
 
 The raw position misses all come from these cars. One penalised car drops down the order and pushes everyone it passes up by one place. At Bahrain 2024, car #51 alone accounts for 12 of them.
 
@@ -290,4 +291,78 @@ Two format quirks came up. The 2024 Spa file has a different column order and le
 - **It isn't independent of the timing.** The classification comes from the same timing system, so this tests my rebuild logic, not whether the timing loops themselves are right.
 
 **Next:** race order can now feed the traffic work. Penalties applied after the finish don't change what happened on track, so they don't affect the road gaps used for traffic exposure.
+
+---
+
+## E-008: Does the statistical-reviewer agent catch planted flaws?
+
+*2026-10-20 · complete*
+
+**Question:** the `statistical-reviewer` agent is meant to find the weaknesses in a result before it's reported. Does it find them, and does it leave sound work alone?
+
+**Method:** 16 synthetic write-ups in this project's style (`evals/statistical_reviewer/`). 12 have one planted flaw each and 4 are controls with none. Each one was run 3 times through the agent headless (`claude -p`, model `claude-opus-5-5`), from an empty folder with no tools and a fixed JSON schema for the answer. Scoring is an exact match against hand-set labels, with no LLM judge. A flawed case counts as caught when the reviewer reports an accepted category at `major` or `critical`. A control counts as a false alarm on any `critical` weakness or a `not supported` verdict. Run `20261020T164733Z`.
+
+**Found:**
+
+| Measure | Result |
+|---|---:|
+| Flawed runs with the planted category reported at any severity | 36 of 36 |
+| Flawed runs with it at major or critical | 33 of 36 |
+| Flawed cases caught at major or critical (majority of 3 runs) | 11 of 12 |
+| Control runs with a false alarm | 2 of 12 |
+| Control cases with a false alarm (majority of 3 runs) | 0 of 4 |
+
+- **The one miss** is the case that calls inferred exposures "measured overtakes". In all three runs the reviewer noticed the wording but rated it minor. It's the category this project cares about most, so this is a real gap in the agent.
+- **The two control alarms were both fair once I read them:**
+  - On the race-order control, the reviewer pointed out that the "order matches for all 654 unpenalised cars" check couldn't fail: official order is laps then time, so matching laps and times forces the order to match. That was a real flaw in E-007, which has been corrected.
+  - On the stint-age control, it said the slope mixes stints with different compounds and fuel loads. That's a fair point, though "critical" overstates it.
+- So the control set wasn't as clean as I'd labelled it. One of the four controls contained a genuine flaw, and it came from my own write-up.
+
+**What it doesn't show:**
+
+- **The same model family wrote the cases and reviews them**, so the planted flaws may be easier for it than flaws someone else would write. 11 of 12 may be generous.
+- **12 flawed cases and 4 controls is small.** One case changes the catch rate by about 8 points.
+- **Picking a category from a fixed list is stricter than a free-text review**, so some misses may be filing differences rather than blind spots.
+- **This set can't be used to improve the agent.** If I change the agent's prompt to fix the overtake miss and rerun on these same cases, the score would be tuned on its own test set. An improved prompt needs a fresh set of cases.
+
+**Next:** a held-out case set before any change to the agent prompt, then the same eval for the other review agents.
+
+---
+
+## E-009: Can keyword search find the right regulation clause?
+
+*2026-10-23 · complete*
+
+**Question:** given a question about the WEC rules, does a plain keyword retriever put the clause that answers it near the top? This measures retrieval only. No answer is generated yet.
+
+**Method:**
+
+- **Corpus:** the 2024, 2025 and 2026 sporting regulations (D-018), giving 855 chunks: 280 for 2024, 283 for 2025 and 292 for 2026. One chunk per lowest-level numbered article.
+- **Retriever:** BM25 with textbook settings, filtered to the season of the question.
+- **Questions** (`evals/regulations/questions.json`):
+  - 30 answerable questions about the 2026 rules, each written in a race engineer's words rather than the regulation's, with the article or articles that answer it.
+  - 6 questions the regulations can't answer, such as Balance of Performance figures, race results and lap records.
+  - The answerable questions are also asked of 2024 and 2025 wherever an article with the same heading exists. That gives 52 more, with the answer mapped by heading rather than checked by hand.
+- **Run:** `python scripts/run_retrieval_eval.py`.
+
+**Found:**
+
+| Setting | Questions | recall@1 | recall@3 | recall@5 |
+|---|---:|---:|---:|---:|
+| 2026, season filter | 30 | 15 | 20 | 24 |
+| 2024 and 2025 versions, season filter | 52 | 30 | 39 | 46 |
+| All seasons, no season filter | 82 | 15 | 44 | 49 |
+
+- **Most misses are vocabulary.** The question says "top up fluids" and the rule says "replenishment". Likewise "stay seated" against "remain on board", "warm the tyres" against "heating", and "which rules win" against "take precedence". Keyword search can't bridge these, and it's the case for trying embeddings.
+- **Versions matter in practice.** Without the season filter, the right article from the wrong season comes out on top for 30 of 82 questions, because the wording is often identical across years. Ranking can't tell the seasons apart, so the season has to be metadata.
+- **A score cut-off can't do refusal.** The best score for an unanswerable question reached 18.0, above the median of 14.4 for answerable ones. Refusing when the documents don't cover a question will need a check at the answer stage, not a retrieval threshold.
+
+**What it doesn't show:**
+
+- **The questions are few and written by one author**, with the same model that built the system. 30 questions means one question moves recall by about 3 points.
+- **The 2024 and 2025 answers were mapped by heading, not checked by hand.** If a clause kept its heading but changed its content, the label could be wrong.
+- **Nothing here is tuned.** BM25 settings are the defaults. Any change made because of these misses would need a fresh question set to report on.
+- **Tables are scrambled by the extraction**, so questions answered by a table (q22, tyre allocations) test the extraction as much as the retrieval.
+
+**Next:** embeddings against this BM25 baseline on a fresh question set, then answer generation with citations and refusal tests.
 

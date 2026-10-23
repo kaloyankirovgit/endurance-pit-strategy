@@ -6,7 +6,7 @@ Where things are right now. Updated at the end of each working session.
 
 ## Current stage
 
-Layer 1 is done and the race order is now checked against the official classifications. Nothing is modelled yet. A commit guard now enforces the no-data rule (D-016). Next come evals for the review agents, then regulation retrieval, then the traffic work (D-015).
+Layer 1 is done and the race order is now checked against the official classifications. Nothing is modelled yet. A commit guard now enforces the no-data rule (D-016). The statistical-reviewer agent has an eval (E-008), and regulation retrieval has a measured BM25 baseline (E-009). The order of the next pieces (retrieval's second round or the traffic work) is up for review.
 
 ## Done
 
@@ -20,20 +20,22 @@ Layer 1 is done and the race order is now checked against the official classific
 - `features/clean_laps.py` flags laps unfit for pace modelling, rain included. 138,884 of 179,259 laps are usable (E-004, E-005).
 - `pipeline.py` runs everything in about 13 seconds: raw CSVs to `interim/laps.parquet`, plus `processed/stints.parquet` and `processed/pit_stops.parquet`. Pandera validates the lap table on write (E-006, D-014).
 - `reconstruct/race_order.py` adds position and gaps at each crossing in DuckDB SQL, including the road gap and class of the car ahead on track.
-- Race order checked against the official `03_Classification` files for all 21 races. Lap counts match for 830 of 833 cars, and among the 654 classified cars with no penalty the order matches every time. The differences fit post-race penalties (E-007).
+- Race order checked against the official `03_Classification` files for all 21 races. Lap counts match for 830 of 833 cars and finishing times to the millisecond for 782. The 51 differences fit post-race penalties (E-007).
 - A commit guard blocks any commit that includes a git-ignored file, both as a Claude Code hook and as the git pre-commit hook (D-016).
-- 80 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
+- An eval for the `statistical-reviewer` agent: 16 synthetic cases, each run 3 times. It caught 11 of 12 planted flaws and raised no majority false alarm on the 4 controls. One control alarm turned out to be a real flaw in E-007, now corrected (E-008).
+- The 2024 to 2026 sporting regulations are downloaded with hashes and split into 855 article-level chunks. Keyword retrieval (BM25) finds the right 2026 clause in the top 5 for 24 of 30 hand-written questions (E-009).
+- 100 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
 
 ## Next
 
-1. **Evals for the review agents**
-   - Plant known flaws in small synthetic write-ups and measure how many the `statistical-reviewer` catches.
-2. **Regulation retrieval (Layer 6, retrieval side)**
-   - Versioned regulations, structural chunks, a hand-built question set, recall@k and refusal tests.
-3. **Traffic exposure (Layer 2)**
+1. **Regulation retrieval, second round**
+   - Embeddings against the BM25 baseline on a fresh question set, then answers with citations and refusal tests.
+2. **Traffic exposure (Layer 2)**
    - Define when a car is running into slower-class traffic from the road gap and class ahead, then compare lap residuals with and without it.
-4. **Drying track**
+3. **Drying track**
    - Find a way to catch laps on a wet track after the rain sensor reads zero.
+4. **Reviewer eval, second round**
+   - A fresh held-out case set before changing the agent prompt (it rated "measured overtakes" as minor), then the other three agents.
 
 ## Key facts
 
@@ -66,6 +68,7 @@ Layer 1 is done and the race order is now checked against the official classific
 | Race order and gaps | Built, and the final order checked against the official classifications (E-007) |
 | Traffic, pace and pit-loss models | Not started |
 | Simulator and optimiser | Not started |
-| Regulations and LLM layer | Not started |
+| Regulations and LLM layer | Retrieval built and measured (E-009), no answer generation yet |
 | CI | Running on GitHub Actions, passing |
 | Commit guard hooks | Built and tested (D-016) |
+| Review-agent evals | statistical-reviewer evaluated, 16 cases × 3 runs (E-008) |

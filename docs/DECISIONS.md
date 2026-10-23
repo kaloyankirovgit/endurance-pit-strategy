@@ -125,7 +125,7 @@ A stop is a garage visit if its `PIT_TIME` is over 3× the race median. The long
 
 *2026-10-20*
 
-Race order is compared with the official end-of-race classification car by car. A raw position match would undersell it, because one post-race penalty shifts every car it passes. So each difference gets a label (time penalty, fewer official laps, or unexplained), and the order is also compared among cars with no difference at all (E-007).
+Race order is compared with the official end-of-race classification car by car. A raw position match would undersell it, because one post-race penalty shifts every car it passes. So each car's laps and finishing time are compared instead, and each difference gets a label: time penalty, fewer official laps, or unexplained (E-007).
 
 The work order after this changes. Hooks and evals for the review agents come next, then the regulation retrieval part of Layer 6, and only then the traffic baseline. Retrieval doesn't depend on the simulator, so only the order changes. The cost is that the first traffic result comes later.
 
@@ -146,11 +146,32 @@ The first version matched the words "git commit" anywhere in a command, and it b
 
 ---
 
+## D-017: Review agents are evaluated with labelled cases and exact-match scoring
+
+*2026-10-20*
+
+The review agents are scored on synthetic write-ups with planted flaws and clean controls, run headless through `claude -p` with a fixed JSON schema for the answer. Scoring is an exact match against labels, with no second LLM acting as judge, so a score can be checked by reading the labels. Each case runs 3 times because the output varies between runs. The agent runs from an empty folder with no tools, so the project's own instructions can't leak in and make the eval easier than real use.
+
+A case set that has been used to change an agent's prompt can't then be used to report the improved score. Prompt changes are tested on a fresh set (E-008).
+
+---
+
+## D-018: Regulation retrieval starts with BM25 and a season filter
+
+*2026-10-23*
+
+- **Text extraction:** `pypdf`, installed through the optional `rag` extra so CI doesn't need it. The regulations are bilingual, with French on the left and English on the right, so only text in the right half of each page is kept. Lines are rebuilt from the text positions.
+- **Chunking:** one chunk per lowest-level numbered article, carrying its heading path and pages. Main articles must follow in order, and sub-headings must start at the column's edge, so numbers inside a sentence don't open a chunk.
+- **Retrieval:** BM25, written in about 40 lines rather than pulled in as a library, with the usual k1 = 1.5 and b = 0.75 and no tuning. No embeddings and no vector store yet. The corpus is three documents, and keyword search is the baseline anything fancier has to beat.
+- **Versions:** every chunk carries its season, and retrieval filters on the season being asked about. E-009 shows why: without the filter, the same article from the wrong season comes out on top for 30 of 82 questions.
+
+---
+
 ## Tools
 
 The rule of thumb is to use a few tools properly rather than a lot of them badly. A tool comes in when a real need shows up.
 
-**In use:** Python, pandas, pytest, Git, GitHub Actions, Parquet (pyarrow), DuckDB, Pandera.
+**In use:** Python, pandas, pytest, Git, GitHub Actions, Parquet (pyarrow), DuckDB, Pandera, pypdf (regulation text, D-018).
 
 **Coming when needed:** statsmodels and SciPy for the mixed-effects and bootstrap work, Matplotlib for figures, then Streamlit and Docker at the end.
 

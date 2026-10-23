@@ -1,0 +1,44 @@
+# Eval: retrieval over the WEC sporting regulations
+
+Does keyword search put the regulation clause that answers a question near the top? This measures retrieval only. No answer is generated yet.
+
+## The questions
+
+`questions.json` holds 36 questions, written for this eval:
+
+- **30 answerable**, about the 2026 rules. Each is worded the way a race engineer might ask it, not copied from the regulation, and lists the article or articles that answer it. The articles were checked against the regulation text.
+- **6 unanswerable**, about things the sporting regulations don't contain: Balance of Performance figures, race results, tyre compounds, stewards' decisions, lap records.
+
+The runner also asks the answerable questions of the 2024 and 2025 regulations, wherever an article with the same heading exists. Those answers are mapped by heading and not checked by hand.
+
+## How it runs
+
+```
+pip install -e ".[rag]"
+python -c "from endurance_strategy.io.regulations import download_regulations; download_regulations()"
+python -c "from endurance_strategy.rag.regulations import build_chunks; from endurance_strategy.paths import RAW_DIR, INTERIM_DIR; build_chunks(RAW_DIR / 'regulations' / '_manifest.json', INTERIM_DIR / 'regulation_chunks.jsonl')"
+python scripts/run_retrieval_eval.py
+```
+
+- The PDFs and the chunks stay local, like the timing data. Only the questions, the code and the scores (chunk IDs, not regulation text) are committed.
+- Scoring is recall@k: does an answering chunk appear in the top *k*? It's reported as a count with the number of questions.
+
+## Results
+
+First run, 2026-10-23 (full write-up in E-009 of `docs/EXPERIMENT_LOG.md`):
+
+| Setting | Questions | recall@1 | recall@3 | recall@5 |
+|---|---:|---:|---:|---:|
+| 2026, season filter | 30 | 15 | 20 | 24 |
+| 2024 and 2025 versions, season filter | 52 | 30 | 39 | 46 |
+| All seasons, no season filter | 82 | 15 | 44 | 49 |
+
+- Most misses come from different words for the same thing ("top up" and "replenishment").
+- Without the season filter, the right article from the wrong year comes out on top for 30 of 82 questions.
+- Unanswerable questions score as high as answerable ones, so refusal can't rely on a score cut-off.
+
+## What it can't show
+
+- 30 hand-written questions from one author is a small set. One question moves recall by about 3 points.
+- The same model family helped write the questions and build the retriever.
+- Nothing has been tuned on these questions. Any improvement has to be reported on a fresh set.

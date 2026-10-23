@@ -22,8 +22,12 @@ What works right now:
 - **Weather on every lap**
   - Joined by the time of day rather than the race clock, because the race clock stops during red flags. At Spa 2024 that would have put the weather two hours out.
 - **Race order and gaps**
-  - Rebuilt at every timing-line crossing in DuckDB SQL, including the gap to the car ahead on track and its class. The final order matches the official classification for every car without a post-race penalty.
-- **80 tests on a synthetic race**
+  - Rebuilt at every timing-line crossing in DuckDB SQL, including the gap to the car ahead on track and its class. Every car's lap count and finishing time were checked against the official classification. They match apart from 51 cars, whose differences fit post-race penalties.
+- **An eval for the AI review agent**
+  - 16 synthetic write-ups with planted flaws and clean controls, run headless through Claude Code and scored against labels. It caught 11 of the 12 planted flaws. See [`evals/statistical_reviewer/`](evals/statistical_reviewer/).
+- **Regulation retrieval**
+  - The 2024 to 2026 sporting regulations, split into article-level chunks with season and page, searched with BM25. It finds the right 2026 clause in the top 5 for 24 of 30 hand-written questions. See [`evals/regulations/`](evals/regulations/).
+- **100 tests on synthetic data**
   - They run in GitHub Actions on every push, with no real data needed.
 
 The full log of what's been tried is in [`docs/EXPERIMENT_LOG.md`](docs/EXPERIMENT_LOG.md), and the reasoning behind the bigger choices is in [`docs/DECISIONS.md`](docs/DECISIONS.md).
@@ -88,6 +92,15 @@ More detail on the source, including a quirk where the site sometimes serves the
 
 ## How it's built
 
-I'm building this with Claude Code as a pair programmer. The rules and review agents it works with live in [`.claude/`](.claude/) and [`CLAUDE.md`](CLAUDE.md). They're part of the project too. They set the standards Claude works to, and the reviews it runs before a result is reported.
+This project is built in close collaboration with Claude Code, Anthropic's coding agent. AI assistance runs through most of it, so it's worth saying plainly how that works.
+
+- **Where Claude helps:** writing and editing the pipeline code, the tests and CI, the write-ups in `docs/`, and running the review agents and evals.
+- **Where I come in:** I set the direction and the standards, and I review every change before it's committed. Every commit goes through me, and I'm accountable for what's in the repo.
+- **How the work is kept honest:**
+  - [`CLAUDE.md`](CLAUDE.md) and [`.claude/rules/`](.claude/rules/) set the standards Claude works to, from data licensing to how statistical results are allowed to be worded.
+  - Review agents in [`.claude/agents/`](.claude/agents/) check code, data, statistics and the simulator before a result is reported. The statistical reviewer is itself evaluated against planted flaws in [`evals/`](evals/).
+  - A commit hook blocks the licensed timing data from being committed, whether Claude or I run the commit (D-016).
+
+The setup is part of the project, not just tooling around it. A lot of the work here is about running an AI-assisted workflow where the checks are enforced rather than hoped for.
 
 This is an independent project. It isn't affiliated with the FIA, the ACO, the WEC or Al Kamel Systems.

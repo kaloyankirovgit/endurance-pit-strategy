@@ -1,6 +1,6 @@
 # Regulations
 
-Nothing collected yet. This is the plan for when I do.
+The 2024, 2025 and 2026 sporting regulations are collected and chunked (D-018). Retrieval over them is measured in E-009.
 
 ## Why they matter here
 
@@ -15,11 +15,19 @@ The PDFs stay local and aren't committed. This file keeps the record of what was
 
 ## Documents
 
-| ID | Title | Season | Revision | Effective | Source | Retrieved |
-|---|---|---|---|---|---|---|
-| | | | | | | |
+| ID | Title | Season | Revision | Published | Effective | SHA-256 (first 16) | Retrieved |
+|---|---|---|---|---|---|---|---|
+| WEC-SR-2024 | 2024 FIA WEC Sporting Regulations | 2024 | clean v1.9 | 19.10.2023 | 01.01.2024 | `959ce8ff1900da4c` | 2026-10-23 |
+| WEC-SR-2025 | 2025 FIA WEC Sporting Regulations | 2025 | clean v1.1 | 18.10.2024 | 01.01.2025 | `3575b64462370d21` | 2026-10-23 |
+| WEC-SR-2026 | 2026 FIA WEC Sporting Regulations | 2026 | clean v1.2 (WMSC) | 16.10.2025 | 01.01.2026 | `98ff1454127b5c6d` | 2026-10-23 |
 
-Source: <https://www.fiawec.com/en/page/regulations/18>
+The WEC site links to the FIA, which hosts the PDFs: <https://www.fia.com/regulation/category/118>. The 2026 file is listed there. The 2024 and 2025 files are still hosted under `fia.com/sites/default/files/` and were found by search. Full URLs and hashes are in `io/regulations.py` and the local manifest. The FIA's `robots.txt` allows these paths and asks for 10 seconds between requests, which the downloader respects.
+
+**What the versions don't cover:**
+
+- **Mid-season revisions.** Each file is the revision hosted now, so it's the latest one for that season. If a clause changed mid-season, an early-season race ran under a wording this corpus doesn't hold.
+- **Other documents.** WEC Committee decisions, event bulletins, the Le Mans supplementary regulations and Balance of Performance tables aren't collected yet.
+- **Bilingual layout.** Only the English column is kept. Tables come out scrambled, the tyre-allocation table in 6.5.4 for example.
 
 What to collect: the sporting regulations first. After that, any technical or balance-of-performance documents that limit what happens in a stop, plus the event bulletins that change the standard rules.
 

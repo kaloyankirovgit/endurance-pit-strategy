@@ -1,0 +1,318 @@
+[
+  {
+    "id": "q01",
+    "season": "2026",
+    "question": "How long does a Bronze driver in an LMGT3 car have to drive in a six-hour race?",
+    "gold_articles": [
+      "13.2.3"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q02",
+    "season": "2026",
+    "question": "Is there a minimum time each Hypercar driver has to spend behind the wheel?",
+    "gold_articles": [
+      "13.2.3"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q03",
+    "season": "2026",
+    "question": "What happens if a driver falls short of the required time at the wheel?",
+    "gold_articles": [
+      "13.2.5"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q04",
+    "season": "2026",
+    "question": "Where does the clock start and stop when a driver's time in the car is counted?",
+    "gold_articles": [
+      "13.2.2"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q05",
+    "season": "2026",
+    "question": "Can the stewards change the driving time limits in the middle of an event?",
+    "gold_articles": [
+      "13.2.4"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q06",
+    "season": "2026",
+    "question": "Can a Hypercar line-up include a Bronze-rated driver?",
+    "gold_articles": [
+      "13.3.2"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q07",
+    "season": "2026",
+    "question": "Which driver ratings does an LMGT3 crew need to include?",
+    "gold_articles": [
+      "13.3.3"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q08",
+    "season": "2026",
+    "question": "Is pit entry open when a Full Course Yellow is called?",
+    "gold_articles": [
+      "14.5.2"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q09",
+    "season": "2026",
+    "question": "What speed do drivers have to slow down to during an FCY?",
+    "gold_articles": [
+      "14.5.1"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q10",
+    "season": "2026",
+    "question": "Can a team still bring its car in for a stop under the Virtual Safety Car?",
+    "gold_articles": [
+      "14.7.2"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q11",
+    "season": "2026",
+    "question": "For how many laps is the pit entry shut after the safety car is deployed?",
+    "gold_articles": [
+      "14.6.5"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q12",
+    "season": "2026",
+    "question": "When the pits are closed, how many seconds of refuelling does an emergency stop allow?",
+    "gold_articles": [
+      "12.2.1",
+      "14.5.2",
+      "14.6.5",
+      "14.4.4"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q13",
+    "season": "2026",
+    "question": "What is the speed limit in the pit lane?",
+    "gold_articles": [
+      "12.1.4"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q14",
+    "season": "2026",
+    "question": "Can a team put fuel in the car while it is inside the garage?",
+    "gold_articles": [
+      "12.3.1"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q15",
+    "season": "2026",
+    "question": "Which major parts are teams forbidden to swap during the race?",
+    "gold_articles": [
+      "12.3.1"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q16",
+    "season": "2026",
+    "question": "Can a driver top up energy or fluids when stopped out on the circuit?",
+    "gold_articles": [
+      "9.1.5"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q17",
+    "season": "2026",
+    "question": "May the driver stay seated while the car is being refuelled?",
+    "gold_articles": [
+      "APPENDIX 8/6.1"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q18",
+    "season": "2026",
+    "question": "What share of the winner's distance must a car complete to be classified?",
+    "gold_articles": [
+      "15.1.4"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q19",
+    "season": "2026",
+    "question": "How are championship points awarded if a red-flagged race never restarts?",
+    "gold_articles": [
+      "15.3.4"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q20",
+    "season": "2026",
+    "question": "If the chequered flag comes out early, at what point is the race considered over?",
+    "gold_articles": [
+      "15.1.2"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q21",
+    "season": "2026",
+    "question": "How is a penalty of time added to a pit stop served, and can mechanics work during it?",
+    "gold_articles": [
+      "7.4.4"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q22",
+    "season": "2026",
+    "question": "How many sets of dry tyres can a Hypercar use for qualifying and a six-hour race?",
+    "gold_articles": [
+      "6.5.4"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q23",
+    "season": "2026",
+    "question": "Which rules win at Le Mans if they differ from the championship's sporting regulations?",
+    "gold_articles": [
+      "1.2.4"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q24",
+    "season": "2026",
+    "question": "What does a drive-through penalty require the driver to do?",
+    "gold_articles": [
+      "7.4.2"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q25",
+    "season": "2026",
+    "question": "Where is a Stop and Go penalty served?",
+    "gold_articles": [
+      "7.4.3"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q26",
+    "season": "2026",
+    "question": "If a car is held up on the first lap of a safety-car start, can it get its place back?",
+    "gold_articles": [
+      "11.3.2"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q27",
+    "season": "2026",
+    "question": "Are teams allowed to warm the tyres or treat them chemically?",
+    "gold_articles": [
+      "6.5.6"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q28",
+    "season": "2026",
+    "question": "Can a driver change happen while the engine is still running?",
+    "gold_articles": [
+      "12.2.2"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q29",
+    "season": "2026",
+    "question": "During a red flag, when can teams start working on cars that were already in the pit lane?",
+    "gold_articles": [
+      "14.4.3"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "q30",
+    "season": "2026",
+    "question": "What limits are placed on the number of team staff during an event?",
+    "gold_articles": [
+      "APPENDIX 7",
+      "4.1.7"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "u01",
+    "season": "2026",
+    "question": "What is the Balance of Performance minimum weight for the Ferrari 499P at Spa?",
+    "gold_articles": [],
+    "answerable": false
+  },
+  {
+    "id": "u02",
+    "season": "2026",
+    "question": "How much fuel energy per stint was Toyota allowed at Le Mans?",
+    "gold_articles": [],
+    "answerable": false
+  },
+  {
+    "id": "u03",
+    "season": "2026",
+    "question": "How many pit stops did the winning car make at the Bahrain race?",
+    "gold_articles": [],
+    "answerable": false
+  },
+  {
+    "id": "u04",
+    "season": "2026",
+    "question": "Which tyre compounds did Michelin bring to the Fuji round?",
+    "gold_articles": [],
+    "answerable": false
+  },
+  {
+    "id": "u05",
+    "season": "2026",
+    "question": "What did the stewards decide about the collision at Imola?",
+    "gold_articles": [],
+    "answerable": false
+  },
+  {
+    "id": "u06",
+    "season": "2026",
+    "question": "What is the lap record at Circuit of the Americas?",
+    "gold_articles": [],
+    "answerable": false
+  }
+]

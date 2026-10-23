@@ -1,0 +1,29 @@
+{
+  "timestamp_utc": "20261020T164733Z",
+  "repeats": 3,
+  "cases": 16,
+  "models": [
+    "claude-opus-5-5"
+  ],
+  "flawed_runs": 36,
+  "caught_runs": 36,
+  "caught_serious_runs": 33,
+  "flawed_cases_caught_serious_majority": [
+    11,
+    12
+  ],
+  "control_runs": 12,
+  "false_alarm_runs": 2,
+  "control_cases_false_alarm_majority": [
+    0,
+    4
+  ],
+  "unstable_cases": [
+    "14_control_stint_age",
+    "16_control_race_order"
+  ],
+  "control_verdicts": {
+    "supported with stated limitations": 10,
+    "not supported": 2
+  }
+}

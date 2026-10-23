@@ -1,0 +1,121 @@
+[
+  {
+    "id": "01_row_bootstrap",
+    "planted": "dependence",
+    "accept": [
+      "dependence",
+      "uncertainty",
+      "sample_size"
+    ]
+  },
+  {
+    "id": "02_laps_as_sample_size",
+    "planted": "sample_size",
+    "accept": [
+      "sample_size",
+      "dependence",
+      "uncertainty",
+      "confounding"
+    ]
+  },
+  {
+    "id": "03_full_race_baseline",
+    "planted": "leakage",
+    "accept": [
+      "leakage"
+    ]
+  },
+  {
+    "id": "04_random_lap_split",
+    "planted": "validation_design",
+    "accept": [
+      "validation_design",
+      "leakage",
+      "dependence"
+    ]
+  },
+  {
+    "id": "05_unadjusted_stint_lap",
+    "planted": "confounding",
+    "accept": [
+      "confounding"
+    ]
+  },
+  {
+    "id": "06_fuel_tyre_split",
+    "planted": "identifiability",
+    "accept": [
+      "identifiability",
+      "model_assumptions"
+    ]
+  },
+  {
+    "id": "07_interval_spans_zero",
+    "planted": "uncertainty",
+    "accept": [
+      "uncertainty",
+      "null_alternative"
+    ]
+  },
+  {
+    "id": "08_overtakes_measured",
+    "planted": "category_integrity",
+    "accept": [
+      "category_integrity"
+    ]
+  },
+  {
+    "id": "09_threshold_search",
+    "planted": "specification_sensitivity",
+    "accept": [
+      "specification_sensitivity",
+      "null_alternative"
+    ]
+  },
+  {
+    "id": "10_struggling_driver",
+    "planted": "null_alternative",
+    "accept": [
+      "null_alternative",
+      "confounding"
+    ]
+  },
+  {
+    "id": "11_normal_pit_loss",
+    "planted": "model_assumptions",
+    "accept": [
+      "model_assumptions",
+      "uncertainty"
+    ]
+  },
+  {
+    "id": "12_ols_unclustered",
+    "planted": "dependence",
+    "accept": [
+      "dependence",
+      "uncertainty",
+      "model_assumptions",
+      "confounding"
+    ]
+  },
+  {
+    "id": "13_control_matched_traffic",
+    "planted": null,
+    "accept": []
+  },
+  {
+    "id": "14_control_stint_age",
+    "planted": null,
+    "accept": []
+  },
+  {
+    "id": "15_control_pit_loss",
+    "planted": null,
+    "accept": []
+  },
+  {
+    "id": "16_control_race_order",
+    "planted": null,
+    "accept": []
+  }
+]

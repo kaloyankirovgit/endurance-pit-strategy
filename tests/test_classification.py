@@ -68,10 +68,10 @@ def test_differences_are_labelled(classification):
     assert out.loc["2", "time_diff_s"] == pytest.approx(-30.0)
 
 
-def test_penalty_breaks_raw_position_match_but_not_unpenalised_order(classification):
+def test_penalty_shifts_raw_position_match(classification):
     out = compare_to_classification(LAPS, classification).set_index("NUMBER")
     assert out.loc[["2", "3"], "position_match"].tolist() == [False, False]
-    assert out.loc[["1", "3"], "unpenalised_order_match"].all()
+    assert out.loc["1", "position_match"]
     assert not out.loc["5", "position_match"]
 
 

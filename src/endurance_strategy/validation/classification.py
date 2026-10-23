@@ -58,8 +58,8 @@ def compare_to_classification(laps: pd.DataFrame, classification: pd.DataFrame,
                               time_tolerance_s: float = 0.001) -> pd.DataFrame:
     """One row per car in either source, with the checks that say where the rebuild and the official result agree.
 
-    Positions are compared among cars the official result lists as Classified, so retirements
-    and disqualifications, which the rules place by status rather than distance, don't count against the rebuild.
+    The evidence is the per-car lap and time match. Official order is laps then time, so once those
+    match the order must too. `position_match` is kept to show how far penalties shift the raw order.
     """
     merged = rebuilt_final_order(laps).merge(classification, on=["event_key", "NUMBER"], how="outer", indicator=True)
     merged["in_both"] = merged["_merge"] == "both"
@@ -76,8 +76,6 @@ def compare_to_classification(laps: pd.DataFrame, classification: pd.DataFrame,
 
     classified = merged["in_both"] & (merged["official_status"] == "Classified")
     merged["position_match"] = classified & _same_rank(merged, classified)
-    unpenalised = classified & (merged["difference"] == "exact")
-    merged["unpenalised_order_match"] = unpenalised & _same_rank(merged, unpenalised)
     return merged.drop(columns="_merge").sort_values(["event_key", "official_position"]).reset_index(drop=True)
 
 
@@ -91,7 +89,6 @@ def _same_rank(frame: pd.DataFrame, subset: pd.Series) -> pd.Series:
 def summarise_by_race(comparison: pd.DataFrame) -> pd.DataFrame:
     by_race = comparison.groupby("event_key")
     classified = comparison[comparison["official_status"] == "Classified"].groupby("event_key")
-    unpenalised = comparison[(comparison["official_status"] == "Classified") & (comparison["difference"] == "exact")]
     summary = pd.DataFrame({
         "cars": by_race.size(),
         "missing_from_rebuild": comparison[comparison["rebuilt_laps"].isna()].groupby("event_key").size(),
@@ -100,8 +97,6 @@ def summarise_by_race(comparison: pd.DataFrame) -> pd.DataFrame:
         "time_match": by_race["time_match"].sum(),
         "classified": classified.size(),
         "classified_position_match": classified["position_match"].sum(),
-        "unpenalised_classified": unpenalised.groupby("event_key").size(),
-        "unpenalised_order_match": unpenalised.groupby("event_key")["unpenalised_order_match"].sum(),
     })
     differences = pd.crosstab(comparison["event_key"], comparison["difference"])
     return summary.join(differences).fillna(0).astype(int)

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from endurance_strategy.features.traffic import add_placebo_counts, add_traffic_exposure, class_pace_gap
+from endurance_strategy.features.traffic import add_placebo_counts, add_traffic_exposure, class_pace_gap, past_class_pace_gap
 
 
 def crossings(rows: list[tuple], event: str = "E") -> pd.DataFrame:
@@ -92,8 +92,8 @@ def test_placebo_counts_look_behind_far_ahead_and_at_the_same_class():
     out = add_placebo_counts(add_traffic_exposure(crossings(rows), window_s=10.0))
     lap = out[(out["NUMBER"] == "1") & (out["LAP_NUMBER"] == 2)].iloc[0]
     assert lap["candidate_traffic_count"] == 2
-    assert lap["slower_behind_count"] == 2
-    assert lap["slower_far_ahead_count"] == 1
+    assert lap["other_side_count"] == 2
+    assert lap["far_count"] == 1
     assert lap["same_class_ahead_count"] == 1
 
 
@@ -103,3 +103,70 @@ def test_exposure_two_laps_later_is_the_cars_own_future_count():
     car = out[out["NUMBER"] == "1"].set_index("LAP_NUMBER")
     assert car.loc[4, "candidate_traffic_count"] == 1
     assert car.loc[2, "exposure_two_laps_later"] == 1
+
+
+def test_being_caught_counts_faster_cars_behind_within_the_window():
+    # GT3 car 51 starts lap 2 at t=100. Hypercars cross 3 s and 8 s later (behind it on the road),
+    # one 12 s later (outside a 10 s window), one 4 s earlier (just passed it), one in the pit lane.
+    rows = [("51", "LMGT3", 1, 100.0, False), ("51", "LMGT3", 2, 215.0, False),
+            ("1", "HYPERCAR", 9, 103.0, False), ("2", "HYPERCAR", 9, 108.0, False),
+            ("3", "HYPERCAR", 9, 112.0, False), ("4", "HYPERCAR", 9, 96.0, False),
+            ("5", "HYPERCAR", 9, 105.0, True), ("52", "LMGT3", 4, 104.0, False)]
+    out = add_placebo_counts(add_traffic_exposure(crossings(rows), window_s=10.0, direction="being_caught"))
+    lap = out[(out["NUMBER"] == "51") & (out["LAP_NUMBER"] == 2)].iloc[0]
+    assert lap["candidate_traffic_count"] == 2
+    assert lap["other_side_count"] == 1
+
+
+def test_hypercar_laps_have_no_faster_class_to_be_caught_by():
+    out = add_traffic_exposure(crossings(BASE), window_s=10.0, direction="being_caught")
+    assert count(out, "1", 2) == 0
+
+
+def past_race() -> pd.DataFrame:
+    """Two classes lapping steadily: Hypercar 100 s laps then 104 s, GT3 112 s laps throughout."""
+    rows = []
+    for car, car_class, laps in (("1", "HYPERCAR", [100.0] * 5 + [104.0] * 5), ("51", "LMGT3", [112.0] * 10)):
+        elapsed = 0.0
+        for number, lap_time in enumerate(laps, start=1):
+            elapsed += lap_time
+            rows.append((car, car_class, number, elapsed, lap_time))
+    frame = pd.DataFrame(rows, columns=["NUMBER", "CLASS", "LAP_NUMBER", "ELAPSED_S", "LAP_TIME_S"])
+    for flag in ("is_first_lap", "is_pit_lap", "is_caution_lap", "is_after_caution", "is_missing_data", "is_wet"):
+        frame[flag] = False
+    frame["is_first_lap"] = frame["LAP_NUMBER"].eq(1)
+    return frame.assign(event_key="E", CROSSING_FINISH_LINE_IN_PIT="")
+
+
+def test_past_window_uses_only_laps_finished_before_the_lap_began():
+    frame = past_race().sort_values(["event_key", "NUMBER", "LAP_NUMBER"]).reset_index(drop=True)
+    frame["lap_start_s"] = frame.groupby(["event_key", "NUMBER"])["ELAPSED_S"].shift()
+    gap = pd.Series(past_class_pace_gap(frame, min_laps=2), index=frame.index)
+    hypercar = frame["NUMBER"].eq("1")
+    # Hypercar lap 4 starts at t=300: GT3 has only lap 2 done (its first lap doesn't count), fewer than min_laps.
+    assert pd.isna(gap[hypercar & frame["LAP_NUMBER"].eq(4)].iloc[0])
+    # Lap 5 starts at t=400: Hypercar laps 2-3 (100 s; lap 4 ends at 400, not before) and GT3 laps 2-3 (112 s).
+    assert gap[hypercar & frame["LAP_NUMBER"].eq(5)].iloc[0] == 12.0
+    # Lap 9 starts at t=812: Hypercar laps 2-5 at 100 s and 6-7 at 104 s are done, median 100, so 12 s.
+    # The whole-race median (104 s) would give 8 s, which needs laps that haven't happened yet.
+    assert gap[hypercar & frame["LAP_NUMBER"].eq(9)].iloc[0] == 12.0
+    assert class_pace_gap(frame.assign(is_usable_for_pace_model=~frame["is_first_lap"]))["E"] == 8.0
+
+
+def test_past_window_feeds_the_exposure_and_leaves_early_laps_uncounted():
+    out = add_traffic_exposure(past_race(), window_s="past")
+    early = out[out["NUMBER"].eq("1") & out["LAP_NUMBER"].le(3)]
+    assert early["candidate_traffic_count"].isna().all()
+
+
+def test_past_window_leaves_caution_and_pit_laps_out_of_the_running_median():
+    frame = past_race()
+    hypercar = frame["NUMBER"].eq("1")
+    frame.loc[hypercar & frame["LAP_NUMBER"].eq(2), ["LAP_TIME_S", "is_caution_lap"]] = [150.0, True]
+    frame.loc[hypercar & frame["LAP_NUMBER"].eq(3), ["LAP_TIME_S", "is_pit_lap"]] = [160.0, True]
+    frame = frame.sort_values(["event_key", "NUMBER", "LAP_NUMBER"]).reset_index(drop=True)
+    frame["lap_start_s"] = frame.groupby(["event_key", "NUMBER"])["ELAPSED_S"].shift()
+    gap = pd.Series(past_class_pace_gap(frame, min_laps=2), index=frame.index)
+    # Lap 7 starts at t=604: usable Hypercar laps done are 4 and 5 (100 s), so the gap is 12 s.
+    # With the caution and pit laps counted, the median would be 125 s and the gap -13 s.
+    assert gap[frame["NUMBER"].eq("1") & frame["LAP_NUMBER"].eq(7)].iloc[0] == 12.0

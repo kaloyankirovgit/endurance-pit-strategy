@@ -553,7 +553,7 @@ The question set is `questions_class.json`: 5 questions asked once per class (10
 - **Checks added after seeing the result** (not planned; now in the script and its output):
   - **Resampling the 7 circuits** instead of the races: 0.32 to 0.43 s per car.
   - **LMGT3 cars 2W to 3W ahead,** too far to catch this lap: 0.00 s (−0.01 to 0.01) alongside the main count, which stays 0.37 s. This null result is the cleanest check on race-phase or pack confounding.
-  - **The car's own count two laps later,** which can't affect this lap: 0.01 s (−0.00 to 0.02). The main count stays 0.37 s.
+  - **The car's own count two laps later:** 0.01 s (−0.00 to 0.02), with the main count still 0.37 s. *Amended after the E-014 review:* this isn't a clean placebo. Its window starts when lap t+1 ends, so this lap's own time moves it. The far-ahead count is the valid check.
   - **LMGT3 cars just behind at the start of the lap:** 0.11 s (0.09 to 0.14) on their own, and 0.04 s (0.03 to 0.06) alongside the main count. The statistical review found this count tracks the previous lap's exposure, so it most likely picks up traffic carried over from the end of the last lap, not confounding.
   - **Other Hypercars within 2 s ahead at the start of the lap** (40% of laps): 0.31 s each (0.28 to 0.35). With them in the model, the LMGT3 figure stays 0.36 s.
 - **A statistical review** (the `statistical-reviewer` agent) tried and failed to show leakage from the lap's own outcome, a clock misalignment, faulty fixed effects or selection through pit stops. It found the window dependence and some wording that read as a per-car cost. Both are fixed above.
@@ -566,3 +566,81 @@ The question set is `questions_class.json`: 5 questions asked once per class (10
 - **The intervals assume the 18 races are exchangeable.** They share 7 circuits and mostly the same cars and drivers, which the bootstrap doesn't resample. A t-interval on the 7 circuit means is wider (0.29 to 0.45), as reported by the review, but still well above zero.
 - **The window uses whole-race medians,** including the Hypercar's own laps. That's harmless for a description, since it's constant within a race and fixed windows agree. A team doesn't have it at lap t, so it can't go into the simulator as it is.
 - **Hypercars only, outside Le Mans,** and not yet tested on held-out races (fit 2024 to 2025, test 2026) as a simulator input would need.
+
+---
+
+## E-014: Does the traffic association hold the other way round, with a past-only window, and from one season to the next?
+
+*2026-10-24 · complete. The plan was written before any of these outcomes was computed.*
+
+Three questions that follow from E-013, all on the same 18 races outside Le Mans and with the same within-stint design (D-022).
+
+**1. The other direction.** For an LMGT3 lap, count the Hypercars that cross the line in the W seconds *after* the GT3 begins its lap, leaving out pit-lane crossings. Those Hypercars are less than W behind on the road and should catch it before the lap ends. Same comparison, intervals and caps as E-013. Placebos, fixed now:
+- Hypercars 2W to 3W behind, too far back to catch it this lap.
+- Hypercars in the W seconds *ahead*, which have just lapped it.
+- The car's own count two laps later.
+
+*Expected:* positive, and smaller than the Hypercar figure per car. A GT3 being lapped mostly gives up the line for a moment. That's a guess, not a measurement.
+
+**2. A past-only window.** E-013's W came from whole-race medians, which a team doesn't have at lap t. Here W at each lap is the gap between the class medians over usable laps that *ended before that lap began*. A lap gets no window until each class has at least 20 such laps. Rerun the Hypercar estimate and the GT3 estimate with it.
+
+*Expected:* close to the whole-race figures, because class pace is fairly stable through a race.
+
+**3. From 2024 to 2025 onto 2026.**
+- Fit the per-car figure on the 14 races from 2024 and 2025, using the whole-race window as in E-013, then apply it unchanged to the 4 races from 2026 (COTA, Imola, São Paulo and Spa).
+- Report the 2026 estimate on its own alongside the 2024 to 2025 one, and how much of the within-stint variance in 2026 lap times the 2024 to 2025 figure explains, against a zero-traffic baseline.
+- Do it for both directions.
+
+**This is not a clean holdout.** The 2026 races were already part of E-013, and I've seen the race-by-race slopes there. Nothing was tuned on them, since the design was fixed before E-013 ran, but the honest name for this is a check of stability over time. Four test races is also very few, so the 2026 figure gets race-by-race numbers, not just an interval.
+
+**Found** (run `20261024T112047Z`, `python scripts/run_traffic_followup.py`, output in `reports/outputs/`, which stays local). As in E-013, every figure is a within-stint association with an inferred exposure, not a measured cost per pass. Drivers pushing or saving, local yellows and same-class fights aren't controlled. The intervals treat the 18 races as exchangeable, though they share 7 circuits and mostly the same cars.
+
+**1. GT3 laps with Hypercars close behind.** 18 races, 322 LMGT3 car entries, 108 drivers, 2,300 stints and 46,442 laps. "Close behind" means within the race's pace gap W behind on the road at the start of the GT3's lap.
+
+| Hypercars within W behind at lap start | Laps | Difference from 0 | 95% interval (races resampled) |
+|---|---:|---:|---:|
+| 0 (reference) | 13,528 | | |
+| 1 | 10,809 | 0.20 s | 0.16 to 0.24 |
+| 2 | 9,155 | 0.35 s | 0.30 to 0.41 |
+| 3 | 5,996 | 0.48 s | 0.41 to 0.57 |
+| 4 or more (mean 5.4) | 6,954 | 0.88 s | 0.77 to 1.00 |
+| Per car (capped at 6) | 46,442 | 0.18 s | 0.16 to 0.20 |
+
+- **Positive at all 18 races,** from 0.11 s (Fuji 2024) to 0.36 s (COTA 2025).
+- **At a fixed window, it's about half the Hypercar figure** (a ratio of 0.47 to 0.57 across windows). Each figure on its own moves with the window: 0.23 s per car at 5 s down to 0.12 s at 20 s. The one-car contrast is 0.18 to 0.22 s across windows.
+- **Can the lap's own outcome create this count?** Not directly. The Hypercars counted cross the line after the GT3 has started its lap, so nothing it does on that lap moves those crossings. An indirect route through earlier laps was checked by adding the previous lap's residual (added after the review): the figure stays 0.17 s (0.15 to 0.20) on the 43,232 laps that have one.
+- **Placebo: Hypercars 2W to 3W behind,** too far back to arrive this lap. −0.01 s (−0.017 to −0.001), with the main figure at 0.18 s.
+  - That's close to zero but not quite, and nothing here explains the small negative value. It doesn't show which way any bias in the main count runs.
+  - The planned "own count two laps later" placebo turned out to be invalid, because its window depends on this lap's time. It's left out. It was nearly the same quantity anyway, correlating 0.83 with the far count.
+- **Hypercars within W ahead at lap start** (just gone past): 0.02 s (0.01 to 0.03), a small carry-over like E-013's.
+- **Other GT3 cars within 2 s ahead** (36% of laps), added after the review: 0.29 s each (0.26 to 0.33). With them in the model, the Hypercar figure stays 0.18 s.
+
+**2. A past-only window.** At each lap, W comes from laps finished before it began, with at least 20 per class and no use of the slow-lap flag, which uses the whole race. Its median across laps is 12.3 s (interquartile range 10.6 to 13.4 s).
+
+| Direction | Whole-race window | Past-only window | Laps with a past-only window |
+|---|---:|---:|---:|
+| Hypercar, GT3 cars ahead | 0.37 s (0.33 to 0.41) | 0.36 s (0.32 to 0.40) | 54,140 of 55,036 |
+| GT3, Hypercars behind | 0.18 s (0.16 to 0.20) | 0.17 s (0.15 to 0.20) | 45,827 of 46,442 |
+
+- **The whole-race window's look-ahead doesn't change the figure.** The two columns cover slightly different laps, because the past-only one drops the early ones.
+- **Only the window is past-only.** The GT3 count uses crossings up to about 12 s into the lap, and the slow-lap rule and the stint line use later laps. The simulator will need gaps on the road at the decision point, not this feature as it stands.
+
+**3. 2024 to 2025 against 2026** (14 races to fit, 4 to compare). Each 2026 interval is a t-interval over the four race slopes, because a bootstrap over 4 races has only 35 distinct samples and comes out too narrow (0.34 to 0.48 against the t-interval's 0.27 to 0.55, for Hypercars).
+
+| Direction | Fitted on 2024 to 2025 | 2026 | 2026 race by race |
+|---|---:|---:|---|
+| Hypercar, GT3 cars ahead | 0.36 s (0.31 to 0.40) | 0.40 s (0.27 to 0.55) | COTA 0.39, Imola 0.38, São Paulo 0.33, Spa 0.54 |
+| GT3, Hypercars behind | 0.18 s (0.15 to 0.20) | 0.19 s (0.12 to 0.27) | COTA 0.20, Imola 0.18, São Paulo 0.14, Spa 0.26 |
+
+- **The 2026 slopes sit close to the 2024 to 2025 ones,** and the same holds with the past-only window (Hypercar 0.35 against 0.39) and with the loose slow-lap rule (0.36 against 0.39). Overlapping intervals aren't a test that the slopes are equal.
+- **Within-stint variance accounted for depends heavily on the filter.** On 2026 Hypercar laps it's 42.5% with the standard slow-lap rule, 24.4% with the loose rule and 46.1% with the past-only window (17.6%, 7.6% and 19.5% for GT3). It barely changes for any slope near the best one, so it says nothing about transfer, and I don't use it as evidence for that.
+- **A stability check at circuits already seen, not a holdout.**
+  - The 2026 races were part of E-013.
+  - Their window and slow-lap rule use 2026's own whole-race medians, so 2026 lap times shape the 2026 exposure. The past-only window avoids that and gives the same answer.
+  - All four 2026 circuits appear in 2024 to 2025 too, with mostly the same cars and drivers. This shows the figure is steady over time at known tracks, not that it transfers to a new circuit.
+
+**What it doesn't show:**
+
+- **No passes, no location, no cause.** The same limits as E-013 apply.
+- **The GT3 figure can't separate time lost to being passed from any change in driving with faster cars around.**
+- **Still outside Le Mans, still not hierarchical.** The one valid GT3 placebo sits just below zero.

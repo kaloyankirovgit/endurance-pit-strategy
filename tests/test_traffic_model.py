@@ -6,6 +6,9 @@ import pandas as pd
 from endurance_strategy.models.traffic import (
     estimate_from_totals,
     point_estimates,
+    add_previous_residual,
+    holdout_check,
+    t_interval,
     joint_fit,
     race_bootstrap,
     race_totals,
@@ -112,3 +115,32 @@ def test_joint_fit_keeps_the_real_count_and_gives_an_unrelated_count_nothing():
     assert abs(fit["coefficients_s"]["candidate_traffic_count"] - 1.0) < 0.05
     low, high = fit["intervals_s"]["unrelated_count"]
     assert low < 0 < high
+
+
+def test_holdout_carries_the_training_figure_over_unchanged():
+    frame = stint_residuals(synthetic_laps(effect_s=1.0, n_races=8, seed=6))
+    train = frame["event_key"].isin([f"R{k}" for k in range(6)])
+    check = holdout_check(frame, train, n_boot=100)
+    assert check["test_races"] == ["R6", "R7"]
+    assert abs(check["train_slope_s_per_car"] - 1.0) < 0.05
+    assert check["test_within_stint_variance_share_train_figure"] <= check["test_within_stint_variance_share_own_figure"]
+    assert check["test_within_stint_variance_share_train_figure"] > 0.5
+
+
+def test_holdout_with_no_real_effect_explains_nothing():
+    frame = stint_residuals(synthetic_laps(effect_s=0.0, n_races=8, seed=7))
+    train = frame["event_key"].isin([f"R{k}" for k in range(6)])
+    assert abs(holdout_check(frame, train, n_boot=50)["test_within_stint_variance_share_train_figure"]) < 0.01
+
+
+def test_t_interval_matches_a_hand_calculation():
+    low, high = t_interval([0.39, 0.38, 0.33, 0.54])
+    mean, sd = 0.41, 0.0904
+    assert abs(low - (mean - 3.182 * sd / 2)) < 0.001 and abs(high - (mean + 3.182 * sd / 2)) < 0.001
+
+
+def test_previous_residual_needs_the_lap_just_before():
+    frame = pd.DataFrame({"event_key": "R", "NUMBER": "1", "stint_number": 1,
+                          "LAP_NUMBER": [5, 6, 8, 9], "lap_residual_s": [0.1, 0.2, 0.3, 0.4]})
+    out = add_previous_residual(frame).set_index("LAP_NUMBER")["previous_lap_residual_s"]
+    assert pd.isna(out[5]) and out[6] == 0.1 and pd.isna(out[8]) and out[9] == 0.3

@@ -7,6 +7,9 @@ from endurance_strategy.features.clean_laps import EXCLUSION_FLAGS
 
 STINT_KEY = ["event_key", "NUMBER", "stint_number"]
 LOOSE_SLOW_LAP_RATIO = 1.25
+# Two-sided 95% critical values of Student's t, by degrees of freedom, for intervals over a few races.
+T_975 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8: 2.306, 9: 2.262, 10: 2.228,
+         11: 2.201, 12: 2.179, 13: 2.160, 14: 2.145, 15: 2.131, 16: 2.120, 17: 2.110, 18: 2.101, 19: 2.093, 20: 2.086}
 
 
 def analysis_mask(laps: pd.DataFrame, slow_lap_rule: str = "standard") -> pd.Series:
@@ -169,6 +172,52 @@ def joint_fit(frame: pd.DataFrame, columns: list[str], n_boot: int = 2000, seed:
         "clusters": n,
         "coefficients_s": {c: float(v) for c, v in zip(columns, estimate)},
         "intervals_s": {c: [float(np.percentile(draws[:, j], 2.5)), float(np.percentile(draws[:, j], 97.5))] for j, c in enumerate(columns)},
+    }
+
+
+def t_interval(values) -> list[float]:
+    """95% t-interval for the mean of a few per-race values. A bootstrap over 4 races has only 35 distinct samples."""
+    values = np.asarray(list(values), dtype=float)
+    half = T_975[len(values) - 1] * values.std(ddof=1) / np.sqrt(len(values))
+    return [float(values.mean() - half), float(values.mean() + half)]
+
+
+def add_previous_residual(frame: pd.DataFrame) -> pd.DataFrame:
+    """The car's within-stint residual on the lap just before, or NaN if that lap isn't in the frame."""
+    out = frame.sort_values(STINT_KEY + ["LAP_NUMBER"]).copy()
+    grouped = out.groupby(STINT_KEY)
+    consecutive = grouped["LAP_NUMBER"].diff().eq(1)
+    out["previous_lap_residual_s"] = grouped["lap_residual_s"].shift().where(consecutive)
+    return out
+
+
+def holdout_check(frame: pd.DataFrame, train: pd.Series, n_boot: int = 2000, seed: int = 20261024) -> dict:
+    """Fit the per-car figure on the `train` races and compare it with the rest.
+
+    Reports both slopes with race-bootstrap intervals, plus a t-interval over each test race's own
+    slope, since a bootstrap over very few races is too narrow. Also the share of within-stint
+    variance in the test laps accounted for by the training figure and by the test races' own, against
+    a zero-traffic baseline. The stint lines are fitted on the test laps themselves for both, and the
+    share is flat near the best slope, so it describes fit under this filter, not transfer.
+    """
+    train_frame, test_frame = frame[train], frame[~train]
+    beta = point_estimates(train_frame)["slope_s_per_car"]
+    y, x = test_frame["lap_residual_s"].to_numpy(), test_frame["exposure_residual"].to_numpy()
+    own_beta = float((x @ y) / (x @ x))
+    share = lambda b: float(1 - ((y - b * x) ** 2).sum() / (y ** 2).sum())
+    by_race = {race: point_estimates(rows)["slope_s_per_car"] for race, rows in test_frame.groupby("event_key")}
+    return {
+        "train_races": sorted(train_frame["event_key"].unique()),
+        "test_races": sorted(test_frame["event_key"].unique()),
+        "train_slope_s_per_car": beta,
+        "train_interval": race_bootstrap(train_frame, n_boot=n_boot, seed=seed)["slope_s_per_car"],
+        "test_slope_s_per_car": own_beta,
+        "test_bootstrap_interval": race_bootstrap(test_frame, n_boot=n_boot, seed=seed)["slope_s_per_car"],
+        "test_t_interval_over_race_slopes": t_interval(by_race.values()),
+        "test_slope_by_race": by_race,
+        "test_within_stint_variance_share_train_figure": share(beta),
+        "test_within_stint_variance_share_own_figure": share(own_beta),
+        "test_laps": int(len(test_frame)),
     }
 
 

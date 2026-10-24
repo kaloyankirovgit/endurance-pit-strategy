@@ -26,15 +26,16 @@ Layer 1 is done and the race order is now checked against the official classific
 - The 2024 to 2026 sporting regulations are downloaded with hashes and split into 855 article-level chunks. Keyword retrieval (BM25) finds the right 2026 clause in the top 5 for 24 of 30 hand-written questions (E-009).
 - Regulation answers are routed, grounded and checked in code (D-019). When retrieval finds the right clause, the answer cites it in 72 of 72 runs, and strategy questions are declined (E-010). Embeddings and a hybrid were compared with BM25 on a fresh question set, and the gap is too small to settle with 30 questions, so BM25 stays the default (E-011, D-020).
 - Answers follow the car class the user picks (D-021). On 5 questions asked for each class, the chosen class's fact was present in 30 of 30 runs and the other class's showed up in 1 of 24 checked runs. LMP2 is refused, because the corpus covers only Hypercar and LMGT3 (E-012).
-- First traffic result (E-013, D-022). Within the same stint, a Hypercar lap is 0.37 s longer (0.33 to 0.41, resampling 18 races) for each LMGT3 car close enough ahead at the start of the lap to be caught. It's an association with inferred exposure, and the per-car figure moves from 0.26 to 0.41 s with the window. Two placebos (cars too far ahead, and the car's own count two laps later) are null.
-- 145 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
+- First traffic result (E-013, D-022). Within the same stint, a Hypercar lap is 0.37 s longer (0.33 to 0.41, resampling 18 races) for each LMGT3 car close enough ahead at the start of the lap to be caught. It's an association with inferred exposure, and the per-car figure moves from 0.26 to 0.41 s with the window. A placebo with cars too far ahead to catch is null.
+- The other direction (E-014): a GT3 lap is 0.18 s longer (0.16 to 0.20) for each Hypercar close behind at lap start. A past-only window gives the same figures (0.36 and 0.17 s), and 2026 matches 2024 to 2025 at the same circuits (0.40 against 0.36 s for Hypercars, 4 races).
+- 154 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
 
 ## Next
 
 1. **Regulations, remaining checks**
    - In-scope refusal tests (questions the router passes but the regulations don't answer), a larger question set to settle BM25 against the hybrid, and a cleaner extraction of the tyre tables (6.5.3, 6.5.4).
-2. **Traffic, second round (Layer 2)**
-   - The other direction (LMGT3 cars being lapped), a held-out check (fit 2024 to 2025, test 2026), a past-only window for the simulator, and Le Mans with three classes as its own study.
+2. **Traffic, what's left (Layer 2)**
+   - Le Mans with three classes as its own study, a version measured from road gaps at the decision point for the simulator, and possibly a hierarchical model against this baseline. Otherwise move on to pace, stints and pit loss (Layer 3).
 3. **Drying track**
    - Find a way to catch laps on a wet track after the rain sensor reads zero.
 4. **Reviewer eval, second round**
@@ -69,7 +70,7 @@ Layer 1 is done and the race order is now checked against the official classific
 | Weather join and garage flag | Built and run on the full corpus |
 | Interim / processed layers | Built as one command, writing schema-checked Parquet |
 | Race order and gaps | Built, and the final order checked against the official classifications (E-007) |
-| Traffic, pace and pit-loss models | Traffic baseline built and reviewed (E-013); pace and pit loss not started |
+| Traffic, pace and pit-loss models | Traffic baseline in both directions, reviewed (E-013, E-014); pace and pit loss not started |
 | Simulator and optimiser | Not started |
 | Regulations and LLM layer | Retrieval (E-009, E-011), grounded answers with a code checker (E-010) and class-aware answers (E-012) built and measured; no simulator tool yet |
 | CI | Running on GitHub Actions, passing |

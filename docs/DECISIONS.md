@@ -211,6 +211,16 @@ W comes from whole-race medians. That's fine for describing races, but a team do
 
 ---
 
+## D-023: Traffic is estimated in both directions, and the simulator's window comes from past laps
+
+*2026-10-24*
+
+Multi-class traffic costs both cars, so both figures go forward: the faster car catching slower ones, and the slower car being caught (E-014). The window W is taken from laps finished before each lap began, which gives the same figures as the whole-race window, so the look-ahead in D-022 doesn't matter for the estimate. The count itself still uses crossings near the start of the lap, so the simulator will need its own version built from road gaps at the decision point.
+
+A check on placebos: a count whose window depends on this lap's own time, such as the car's count two laps on, isn't a valid placebo. The far-window count is the one to use.
+
+---
+
 ## Tools
 
 The rule of thumb is to use a few tools properly rather than a lot of them badly. A tool comes in when a real need shows up.

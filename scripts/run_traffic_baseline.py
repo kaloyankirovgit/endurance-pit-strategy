@@ -68,9 +68,9 @@ def main() -> None:
         "placebo_fits": {
             name: joint_fit(primary, columns, n_boot=args.n_boot)
             for name, columns in [
-                ("behind_alone", ["slower_behind_count"]),
-                ("ahead_and_behind", ["candidate_traffic_count", "slower_behind_count"]),
-                ("ahead_and_far_ahead", ["candidate_traffic_count", "slower_far_ahead_count"]),
+                ("behind_alone", ["other_side_count"]),
+                ("ahead_and_behind", ["candidate_traffic_count", "other_side_count"]),
+                ("ahead_and_far_ahead", ["candidate_traffic_count", "far_count"]),
                 ("ahead_and_two_laps_later", ["candidate_traffic_count", "exposure_two_laps_later"]),
                 ("ahead_and_same_class_ahead", ["candidate_traffic_count", "same_class_ahead_count"]),
             ]

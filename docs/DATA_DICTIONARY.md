@@ -97,11 +97,20 @@ A car is identified by `event_key` plus `NUMBER`.
 | `stints.parquet` | Stint | driver, first and last lap, laps, clean laps, median clean lap, ended in pit, started from garage |
 | `pit_stops.parquet` | Out-lap | `PIT_TIME_S`, garage flag, flag at the line, incoming driver, whether the driver changed |
 
+### Traffic exposure (built by `features/traffic.py` for the analysis, not stored in the Parquet tables)
+
+| Column | Label | Meaning |
+|---|---|---|
+| `lap_start_s` | Reconstructed | The car's previous line crossing, which is when this lap began. |
+| `traffic_window_s` | Assumed | How far ahead counts as "will be caught this lap". By default the race's class pace gap (D-022). |
+| `candidate_traffic_count` | Reconstructed count, inferred meaning | Slower-class cars that crossed the line within the window before this lap began, not counting pit-lane crossings. **Not observed overtakes** (D-004). |
+| `is_candidate_traffic` | Inferred | `candidate_traffic_count` is above zero. |
+| `slower_behind_count`, `slower_far_ahead_count`, `same_class_ahead_count`, `exposure_two_laps_later` | Reconstructed | Placebo and comparison counts for E-013. |
+
 ### Planned
 
 | Column | Label | Meaning |
 |---|---|---|
-| `is_candidate_traffic` | Inferred | Likely running in slower-class traffic. **Not an observed overtake** (D-004). |
 | `lap_residual` | Inferred | Actual lap time minus expected clean pace. |
 | `tyre_state`, `fuel_state` | Assumed | Not in the data at all (D-005). |
 

@@ -9,7 +9,7 @@ The question I'm working towards:
 
 ## Where it's at
 
-Early. The data side is in place and tested, and nothing is modelled yet.
+Early. The data side is in place and tested, and the first traffic result is in. The simulator isn't built yet.
 
 What works right now:
 
@@ -31,7 +31,9 @@ What works right now:
   - A router sends strategy questions away, because pit timing has to come from the simulator. Rules questions get an answer drawn only from the retrieved clauses, with word-for-word quotes.
   - A plain-code checker rejects any answer whose citations, quotes or numbers don't trace back to those clauses.
   - When retrieval found the right clause, the answer cited it in all 72 runs.
-- **124 tests on synthetic data**
+- **A first traffic result**
+  - Within the same stint, a Hypercar lap is about 0.37 s longer for each LMGT3 car that was close enough ahead at the start of the lap to be caught (0.33 to 0.41 s, resampling 18 races). That's an association with inferred traffic, not a measured cost per overtake, and the per-car figure moves from 0.26 to 0.41 s with how "close enough" is defined. Laps with one such car against none differ by about 0.4 s whichever definition is used. Details and the checks that didn't break it are in E-013.
+- **145 tests on synthetic data**
   - They run in GitHub Actions on every push, with no real data needed.
 
 The full log of what's been tried is in [`docs/EXPERIMENT_LOG.md`](docs/EXPERIMENT_LOG.md), and the reasoning behind the bigger choices is in [`docs/DECISIONS.md`](docs/DECISIONS.md).

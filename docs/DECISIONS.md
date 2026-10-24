@@ -199,6 +199,18 @@ LMP2 is refused in code, not left to the model, because the corpus doesn't cover
 
 ---
 
+## D-022: Traffic exposure is counted at the start of the lap, within the class pace gap
+
+*2026-10-24*
+
+For each lap, the exposure is the number of slower-class cars that crossed the line in the W seconds before the car began that lap, leaving out pit-lane crossings. W is the race's class pace gap, so those are the cars it should catch before the lap ends. Counting at the start matters. The end-of-lap gap is partly caused by being held up, so it would build the outcome into the exposure.
+
+The comparison is within stint (one car, one driver, one set of tyres), with a straight-line trend in stint lap removed from both the lap time and the exposure. Removing it from the lap time alone hid about 10% of a known effect on synthetic data. Intervals resample whole races.
+
+W comes from whole-race medians. That's fine for describing races, but a team doesn't have it at lap t, so the simulator needs a past-only version. The per-car figure depends on W (E-013), so results quote the W range or the one-car contrast, which barely moves with W.
+
+---
+
 ## Tools
 
 The rule of thumb is to use a few tools properly rather than a lot of them badly. A tool comes in when a real need shows up.

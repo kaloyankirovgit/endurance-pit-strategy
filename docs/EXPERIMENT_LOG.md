@@ -494,3 +494,75 @@ The question set is `questions_class.json`: 5 questions asked once per class (10
 - **The LMP2 refusal is guaranteed by code.** What's measured is that the router sends those questions down the regulations path.
 - **5 pairs from one author,** written after reading the clauses. 2 of the 5 read from the 6.5.4 tyre table, whose header comes out of the PDF scrambled. The answers still took the right row, but that's 2 questions on one table, and fixing the table extraction is a separate open job.
 - **The game the strategy tool is aimed at may not follow the real regulations,** and nothing here tests that.
+
+---
+
+## E-013: Do Hypercar laps get slower with more GT3 cars to catch?
+
+*2026-10-24 · complete. The plan was written before any lap-time outcome was computed, and the checks added afterwards are marked as such.*
+
+**Question:** for a Hypercar, how does lap time change with the number of LMGT3 cars it is expected to catch during the lap? This is the first traffic result (Layer 2), and it is an association, not a per-overtake cost (D-004).
+
+**Exposure (reconstructed from observed crossings, with a chosen window):** at the start of each Hypercar lap, count the LMGT3 cars that crossed the line in the previous W seconds, leaving out crossings made in the pit lane. Those cars are less than W seconds ahead on the road. W is the race's class pace gap (median usable LMGT3 lap minus median usable Hypercar lap, 9.4 to 16.0 s across the 18 races), so a car inside the window should be caught before the lap ends. The count is taken at the start of the lap because the end-of-lap gap is partly caused by being held up.
+
+**Outcome and comparison:** lap time against the same car's own stint (one driver, one set of tyres), with a straight-line trend in stint lap removed from both the lap time and the exposure. That's a fixed-effects regression with one line per stint. Two numbers: seconds per car (count capped at 6), and each exposure level 1, 2, 3 and 4+ against 0.
+
+**Data:** the 18 races outside Le Mans (two classes only). Hypercar laps that are green, dry, not a first, pit or post-caution lap, with no missing timing, in stints of at least 5 such laps.
+
+**Intervals:** 95% percentile intervals from 2,000 bootstrap samples that draw whole races (seed 20261024). Races are the independent unit, so the interval is about the 18 races, not the laps.
+
+**Fixed before looking:**
+- Primary: W = race pace gap, the standard slow-lap rule (D-012), the linear stint trend.
+- Sensitivity:
+  - W fixed at 5, 10, 15 and 20 s;
+  - the loose slow-lap rule (only laps over 1.25 times the class median dropped), because the standard rule removes some heavily delayed traffic laps and pulls the estimate towards zero;
+  - stint mean instead of the stint line;
+  - a race-by-race slope, to see whether one track drives the average.
+
+**Expected:** a positive slope, on the order of a second per car. That's a guess, written down so the result can be compared with it, and it isn't a measurement.
+
+**Checked first:** the estimator recovered a known 1.2 s cost per car on made-up data to within 0.05 s. A first version that removed the stint trend from lap time only, not from the exposure, came out 10% low (1.08 s). That bias was fixed before any real data was run.
+
+**Found** (run `20261024T005439Z`, `python scripts/run_traffic_baseline.py`, output in `reports/outputs/`, which stays local). Sample: 18 races at 7 circuits, 323 Hypercar car entries, 83 drivers, 2,206 stints and 55,036 laps.
+
+**Headline:** compared within the same stint, a Hypercar lap is longer by **0.37 s (0.33 to 0.41) for each LMGT3 car that crossed the line within the race's class pace gap ahead of it at the start of the lap**. Across window widths of 5 to 20 s the per-car figure runs from 0.41 to 0.26 s. That spread is bigger than the sampling interval, so the per-car number describes this exposure definition as much as traffic itself. Laps with exactly one such car against laps with none differ by 0.39 to 0.42 s at every window, which makes that the steadier number. All of these are associations with an inferred exposure. They are not a measured cost per overtake, and drivers pushing or saving, local yellows and Hypercar fights more than 2 s apart are not controlled.
+
+| Exposure level against 0 cars (window = race pace gap) | Laps | Difference | 95% interval (races resampled) |
+|---|---:|---:|---:|
+| 0 cars (reference) | 17,751 | | |
+| 1 car | 14,260 | 0.40 s | 0.35 to 0.45 |
+| 2 cars | 10,765 | 0.73 s | 0.66 to 0.81 |
+| 3 cars | 6,163 | 1.04 s | 0.94 to 1.14 |
+| 4 or more (mean 5.2) | 6,097 | 1.76 s | 1.58 to 1.97 |
+| Per car (count capped at 6) | 55,036 | 0.37 s | 0.33 to 0.41 |
+
+- **The rise is close to straight.** The 4+ level averages 5.2 cars, and 1.76 / 5.2 is about 0.34 s per car.
+- **Positive at all 18 races,** from 0.23 s (Fuji 2024) to 0.55 s (COTA 2025). Each race's window differs (9.4 to 16.0 s), so these per-car figures aren't on one scale. Spa has the widest window, which should lower its figure, yet it's near the top in all three years (0.49 to 0.54 s). Why is untested.
+- **Against my guess:** I'd written down about a second per car. That guess was about the cost of a pass, which this design doesn't measure, so the two aren't directly comparable.
+- **Planned sensitivity:**
+
+| Variation | Per car | Interval | 1 car against 0 |
+|---|---:|---:|---:|
+| Window 5 s | 0.41 s | 0.38 to 0.46 | 0.39 s |
+| Window 10 s | 0.37 s | 0.34 to 0.41 | 0.42 s |
+| Window 15 s | 0.31 s | 0.27 to 0.35 | 0.42 s |
+| Window 20 s | 0.26 s | 0.22 to 0.30 | 0.41 s |
+| Loose slow-lap rule (55,640 laps) | 0.37 s | 0.33 to 0.41 | 0.41 s |
+| Stint mean instead of a stint line | 0.36 s | 0.33 to 0.40 | 0.37 s |
+
+- **Checks added after seeing the result** (not planned; now in the script and its output):
+  - **Resampling the 7 circuits** instead of the races: 0.32 to 0.43 s per car.
+  - **LMGT3 cars 2W to 3W ahead,** too far to catch this lap: 0.00 s (−0.01 to 0.01) alongside the main count, which stays 0.37 s. This null result is the cleanest check on race-phase or pack confounding.
+  - **The car's own count two laps later,** which can't affect this lap: 0.01 s (−0.00 to 0.02). The main count stays 0.37 s.
+  - **LMGT3 cars just behind at the start of the lap:** 0.11 s (0.09 to 0.14) on their own, and 0.04 s (0.03 to 0.06) alongside the main count. The statistical review found this count tracks the previous lap's exposure, so it most likely picks up traffic carried over from the end of the last lap, not confounding.
+  - **Other Hypercars within 2 s ahead at the start of the lap** (40% of laps): 0.31 s each (0.28 to 0.35). With them in the model, the LMGT3 figure stays 0.36 s.
+- **A statistical review** (the `statistical-reviewer` agent) tried and failed to show leakage from the lap's own outcome, a clock misalignment, faulty fixed effects or selection through pit stops. It found the window dependence and some wording that read as a per-car cost. Both are fixed above.
+
+**What it doesn't show:**
+
+- **No overtakes and no location.** "Expected to catch" is inferred from line crossings and the class pace gap. Some cars in the window won't be caught, and some caught from beyond it are counted as zero, which is why the per-car figure moves with the window. Where on the lap time is lost isn't observed.
+- **Uncontrolled causes remain.** Drivers push or save for reasons tied to race position. The flag column only records the flag at the line, so local yellows are missed. Hypercar fights more than 2 s apart and a drying track aren't modelled.
+- **The exclusions differ by exposure level.** In the review's count, laps with no cars to catch were more often slow (16% against about 11%), under caution or just after one. The loose-rule run limits the slow-lap part of this, but the caution exclusions are selective in a way not tested.
+- **The intervals assume the 18 races are exchangeable.** They share 7 circuits and mostly the same cars and drivers, which the bootstrap doesn't resample. A t-interval on the 7 circuit means is wider (0.29 to 0.45), as reported by the review, but still well above zero.
+- **The window uses whole-race medians,** including the Hypercar's own laps. That's harmless for a description, since it's constant within a race and fixed windows agree. A team doesn't have it at lap t, so it can't go into the simulator as it is.
+- **Hypercars only, outside Le Mans,** and not yet tested on held-out races (fit 2024 to 2025, test 2026) as a simulator input would need.

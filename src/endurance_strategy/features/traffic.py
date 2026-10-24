@@ -57,12 +57,14 @@ def count_crossings_near_lap_start(laps: pd.DataFrame, low_s: pd.Series | float,
     """For each lap, count line crossings by other classes in [lap start + low_s, lap start + high_s).
 
     `laps` must be sorted by car and lap with a `lap_start_s` column and a unique default index.
-    `which` is "slower" or "faster" (classes ranked below or above the car's), or "same" (its own
-    class, where the car's own crossing at the lap start is outside any window that ends at 0).
+    `which` is "slower" or "faster" (classes ranked below or above the car's), "same" (its own
+    class, where the car's own crossing at the lap start is outside any window that ends at 0), or
+    one class name such as "LMP2".
     Pit-lane crossings are left out. Negative offsets look ahead on the road, positive ones behind.
     NaN on a first lap, or where the window is NaN.
     """
     rank = laps["CLASS"].map(CLASS_RANK).to_numpy()
+    named = laps["CLASS"].eq(which).to_numpy() if which in CLASS_RANK else None
     on_track = laps["CROSSING_FINISH_LINE_IN_PIT"].ne("B").to_numpy()
     elapsed, start = laps["ELAPSED_S"].to_numpy(dtype=float), laps["lap_start_s"].to_numpy(dtype=float)
     low = np.broadcast_to(np.asarray(low_s, dtype=float), len(laps))
@@ -71,8 +73,11 @@ def count_crossings_near_lap_start(laps: pd.DataFrame, low_s: pd.Series | float,
     counts = np.full(len(laps), np.nan)
     for rows in laps.groupby("event_key").indices.values():
         for class_rank in np.unique(rank[rows]):
-            other = {"slower": rank[rows] > class_rank, "faster": rank[rows] < class_rank,
-                     "same": rank[rows] == class_rank}[which]
+            if named is not None:
+                other = named[rows] & (rank[rows] != class_rank)
+            else:
+                other = {"slower": rank[rows] > class_rank, "faster": rank[rows] < class_rank,
+                         "same": rank[rows] == class_rank}[which]
             crossings = np.sort(elapsed[rows[other & on_track[rows]]])
             cars = rows[(rank[rows] == class_rank) & countable[rows]]
             counts[cars] = (np.searchsorted(crossings, start[cars] + high[cars], side="left")
@@ -141,4 +146,35 @@ def add_placebo_counts(exposed: pd.DataFrame, same_class_gap_s: float = 2.0) -> 
     out["far_count"] = count_crossings_near_lap_start(out, *window_offsets(direction, window, 2.0, 3.0), which=which)
     out["same_class_ahead_count"] = count_crossings_near_lap_start(out, -same_class_gap_s, 0.0, which="same")
     out["exposure_two_laps_later"] = out.groupby(CAR_KEY)["candidate_traffic_count"].shift(-2)
+    return out
+
+
+def add_class_pair_counts(laps: pd.DataFrame) -> pd.DataFrame:
+    """One exposure count per other class, each with that pair's own window, for races with three classes.
+
+    For a car of class C and another class O at the same race, W is the pace gap between them
+    (`class_pace_gap`). A slower O is counted ahead within W, a faster O behind within W, as in
+    `add_traffic_exposure`. Adds `count_<O>` and the placebo `far_<O>` (2W to 3W on the same side),
+    NaN where O is the car's own class or isn't in the race. `candidate_traffic_count` is the total,
+    so the usual lap filter can be applied.
+    """
+    out = laps.sort_values(LAP_KEY).reset_index(drop=True)
+    out["lap_start_s"] = out.groupby(CAR_KEY)["ELAPSED_S"].shift()
+    classes = sorted(out["CLASS"].unique(), key=CLASS_RANK.get)
+    total = np.zeros(len(out))
+    for other in classes:
+        count, far = np.full(len(out), np.nan), np.full(len(out), np.nan)
+        for own in classes:
+            if own == other:
+                continue
+            faster, slower = sorted((own, other), key=CLASS_RANK.get)
+            window = out["event_key"].map(class_pace_gap(out, faster=faster, slower=slower)).to_numpy(dtype=float)
+            direction = "catching" if CLASS_RANK[other] > CLASS_RANK[own] else "being_caught"
+            rows = out["CLASS"].eq(own).to_numpy()
+            near_counts = count_crossings_near_lap_start(out, *window_offsets(direction, window), which=other)
+            far_counts = count_crossings_near_lap_start(out, *window_offsets(direction, window, 2.0, 3.0), which=other)
+            count[rows], far[rows] = near_counts[rows], far_counts[rows]
+        out[f"count_{other}"], out[f"far_{other}"] = count, far
+        total = total + np.nan_to_num(count)
+    out["candidate_traffic_count"] = np.where(out["lap_start_s"].notna(), total, np.nan)
     return out

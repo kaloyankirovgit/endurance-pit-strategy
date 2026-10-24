@@ -644,3 +644,67 @@ Three questions that follow from E-013, all on the same 18 races outside Le Mans
 - **No passes, no location, no cause.** The same limits as E-013 apply.
 - **The GT3 figure can't separate time lost to being passed from any change in driving with faster cars around.**
 - **Still outside Le Mans, still not hierarchical.** The one valid GT3 placebo sits just below zero.
+
+---
+
+## E-015: At Le Mans, how does lap time move with each other class counted?
+
+*2026-10-24 · complete. The plan was written before any outcome was computed.*
+
+**Question:** Le Mans is the only three-class race (Hypercar, LMP2, LMGT3). LMP2 sits in the middle: it catches GT3 cars and is caught by Hypercars. For each class, how does lap time change with the count of each other class within that pair's window at the start of the lap?
+
+**Exposure:** the same as D-022 and E-014, but one count per other class, each with its own window. The window for a pair of classes is that race's pace gap between them (median usable lap of the slower minus the faster):
+- a slower class is counted ahead, within the pair's window;
+- a faster class is counted behind, within it.
+
+So a Hypercar lap gets an LMP2 count and a GT3 count, an LMP2 lap gets a GT3 count ahead and a Hypercar count behind, and a GT3 lap gets an LMP2 count and a Hypercar count, both behind.
+
+**Comparison:** for each class, one within-stint fit with both counts at once (capped at 6), with the same lap filter and stint line as E-013. A placebo per pair, fixed now: the same class 2W to 3W away on the same side, fitted alongside.
+
+**Data:** Le Mans 2024, 2025 and 2026. 2024 had rain and fewer usable laps.
+
+**Uncertainty:** 3 races. A bootstrap over 3 races is meaningless, so I report each race's coefficients and a t-interval over the three (2 degrees of freedom, which makes it wide). Any figure from this is three observations.
+
+**Expected (a guess):** every coefficient positive. The faster car loses more than the slower one in each pair, as in E-014. Per-car figures aren't comparable with the other 18 races, because the windows are about 10 to 29 s here against about 12 s there.
+
+**Not in this entry:** the 15 intermediate timing points at Le Mans 2025 and 2026, which could locate traffic within a lap. That's a separate sub-study (D-009).
+
+**Found** (run `20261024T114313Z`, `python scripts/run_traffic_le_mans.py`). Each figure is the within-stint lap-time increase associated with one more car counted, not a cost per pass. Intervals resample car entries (inside a race, or pooled across races). The planned t-interval over 3 races was dropped as a headline, because with 2 degrees of freedom it can come out narrower than a single race's own interval when three values happen to agree.
+
+**The plan was incomplete, and fixing it changed the result.** E-013 checked a loose slow-lap rule, but this entry didn't plan that check until the statistical review ran it. It matters at Le Mans because of 2024:
+- **52% of 2024 laps are flagged slow,** against 16 to 17% in 2025 and 2026.
+- **The rain flag catches only 4.9% of 2024 laps.** Damp and drying running gets removed by cutting slow laps, which picks out the fastest half of the laps by their outcome.
+- **17% of 2024 laps are under caution.**
+
+So 2024 is reported separately, and the result rests on 2025 and 2026, two races. A second gap: **slow zones aren't in the flag column** (it only holds GF, SF, FCY and FF), so a Le Mans slow zone shows up as a green lap. The standard rule only removes slow zones that cost more than about 7% of a lap.
+
+| Car | Count of | Window | Standard rule, 2025 and 2026 (pooled) | 2025 / 2026 | Loose rule, 2025 and 2026 |
+|---|---|---:|---:|---|---:|
+| Hypercar | LMP2 ahead | about 10 s | 0.28 s (0.25 to 0.32) | 0.31 / 0.26 | 0.26 s (0.19 to 0.33) |
+| Hypercar | GT3 ahead | about 29 s | 0.35 s (0.34 to 0.37) | 0.33 / 0.37 | 0.37 s (0.33 to 0.41) |
+| LMP2 | Hypercar behind | about 10 s | 0.22 s (0.19 to 0.26) | 0.23 / 0.21 | 0.14 s (0.05 to 0.22) |
+| LMP2 | GT3 ahead | about 19 s | 0.42 s (0.40 to 0.43) | 0.40 / 0.43 | 0.43 s (0.35 to 0.51) |
+| GT3 | LMP2 behind | about 19 s | 0.14 s (0.13 to 0.16) | 0.15 / 0.14 | 0.13 s (0.03 to 0.24) |
+| GT3 | Hypercar behind | about 29 s | 0.08 s (0.06 to 0.09) | 0.07 / 0.09 | 0.07 s (0.01 to 0.13) |
+
+- **Holds under both rules:**
+  - Hypercar with GT3 ahead, at 0.35 to 0.37 s;
+  - Hypercar with LMP2 ahead, at 0.26 to 0.28 s;
+  - LMP2 with GT3 ahead, at 0.42 to 0.43 s;
+  - GT3 with LMP2 behind, at 0.13 to 0.14 s, though wide under the loose rule.
+- **Depends on the rule:** LMP2 with Hypercars behind falls from 0.22 to 0.14 s. GT3 with Hypercars behind is small either way (0.07 to 0.08 s).
+- **The faster car's figure is larger in each pair, matching the guess written down in the plan.** It holds in every race and under both rules. The closest pair is Hypercar against LMP2: the paired difference across the three races is 0.06 s (0.01 to 0.10, from the review). That's an ordering, not a mechanism.
+- **Placebos (the same class 2W to 3W away):**
+  - **Standard rule:** all six pooled placebos are within ±0.02 s, and only one interval misses zero (Hypercar with far GT3 cars, −0.015 s).
+  - **Loose rule:** most come out between −0.03 and −0.11 s, and three of the six intervals exclude zero.
+  - So the extra slow laps the loose rule keeps bring in a pattern this design doesn't explain. Neither rule gives a clean answer for the figures that disagree.
+- **2024 on its own** (standard rule) gives similar numbers: Hypercar 0.25 and 0.35 s, LMP2 0.20 and 0.51 s, GT3 0.13 and 0.00 s. Under the loose rule it swings to between −0.17 and +0.49 s, with intervals up to ±0.3 s.
+- **Checks the review ran that changed nothing:** the previous lap's residual, same-class cars within 2 s, and overlap between a GT3 car's two "behind" counts. After detrending within the stint, those two counts correlate at −0.03.
+
+**What it doesn't show:**
+
+- **Two usable races.** Le Mans figures should be treated as two observations per pair, with 2024 as a warning about wet and drying running.
+- **Not comparable with the other 18 races.** The windows here are 10 to 29 s, and E-014 showed the per-car figure falls as the window widens. So these numbers aren't set against the 0.37 and 0.18 s found elsewhere.
+- **Slow zones and drying track aren't identified** in this data as processed, and they bias whichever laps are kept.
+- **The review flagged two things not done here:** dropping more than one lap after a caution, which lowered 5 of 6 figures slightly in its check, and night against day, which gave 0.35 against 0.24 s for Hypercar with LMP2 ahead, again in its check.
+- **The windows use whole-race medians**, as in E-013 (see E-014 for the past-only version). Every earlier limit still applies: no passes, no location, no cause, and driving choices aren't controlled.

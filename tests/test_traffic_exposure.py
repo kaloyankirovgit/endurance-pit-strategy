@@ -2,7 +2,13 @@ from __future__ import annotations
 
 import pandas as pd
 
-from endurance_strategy.features.traffic import add_placebo_counts, add_traffic_exposure, class_pace_gap, past_class_pace_gap
+from endurance_strategy.features.traffic import (
+    add_class_pair_counts,
+    add_placebo_counts,
+    add_traffic_exposure,
+    class_pace_gap,
+    past_class_pace_gap,
+)
 
 
 def crossings(rows: list[tuple], event: str = "E") -> pd.DataFrame:
@@ -170,3 +176,57 @@ def test_past_window_leaves_caution_and_pit_laps_out_of_the_running_median():
     # Lap 7 starts at t=604: usable Hypercar laps done are 4 and 5 (100 s), so the gap is 12 s.
     # With the caution and pit laps counted, the median would be 125 s and the gap -13 s.
     assert gap[frame["NUMBER"].eq("1") & frame["LAP_NUMBER"].eq(7)].iloc[0] == 12.0
+
+
+def three_class_race() -> pd.DataFrame:
+    """Made-up Le Mans-style crossings with usable laps so each pair has a pace gap.
+
+    Medians: Hypercar 200 s, LMP2 210 s, GT3 230 s, so the windows are 10 s (HY-P2), 30 s (HY-GT3)
+    and 20 s (P2-GT3).
+    """
+    rows = []
+    for car, car_class, lap_time, offset in (("1", "HYPERCAR", 200.0, 0.0), ("31", "LMP2", 210.0, -5.0), ("51", "LMGT3", 230.0, -25.0)):
+        for lap in range(1, 4):
+            rows.append((car, car_class, lap, offset + lap * lap_time, lap_time))
+    frame = pd.DataFrame(rows, columns=["NUMBER", "CLASS", "LAP_NUMBER", "ELAPSED_S", "LAP_TIME_S"])
+    return frame.assign(event_key="LM", CROSSING_FINISH_LINE_IN_PIT="", is_usable_for_pace_model=True)
+
+
+def test_each_other_class_is_counted_with_its_own_window():
+    out = add_class_pair_counts(three_class_race())
+    hypercar_lap2 = out[(out["NUMBER"] == "1") & (out["LAP_NUMBER"] == 2)].iloc[0]
+    # Lap 2 starts at t=200. The LMP2 and the GT3 both cross next at t=205, behind the Hypercar, so neither is ahead.
+    assert hypercar_lap2["count_LMP2"] == 0 and hypercar_lap2["count_LMGT3"] == 0
+    assert pd.isna(hypercar_lap2["count_HYPERCAR"])
+
+
+def test_pair_counts_pick_up_cars_ahead_and_behind():
+    frame = three_class_race()
+    extra = pd.DataFrame([("32", "LMP2", 7, 195.0, 210.0), ("52", "LMGT3", 7, 180.0, 230.0), ("2", "HYPERCAR", 7, 215.0, 200.0)],
+                         columns=["NUMBER", "CLASS", "LAP_NUMBER", "ELAPSED_S", "LAP_TIME_S"]).assign(
+        event_key="LM", CROSSING_FINISH_LINE_IN_PIT="", is_usable_for_pace_model=False)
+    out = add_class_pair_counts(pd.concat([frame, extra]))
+    hypercar = out[(out["NUMBER"] == "1") & (out["LAP_NUMBER"] == 2)].iloc[0]
+    assert hypercar["count_LMP2"] == 1      # LMP2 at 195, 5 s ahead, inside 10 s
+    assert hypercar["count_LMGT3"] == 1     # GT3 at 180, 20 s ahead, inside 30 s
+    lmp2 = out[(out["NUMBER"] == "31") & (out["LAP_NUMBER"] == 2)].iloc[0]
+    # LMP2 lap 2 starts at 205: Hypercar 2 crosses at 215, 10 s behind, outside [0, 10).
+    assert lmp2["count_HYPERCAR"] == 0
+    assert hypercar["candidate_traffic_count"] == 2
+
+
+def test_gt3_counts_two_faster_classes_behind_with_their_own_windows_and_skips_the_pit_lane():
+    # GT3 lap 2 starts at t=205. Windows behind: LMP2 20 s, so [205, 225); Hypercar 30 s, so [205, 235).
+    frame = three_class_race()
+    extra = pd.DataFrame([
+        ("2", "HYPERCAR", 7, 220.0, ""),     # 15 s behind: in the Hypercar window
+        ("33", "LMP2", 7, 210.0, "B"),       # in the window but in the pit lane
+        ("34", "LMP2", 7, 250.0, ""),        # 45 s behind: in the LMP2 far window [245, 265)
+    ], columns=["NUMBER", "CLASS", "LAP_NUMBER", "ELAPSED_S", "CROSSING_FINISH_LINE_IN_PIT"]).assign(
+        event_key="LM", LAP_TIME_S=999.0, is_usable_for_pace_model=False)
+    out = add_class_pair_counts(pd.concat([frame, extra]))
+    gt3 = out[(out["NUMBER"] == "51") & (out["LAP_NUMBER"] == 2)].iloc[0]
+    assert gt3["count_HYPERCAR"] == 1
+    assert gt3["count_LMP2"] == 1          # car 31 crosses at exactly 205, the start of the window
+    assert gt3["far_LMP2"] == 1
+    assert pd.isna(gt3["count_LMGT3"]) and pd.isna(gt3["far_LMGT3"])

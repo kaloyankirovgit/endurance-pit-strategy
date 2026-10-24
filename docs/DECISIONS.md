@@ -221,6 +221,21 @@ A check on placebos: a count whose window depends on this lap's own time, such a
 
 ---
 
+## D-024: Layer 2 closes with traffic figures per class pair, and Le Mans kept apart
+
+*2026-10-24*
+
+What goes forward to the simulator from Layer 2:
+
+- **Two-class races (18):** the within-stint association per car for each direction. Hypercar with GT3 cars ahead is 0.37 s (0.33 to 0.41), and GT3 with Hypercars behind is 0.18 s (0.16 to 0.20), using the past-only window (E-013, E-014). The race bootstrap draws carry the parameter uncertainty.
+- **Le Mans:** per-pair figures from 2025 and 2026 only (E-015). Two of the six pairs depend on the slow-lap rule, and 2024 is left out as wet and drying.
+
+Each figure is labelled INFERRED, an association with a reconstructed count, never a cost per pass (D-004). They aren't pooled across Le Mans and the other races (D-009), because their windows differ.
+
+Two gaps from E-015 get their own work, not more modelling here. Slow zones aren't in the flag column, and drying-track laps aren't flagged. Both bias which laps count as clean, at Le Mans most of all. A hierarchical traffic model is deferred until the simulator shows that the traffic term's uncertainty matters to a decision.
+
+---
+
 ## Tools
 
 The rule of thumb is to use a few tools properly rather than a lot of them badly. A tool comes in when a real need shows up.

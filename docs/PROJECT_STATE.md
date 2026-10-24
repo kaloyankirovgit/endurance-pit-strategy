@@ -28,16 +28,18 @@ Layer 1 is done and the race order is now checked against the official classific
 - Answers follow the car class the user picks (D-021). On 5 questions asked for each class, the chosen class's fact was present in 30 of 30 runs and the other class's showed up in 1 of 24 checked runs. LMP2 is refused, because the corpus covers only Hypercar and LMGT3 (E-012).
 - First traffic result (E-013, D-022). Within the same stint, a Hypercar lap is 0.37 s longer (0.33 to 0.41, resampling 18 races) for each LMGT3 car close enough ahead at the start of the lap to be caught. It's an association with inferred exposure, and the per-car figure moves from 0.26 to 0.41 s with the window. A placebo with cars too far ahead to catch is null.
 - The other direction (E-014): a GT3 lap is 0.18 s longer (0.16 to 0.20) for each Hypercar close behind at lap start. A past-only window gives the same figures (0.36 and 0.17 s), and 2026 matches 2024 to 2025 at the same circuits (0.40 against 0.36 s for Hypercars, 4 races).
-- 154 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
+- Le Mans with three classes (E-015). In each class pair the faster car's figure is larger. Four pairs hold under both slow-lap rules in 2025 and 2026, and two depend on the rule. 2024 is compromised: 52% of its laps are flagged slow, because of damp and drying running that the rain flag misses.
+- Layer 2 is closed (D-024).
+- 157 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
 
 ## Next
 
 1. **Regulations, remaining checks**
    - In-scope refusal tests (questions the router passes but the regulations don't answer), a larger question set to settle BM25 against the hybrid, and a cleaner extraction of the tyre tables (6.5.3, 6.5.4).
-2. **Traffic, what's left (Layer 2)**
-   - Le Mans with three classes as its own study, a version measured from road gaps at the decision point for the simulator, and possibly a hierarchical model against this baseline. Otherwise move on to pace, stints and pit loss (Layer 3).
-3. **Drying track**
-   - Find a way to catch laps on a wet track after the rain sensor reads zero.
+2. **Pace, stints and pit loss (Layer 3)**
+   - The stint-age effect (fuel and tyres together, D-005), pit loss from in-laps and out-laps against normal pace, and pit-lane time distributions, each checked on held-out races.
+3. **Drying track and slow zones**
+   - Find a way to catch laps on a wet track after the rain sensor reads zero, and Le Mans slow zones, which the flag column doesn't record. Both matter more now (E-015).
 4. **Reviewer eval, second round**
    - A fresh held-out case set before changing the agent prompt (it rated "measured overtakes" as minor), then the other three agents.
 
@@ -70,7 +72,7 @@ Layer 1 is done and the race order is now checked against the official classific
 | Weather join and garage flag | Built and run on the full corpus |
 | Interim / processed layers | Built as one command, writing schema-checked Parquet |
 | Race order and gaps | Built, and the final order checked against the official classifications (E-007) |
-| Traffic, pace and pit-loss models | Traffic baseline in both directions, reviewed (E-013, E-014); pace and pit loss not started |
+| Traffic, pace and pit-loss models | Traffic done: both directions and Le Mans pairs, reviewed (E-013 to E-015, D-024). Pace and pit loss not started |
 | Simulator and optimiser | Not started |
 | Regulations and LLM layer | Retrieval (E-009, E-011), grounded answers with a code checker (E-010) and class-aware answers (E-012) built and measured; no simulator tool yet |
 | CI | Running on GitHub Actions, passing |

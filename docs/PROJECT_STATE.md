@@ -18,7 +18,7 @@ Layer 1 is done and the race order is now checked against the official classific
 - Weather downloaded for all 21 races and joined to every lap through each circuit's time zone (E-005, D-013).
 - Garage visits separated from normal stops: 185 stops over 3× the race median.
 - `features/clean_laps.py` flags laps unfit for pace modelling, rain and field-wide slow periods included. 138,189 of 179,259 laps are usable (E-004, E-005, E-016).
-- `pipeline.py` runs everything in about 13 seconds: raw CSVs to `interim/laps.parquet`, plus `processed/stints.parquet` and `processed/pit_stops.parquet`. Pandera validates the lap table on write (E-006, D-014).
+- `pipeline.py` runs everything in under 20 seconds (about 13 before the field-slow flag, D-025): raw CSVs to `interim/laps.parquet`, plus `processed/stints.parquet` and `processed/pit_stops.parquet`. Pandera validates the lap table on write (E-006, D-014).
 - `reconstruct/race_order.py` adds position and gaps at each crossing in DuckDB SQL, including the road gap and class of the car ahead on track.
 - Race order checked against the official `03_Classification` files for all 21 races. Lap counts match for 830 of 833 cars and finishing times to the millisecond for 782. The 51 differences fit post-race penalties (E-007).
 - A commit guard blocks any commit that includes a git-ignored file, both as a Claude Code hook and as the git pre-commit hook (D-016).

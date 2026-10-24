@@ -14,7 +14,7 @@ Early. The data side is in place and tested, and the first traffic result is in.
 What works right now:
 
 - **One command builds everything**
-  - `python -m endurance_strategy.pipeline` takes the raw race and weather files to a validated lap table plus stint and pit-stop tables, in Parquet, in about 13 seconds.
+  - `python -m endurance_strategy.pipeline` takes the raw race and weather files to a validated lap table plus stint and pit-stop tables, in Parquet, in under 20 seconds on a laptop.
 - **21 races from 2024 to 2026**
   - 179,259 laps from 833 car entries, split into 10,577 stints. 138,189 laps pass the clean-lap rules, which also catch field-wide slow periods the rain sensor misses, such as a drying track or slow zones (D-025).
 - **Pit stops and stints**

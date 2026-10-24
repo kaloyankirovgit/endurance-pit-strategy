@@ -34,6 +34,7 @@ def laps(car: str, times: list[float], flags: str | None = None, pits: str | Non
         "CROSSING_FINISH_LINE_IN_PIT": ["B" if c == "B" else "" for c in pits],
         "PIT_TIME_S": pit_time,
         "RAIN": rain if rain is not None else [0] * n,
+        "ELAPSED_S": np.cumsum(times, dtype=float),
     })
 
 
@@ -132,3 +133,34 @@ def test_summary_counts_laps_excluded_for_one_reason_only() -> None:
     assert summary.loc["is_caution_lap", "laps_flagged"] == 1
     assert summary.loc["is_caution_lap", "only_reason"] == 0
     assert summary.loc["is_after_caution", "only_reason"] == 1
+
+
+def field(cars: int, times_by_lap: list[float], car_class: str = "HYPERCAR") -> pd.DataFrame:
+    """Several cars on identical laps, so the whole class shares the same pace at the same time."""
+    return pd.concat([laps(str(k), times_by_lap, car_class=car_class) for k in range(cars)], ignore_index=True)
+
+
+def test_a_whole_class_running_slow_is_a_field_slow_period():
+    out = run(field(12, [100] * 10 + [110] * 5 + [100] * 10), slow_lap_ratio=1.5)
+    slow_period = out["LAP_NUMBER"].between(12, 15)
+    assert out.loc[slow_period, "is_field_slow"].all()
+    assert not out.loc[out["LAP_NUMBER"].between(2, 8), "is_field_slow"].any()
+    assert not out.loc[slow_period, "is_usable_for_pace_model"].any()
+
+
+def test_one_slow_car_does_not_make_a_field_slow_period():
+    frame = pd.concat([field(12, [100] * 20), laps("99", [100] * 10 + [110] * 10)], ignore_index=True)
+    out = run(frame, slow_lap_ratio=1.5)
+    assert not out["is_field_slow"].any()
+
+
+def test_field_slow_needs_enough_laps_in_the_window():
+    out = run(field(1, [100] * 3 + [110] * 3))
+    assert out["field_pace_ratio"].isna().all()
+    assert not out["is_field_slow"].any()
+
+
+def test_field_slow_threshold_can_be_changed():
+    frame = field(12, [100] * 10 + [103] * 6 + [100] * 10)
+    assert not run(frame, slow_lap_ratio=1.5)["is_field_slow"].any()
+    assert run(frame, slow_lap_ratio=1.5, field_slow_ratio=1.02)["is_field_slow"].any()

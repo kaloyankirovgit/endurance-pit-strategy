@@ -236,6 +236,16 @@ Two gaps from E-015 get their own work, not more modelling here. Slow zones aren
 
 ---
 
+## D-025: Field-wide slow periods join the clean-lap rules
+
+*2026-10-24*
+
+A lap is left out of the clean set if its whole class ran more than 4% over that race's dry pace in the five minutes either side (`is_field_slow`, E-016). It catches drying track that the rain sensor misses, and slow zones and local yellows the flag column doesn't hold. It doesn't claim to know which. This is the eighth rule in D-012.
+
+The 4% sits in a near-empty gap in the distribution, and it was chosen from that distribution, not from any model result. It removes 695 laps. Traffic figures from the 18 two-class races don't move. At Le Mans it fixes most of the loose-rule placebo failures from E-015.
+
+---
+
 ## Tools
 
 The rule of thumb is to use a few tools properly rather than a lot of them badly. A tool comes in when a real need shows up.

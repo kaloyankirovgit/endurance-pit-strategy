@@ -17,7 +17,7 @@ Layer 1 is done and the race order is now checked against the official classific
 - `reconstruct/stints.py` flags in-laps and out-laps and numbers stints. The pit columns are fully explained (E-003, D-011): 10,577 stints, and all 3,478 driver changes land on out-laps.
 - Weather downloaded for all 21 races and joined to every lap through each circuit's time zone (E-005, D-013).
 - Garage visits separated from normal stops: 185 stops over 3× the race median.
-- `features/clean_laps.py` flags laps unfit for pace modelling, rain included. 138,884 of 179,259 laps are usable (E-004, E-005).
+- `features/clean_laps.py` flags laps unfit for pace modelling, rain and field-wide slow periods included. 138,189 of 179,259 laps are usable (E-004, E-005, E-016).
 - `pipeline.py` runs everything in about 13 seconds: raw CSVs to `interim/laps.parquet`, plus `processed/stints.parquet` and `processed/pit_stops.parquet`. Pandera validates the lap table on write (E-006, D-014).
 - `reconstruct/race_order.py` adds position and gaps at each crossing in DuckDB SQL, including the road gap and class of the car ahead on track.
 - Race order checked against the official `03_Classification` files for all 21 races. Lap counts match for 830 of 833 cars and finishing times to the millisecond for 782. The 51 differences fit post-race penalties (E-007).
@@ -30,7 +30,8 @@ Layer 1 is done and the race order is now checked against the official classific
 - The other direction (E-014): a GT3 lap is 0.18 s longer (0.16 to 0.20) for each Hypercar close behind at lap start. A past-only window gives the same figures (0.36 and 0.17 s), and 2026 matches 2024 to 2025 at the same circuits (0.40 against 0.36 s for Hypercars, 4 races).
 - Le Mans with three classes (E-015). In each class pair the faster car's figure is larger. Four pairs hold under both slow-lap rules in 2025 and 2026, and two depend on the rule. 2024 is compromised: 52% of its laps are flagged slow, because of damp and drying running that the rain flag misses.
 - Layer 2 is closed (D-024).
-- 157 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
+- Field-wide slow periods are flagged (E-016, D-025). They catch a drying track the rain sensor misses, slow zones and local yellows. They remove 695 laps from the clean set (now 138,189), leave the 18-race traffic figures unchanged and fix most of E-015's loose-rule placebo failures.
+- 161 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
 
 ## Next
 
@@ -38,8 +39,8 @@ Layer 1 is done and the race order is now checked against the official classific
    - In-scope refusal tests (questions the router passes but the regulations don't answer), a larger question set to settle BM25 against the hybrid, and a cleaner extraction of the tyre tables (6.5.3, 6.5.4).
 2. **Pace, stints and pit loss (Layer 3)**
    - The stint-age effect (fuel and tyres together, D-005), pit loss from in-laps and out-laps against normal pace, and pit-lane time distributions, each checked on held-out races.
-3. **Drying track and slow zones**
-   - Find a way to catch laps on a wet track after the rain sensor reads zero, and Le Mans slow zones, which the flag column doesn't record. Both matter more now (E-015).
+3. **Slow-lap reference**
+   - The slow-lap rule's reference median still includes field-slow periods (E-016). Recompute it without them if Layer 3 shows it matters.
 4. **Reviewer eval, second round**
    - A fresh held-out case set before changing the agent prompt (it rated "measured overtakes" as minor), then the other three agents.
 

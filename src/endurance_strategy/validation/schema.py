@@ -28,6 +28,8 @@ INTERIM_LAPS = pa.DataFrameSchema(
         "is_in_lap": pa.Column(bool),
         "is_out_lap": pa.Column(bool),
         "is_garage_stop": pa.Column(bool),
+        "field_pace_ratio": pa.Column(float, positive, nullable=True),
+        "is_field_slow": pa.Column(bool),
         "is_usable_for_pace_model": pa.Column(bool),
     },
     unique=["event_key", "NUMBER", "LAP_NUMBER"],

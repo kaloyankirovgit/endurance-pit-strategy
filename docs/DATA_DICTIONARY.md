@@ -97,6 +97,13 @@ A car is identified by `event_key` plus `NUMBER`.
 | `stints.parquet` | Stint | driver, first and last lap, laps, clean laps, median clean lap, ended in pit, started from garage |
 | `pit_stops.parquet` | Out-lap | `PIT_TIME_S`, garage flag, flag at the line, incoming driver, whether the driver changed |
 
+### Field-wide slow periods (D-025)
+
+| Column | Label | Meaning |
+|---|---|---|
+| `field_pace_ratio` | Reconstructed | Median lap-time ratio against the class's dry reference, over its green non-pit laps within ±5 minutes. It uses later laps, so it describes the race. |
+| `is_field_slow` | Inferred | `field_pace_ratio` over 1.04: drying track, a slow zone or local yellows, cause unknown. One of the clean-lap rules. |
+
 ### Traffic exposure (built by `features/traffic.py` for the analysis, not stored in the Parquet tables)
 
 | Column | Label | Meaning |

@@ -16,7 +16,7 @@ What works right now:
 - **One command builds everything**
   - `python -m endurance_strategy.pipeline` takes the raw race and weather files to a validated lap table plus stint and pit-stop tables, in Parquet, in about 13 seconds.
 - **21 races from 2024 to 2026**
-  - 179,259 laps from 833 car entries, split into 10,577 stints. 138,884 laps pass the clean-lap rules.
+  - 179,259 laps from 833 car entries, split into 10,577 stints. 138,189 laps pass the clean-lap rules, which also catch field-wide slow periods the rain sensor misses, such as a drying track or slow zones (D-025).
 - **Pit stops and stints**
   - In-laps, out-laps and driver changes are flagged, and garage visits are kept apart from normal stops.
 - **Weather on every lap**
@@ -35,7 +35,7 @@ What works right now:
   - Within the same stint, a Hypercar lap is about 0.37 s longer for each LMGT3 car that was close enough ahead at the start of the lap to be caught (0.33 to 0.41 s, resampling 18 races). That's an association with inferred traffic, not a measured cost per overtake, and the per-car figure moves from 0.26 to 0.41 s with how "close enough" is defined. Laps with one such car against none differ by about 0.4 s whichever definition is used. Details and the checks that didn't break it are in E-013.
   - The other way round, a GT3 lap is about 0.18 s longer (0.16 to 0.20) for each Hypercar close behind at the start of the lap. Both figures barely move when the window uses only laps already finished, and the 2026 races line up with 2024 and 2025 (E-014). That's stability at tracks already seen, not a test on new ones.
   - At Le Mans, with three classes, the faster car's figure is the larger one in every class pair, but only 2025 and 2026 are usable. In 2024 a damp, drying track that the rain flag misses leaves half the laps flagged slow (E-015).
-- **157 tests on synthetic data**
+- **161 tests on synthetic data**
   - They run in GitHub Actions on every push, with no real data needed.
 
 The full log of what's been tried is in [`docs/EXPERIMENT_LOG.md`](docs/EXPERIMENT_LOG.md), and the reasoning behind the bigger choices is in [`docs/DECISIONS.md`](docs/DECISIONS.md).

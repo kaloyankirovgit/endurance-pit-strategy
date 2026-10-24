@@ -708,3 +708,46 @@ So 2024 is reported separately, and the result rests on 2025 and 2026, two races
 - **Slow zones and drying track aren't identified** in this data as processed, and they bias whichever laps are kept.
 - **The review flagged two things not done here:** dropping more than one lap after a caution, which lowered 5 of 6 figures slightly in its check, and night against day, which gave 0.35 against 0.24 s for Hypercar with LMP2 ahead, again in its check.
 - **The windows use whole-race medians**, as in E-013 (see E-014 for the past-only version). Every earlier limit still applies: no passes, no location, no cause, and driving choices aren't controlled.
+
+---
+
+## E-016: Can field-wide slow periods be caught when the rain sensor misses them?
+
+*2026-10-24 · complete*
+
+**Question:** E-015 found that half the 2024 Le Mans laps were flagged slow while the rain sensor read zero, and that Le Mans slow zones never appear in the flag column. Can timing data alone mark those periods, without saying what caused them?
+
+**Looked at first:** Le Mans 2024 hour by hour, using green, non-pit laps. Whole hours (6, 8, 16, 17, 22 and 23) had the field's median lap 9 to 14% above the dry reference, with `RAIN` at 0 for almost all of them. The sensor caught part of hour 11 and part of hour 23.
+
+**Method:** for each lap, `field_pace_ratio` is the median, over its class's green non-pit laps that ended within ±5 minutes, of lap time divided by the class's dry median at that race. NaN with fewer than 10 such laps. A lap is `is_field_slow` above 1.04. The flag joins the clean-lap rules (D-025).
+
+**Found:**
+
+| `field_pace_ratio` of green non-pit laps | Share |
+|---|---:|
+| Up to 1.01 | 88.5% |
+| 1.01 to 1.02 | 6.8% |
+| 1.02 to 1.03 | 0.7% |
+| 1.03 to 1.05 | 0.4% |
+| 1.05 to 1.10 | 1.5% |
+| Over 1.10 | 2.1% |
+
+- **The split is clean.** Almost nothing sits between 1.03 and 1.05, so the 1.04 cut-off is a choice inside a gap, not a fine-tuned threshold. It was set from this distribution, not from any traffic result.
+- **Where it fires:**
+  - **Imola 2024:** 16% of green laps, where the rain sensor caught 0.7%.
+  - **Le Mans 2024:** 34%.
+  - **COTA 2025:** 12%, where the rain sensor already caught most of it.
+  - **Smaller pockets** of 1 to 2.5% at COTA 2026, Imola 2026 and Le Mans 2025 and 2026, which fit slow zones or local yellows.
+- **It removes 695 laps from the clean set** (138,884 down to 138,189). Its 7,703 flagged laps were mostly already out through the slow-lap rule.
+- **Effect on the traffic results** (rerun with the new rule):
+  - **The 18 races barely move:** Hypercar 0.37 s (0.33 to 0.41) and GT3 0.18 s (0.16 to 0.20). The far-ahead placebo stays at 0.00 s.
+  - **Le Mans, loose slow-lap rule, 2025 and 2026:** placebo intervals that miss zero drop from 3 of 6 to 1 of 6, now between −0.04 and +0.03 s. Most of E-015's loose-rule placebo failure came from these periods.
+  - **LMP2 with Hypercars behind** moves from 0.14 to 0.16 s under the loose rule. That's still below the 0.22 s under the standard rule, so it stays the fragile pair.
+  - The E-013 to E-015 entries keep the numbers from before this flag existed. Their runs are reproducible from the commits before D-025.
+
+**What it doesn't show:**
+
+- **It can't name the cause.** Drying track, slow zones, local yellows and fog all look the same here.
+- **It misses slow zones that cost little.** One sector under a slow zone may not move the field's median lap by 4%.
+- **It uses laps after the one being flagged,** so it's a cleaning rule for describing races, not something a team knows at lap t.
+- **The slow-lap rule's reference is still the race median including these periods,** so at a race like Imola 2024 that reference is a little slow. Not changed here.

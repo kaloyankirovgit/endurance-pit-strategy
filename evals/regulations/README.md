@@ -67,7 +67,7 @@ On the held-out set the differences come down to a few questions, which 30 can't
 
 ## Vague questions (E-017)
 
-`questions_vague.json` holds 30 questions written without the regulations to hand: 18 answerable, 6 the corpus doesn't answer (kept for refusal tests), and 6 about game behaviour or strategy, moved to `routing_vague.json`. The labels are provisional until checked.
+`questions_vague.json` holds 30 questions written without the regulations to hand: 18 answerable, 6 the corpus doesn't answer (kept for refusal tests), and 6 about game behaviour or strategy, moved to `routing_vague.json`. Kaloyan checked all 24 labels against the clause text and agreed with each.
 
 | Retriever | recall@1 | recall@3 | recall@5 (of 18) |
 |---|---:|---:|---:|

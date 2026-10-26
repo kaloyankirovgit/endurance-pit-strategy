@@ -805,4 +805,6 @@ So 2024 is reported separately, and the result rests on 2025 and 2026, two races
 - **The pooled test includes the held-out 2 to 0, part of the pattern that suggested this test (D-020).** That tilts it towards a pass, and it still failed. A future rule should be tested on a set that played no part in proposing it.
 - **18 answerable questions from one author.** One question moves recall@5 by about 6 points.
 
+**Label check (2026-10-26, after the run):** Kaloyan checked all 24 labels against the clause text with the retriever ranks hidden, and agreed with every one. v04 and v16 stay answerable but partial, as labelled. No label changed, so the results above stand without a rerun. He saw Claude's notes while checking, so this confirms the labels rather than being an independent second labelling.
+
 **Reviewed by** the statistical-reviewer agent before reporting. It kept the decision and corrected the wording of the recall-drop and embedding claims, and the truncation explanation.

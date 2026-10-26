@@ -30,7 +30,7 @@ Layer 1 is done and the race order is now checked against the official classific
 - The other direction (E-014): a GT3 lap is 0.18 s longer (0.16 to 0.20) for each Hypercar close behind at lap start. A past-only window gives the same figures (0.36 and 0.17 s), and 2026 matches 2024 to 2025 at the same circuits (0.40 against 0.36 s for Hypercars, 4 races).
 - Le Mans with three classes (E-015). In each class pair the faster car's figure is larger. Four pairs hold under both slow-lap rules in 2025 and 2026, and two depend on the rule. 2024 is compromised: 52% of its laps are flagged slow, because of damp and drying running that the rain flag misses.
 - Layer 2 is closed (D-024).
-- Vague, engineer-style regulation questions (E-017): 30 written without the regulations to hand. On the 18 answerable ones the hybrid won 5 questions to 1 against BM25 pooled with the held-out set, short of the pre-registered p < 0.05 (p = 0.22), so BM25 stays the default. BM25 found the clause in the top 5 for 9 of 18. The labels are provisional until Kaloyan checks them.
+- Vague, engineer-style regulation questions (E-017): 30 written without the regulations to hand. On the 18 answerable ones the hybrid won 5 questions to 1 against BM25 pooled with the held-out set, short of the pre-registered p < 0.05 (p = 0.22), so BM25 stays the default. BM25 found the clause in the top 5 for 9 of 18. Kaloyan checked all 24 labels and agreed with each.
 - A live tool in Le Mans Ultimate is parked until after the optimiser (D-026).
 - Field-wide slow periods are flagged (E-016, D-025). They catch a drying track the rain sensor misses, slow zones and local yellows. They remove 695 laps from the clean set (now 138,189), leave the 18-race traffic figures unchanged and fix most of E-015's loose-rule placebo failures.
 - 161 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
@@ -38,7 +38,6 @@ Layer 1 is done and the race order is now checked against the official classific
 ## Next
 
 1. **Regulations, remaining checks**
-   - Kaloyan checks the E-017 labels with the retriever ranks hidden, and the run is repeated if any change.
    - In-scope refusal tests: the 6 unanswerable questions in `questions_vague.json` are ready for them, and the 6 game and strategy questions in `routing_vague.json` test the router.
    - Embed the long chunks (12.2.2 is 727 tokens, cut at 512) by sub-clause, tested on fresh questions.
    - A cleaner extraction of the tyre tables (6.5.3, 6.5.4).

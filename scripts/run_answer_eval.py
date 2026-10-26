@@ -50,12 +50,13 @@ def main() -> None:
     parser.add_argument("--repeats", type=int, default=3)
     parser.add_argument("--workers", type=int, default=6)
     parser.add_argument("--questions", default="questions.json", help="question file in evals/regulations")
+    parser.add_argument("--routing", default="routing.json", help="routing-case file in evals/regulations")
     parser.add_argument("--no-routing", action="store_true", help="skip the routing cases")
     args = parser.parse_args()
 
     chunks = [json.loads(line) for line in (INTERIM_DIR / "regulation_chunks.jsonl").read_text().splitlines()]
     questions = json.loads((EVAL_DIR / args.questions).read_text())
-    routing_questions = [] if args.no_routing else json.loads((EVAL_DIR / "routing.json").read_text())
+    routing_questions = [] if args.no_routing else json.loads((EVAL_DIR / args.routing).read_text())
     unknown = {q.get("car_class") for q in questions} - set(CAR_CLASSES) - {None}
     if unknown:
         raise SystemExit(f"unknown car classes in {args.questions}: {sorted(unknown)}")
@@ -83,7 +84,8 @@ def main() -> None:
     results = EVAL_DIR / "results"
     results.mkdir(exist_ok=True)
     (results / f"{stamp}_answers.jsonl").write_text("".join(json.dumps(row, ensure_ascii=False) + "\n" for row in log))
-    summary = {"timestamp_utc": stamp, "questions_file": args.questions, "repeats": args.repeats, "duration_s": duration_s,
+    summary = {"timestamp_utc": stamp, "questions_file": args.questions,
+               "routing_file": None if args.no_routing else args.routing, "repeats": args.repeats, "duration_s": duration_s,
                "retriever": "BM25 top 5, season filter",
                "models": sorted({m for t in traces for m in t["models"]}), **summarise(graded, routing)}
     (results / f"{stamp}_answers_summary.json").write_text(json.dumps(summary, indent=2))

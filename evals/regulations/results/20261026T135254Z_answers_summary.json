@@ -1,0 +1,39 @@
+{
+  "timestamp_utc": "20261026T135254Z",
+  "questions_file": "questions_vague.json",
+  "routing_file": "routing_vague.json",
+  "repeats": 3,
+  "duration_s": 230,
+  "retriever": "BM25 top 5, season filter",
+  "models": [
+    "claude-opus-5-5"
+  ],
+  "answerable_runs": 54,
+  "answerable_outcomes": {
+    "refused": 28,
+    "answered": 14,
+    "rejected_by_check": 2,
+    "routed_away": 10
+  },
+  "answered_citing_gold": 13,
+  "key_fact_runs": 21,
+  "key_facts_present": 10,
+  "wrong_fact_shown_runs": 0,
+  "wrong_facts_present": 0,
+  "retrieval_hit_runs": 18,
+  "retrieval_hit_answered_citing_gold": 13,
+  "retrieval_miss_runs": 36,
+  "retrieval_miss_outcomes": {
+    "refused": 25,
+    "answered": 1,
+    "routed_away": 10
+  },
+  "unanswerable_runs": 18,
+  "unanswerable_nothing_shown": 18,
+  "unanswerable_outcomes": {
+    "refused": 15,
+    "routed_away": 3
+  },
+  "routing_runs": 18,
+  "routing_correct": 13
+}

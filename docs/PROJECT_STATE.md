@@ -31,6 +31,7 @@ Layer 1 is done and the race order is now checked against the official classific
 - Le Mans with three classes (E-015). In each class pair the faster car's figure is larger. Four pairs hold under both slow-lap rules in 2025 and 2026, and two depend on the rule. 2024 is compromised: 52% of its laps are flagged slow, because of damp and drying running that the rain flag misses.
 - Layer 2 is closed (D-024).
 - Vague, engineer-style regulation questions (E-017): 30 written without the regulations to hand. On the 18 answerable ones the hybrid won 5 questions to 1 against BM25 pooled with the held-out set, short of the pre-registered p < 0.05 (p = 0.22), so BM25 stays the default. BM25 found the clause in the top 5 for 9 of 18. Kaloyan checked all 24 labels and agreed with each.
+- In-scope refusal tested (E-018). The 5 unanswerable vague questions that reached the answer step were declined every time (3 runs each, effective n = 5), while 13 of 18 runs where retrieval found the clause were answered. The checker's 2 rejections were false positives, and refusal text isn't checked.
 - A live tool in Le Mans Ultimate is parked until after the optimiser (D-026).
 - Field-wide slow periods are flagged (E-016, D-025). They catch a drying track the rain sensor misses, slow zones and local yellows. They remove 695 laps from the clean set (now 138,189), leave the 18-race traffic figures unchanged and fix most of E-015's loose-rule placebo failures.
 - 161 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
@@ -38,7 +39,8 @@ Layer 1 is done and the race order is now checked against the official classific
 ## Next
 
 1. **Regulations, remaining checks**
-   - In-scope refusal tests: the 6 unanswerable questions in `questions_vague.json` are ready for them, and the 6 game and strategy questions in `routing_vague.json` test the router.
+   - Check refusal text in code, like answers: a refusal that paraphrases a clause is shown unverified (E-018).
+   - Cut the checker's false positives: an article number named but not cited, and a number derived from a clause's rule (E-018).
    - Embed the long chunks (12.2.2 is 727 tokens, cut at 512) by sub-clause, tested on fresh questions.
    - A cleaner extraction of the tyre tables (6.5.3, 6.5.4).
 2. **Pace, stints and pit loss (Layer 3)**
@@ -79,7 +81,7 @@ Layer 1 is done and the race order is now checked against the official classific
 | Race order and gaps | Built, and the final order checked against the official classifications (E-007) |
 | Traffic, pace and pit-loss models | Traffic done: both directions and Le Mans pairs, reviewed (E-013 to E-015, D-024). Pace and pit loss not started |
 | Simulator and optimiser | Not started |
-| Regulations and LLM layer | Retrieval (E-009, E-011, E-017), grounded answers with a code checker (E-010) and class-aware answers (E-012) built and measured; no simulator tool yet |
+| Regulations and LLM layer | Retrieval (E-009, E-011, E-017), grounded answers with a code checker (E-010), in-scope refusal (E-018) and class-aware answers (E-012) built and measured; no simulator tool yet |
 | CI | Running on GitHub Actions, passing |
 | Commit guard hooks | Built and tested (D-016) |
 | Review-agent evals | statistical-reviewer evaluated, 16 cases × 3 runs (E-008) |

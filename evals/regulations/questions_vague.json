@@ -83,7 +83,14 @@
       "12.2.2"
     ],
     "answerable": true,
-    "key_facts": [],
+    "key_facts": [
+      [
+        "engine"
+      ],
+      [
+        "off"
+      ]
+    ],
     "wording": "real",
     "source_number": 8,
     "note": "Work and personnel only with the engine off (12.2.1); refuelling and driver change need engine off (12.2.2)."
@@ -108,7 +115,11 @@
       "14.6.5"
     ],
     "answerable": true,
-    "key_facts": [],
+    "key_facts": [
+      [
+        "clos"
+      ]
+    ],
     "wording": "real",
     "source_number": 10,
     "note": "Pit entry closes when 'PREPARE FOR FCY' is posted (14.5.2); closed for the first three SC laps (14.6.5)."
@@ -134,7 +145,15 @@
       "12.1.4"
     ],
     "answerable": true,
-    "key_facts": [],
+    "key_facts": [
+      [
+        "drive-through",
+        "drive through"
+      ],
+      [
+        "60"
+      ]
+    ],
     "wording": "real",
     "source_number": 12,
     "note": ""
@@ -160,7 +179,11 @@
       "14.6.9"
     ],
     "answerable": true,
-    "key_facts": [],
+    "key_facts": [
+      [
+        "overtak"
+      ]
+    ],
     "wording": "real",
     "source_number": 14,
     "note": ""
@@ -248,7 +271,16 @@
       "6.4.1"
     ],
     "answerable": true,
-    "key_facts": [],
+    "key_facts": [
+      [
+        "2 seconds",
+        "two seconds"
+      ],
+      [
+        "4 flashes",
+        "four flashes"
+      ]
+    ],
     "wording": "sim",
     "source_number": 26,
     "note": "Real answer: flashing allowed on track, max 2 s and 4 flashes, none in the pit lane (6.4.1)."
@@ -274,7 +306,14 @@
       "12.2.2"
     ],
     "answerable": true,
-    "key_facts": [],
+    "key_facts": [
+      [
+        "stopped"
+      ],
+      [
+        "engine"
+      ]
+    ],
     "wording": "real",
     "source_number": 28,
     "note": "Driver change only with the car stopped, engine off, in its stopping area (12.2.2 b)."
@@ -288,7 +327,14 @@
       "9.1.5"
     ],
     "answerable": true,
-    "key_facts": [],
+    "key_facts": [
+      [
+        "push"
+      ],
+      [
+        "disqualif"
+      ]
+    ],
     "wording": "sim",
     "source_number": 29,
     "note": "Real answer: the driver may not push the car and no replenishment on track, both DQ (9.1.4, 9.1.5)."

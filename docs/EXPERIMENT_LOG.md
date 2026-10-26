@@ -808,3 +808,39 @@ So 2024 is reported separately, and the result rests on 2025 and 2026, two races
 **Label check (2026-10-26, after the run):** Kaloyan checked all 24 labels against the clause text with the retriever ranks hidden, and agreed with every one. v04 and v16 stay answerable but partial, as labelled. No label changed, so the results above stand without a rerun. He saw Claude's notes while checking, so this confirms the labels rather than being an independent second labelling.
 
 **Reviewed by** the statistical-reviewer agent before reporting. It kept the decision and corrected the wording of the recall-drop and embedding claims, and the truncation explanation.
+
+---
+
+## E-018: Do the answers refuse what the regulations don't cover, on vague questions?
+
+*2026-10-26 · complete*
+
+**Question:** E-010's unanswerable questions were all sent away by the router, so the answerer's own refusal was never tested. On the E-017 vague set, which has real racing questions the regulations don't answer, does anything unsupported reach the user?
+
+**Method:** `python scripts/run_answer_eval.py --questions questions_vague.json --routing routing_vague.json`. All 24 questions and the 6 routing cases, 3 runs each, through the router, BM25 retrieval (top 5), the answer prompt and the code checker. Key facts for 7 answerable questions were taken from the clause text before the run. Model: `claude-opus-5-5`. Run `20261026T135254Z`, 230 s.
+
+**Found:**
+
+- **In-scope refusal:** 5 of the 6 unanswerable questions reached the answer step (4 real-worded, 1 sim-worded), and the answerer declined every one. Each question ran 3 times with the same retrieval and the same outcome every time, so the effective n is 5, not 15. With 5 of 5, a one-sided 95% lower bound on the refusal rate is about 55%. The engine-map question (v19) was routed away all 3 times.
+- **Not refusing everything:** of the 18 runs where retrieval found the answering clause (6 questions), 13 were answered citing it. This is the contrast that separates "refuses what it can't support" from "refuses everything". When retrieval missed, the answerer declined 25 of 26 runs that reached it. So the data can't tell refusing because the corpus lacks the rule apart from refusing because retrieval missed.
+- **The checker's two rejections were false positives.** Both blocked answers were correct:
+  - v12 derived "61 km/h" from the clause's round-up rule;
+  - v10 named 14.6.5 only to say that the extracts didn't include it.
+  
+  The checker caught no fabricated number in this run.
+- **Retrieval misses (12 questions, 36 runs):** 25 declined and 10 routed away, all sim-worded (v23, v26, v30, and v27 once). One answered from a nearby clause: v15 cited the VSC article (14.7.1), which has the same "car with an obvious problem" exception, and said the extracts didn't cover local yellows.
+- **Shown answers:** Claude read all 16 (14 from 6 vague questions, 2 from routing case vr18), and none contradicted its cited clause.
+- **Routing on the game and strategy questions:** 13 of 18 runs matched the label. The 5 that didn't went to regulation lookup:
+  - vr05 (disconnected driver, 2 of 3), which has a real rule underneath (minimum driving time);
+  - vr18 (curb exploit, 3 of 3), which answered or declined from 9.1.2 with a citation.
+  
+  The labels were Claude's and weren't checked, so they stay unchanged after the run, and 13 of 18 isn't a routing error rate.
+
+**What it doesn't show:**
+
+- **Refusal explanations are shown but not checked.** `check_answer` returns no problems for an unsupported answer, and `refusal_reason` goes to the user as written. Some refusals paraphrase clauses (v24 restates parts of 6.5.7), and those paraphrases are never verified. This is a gap in the guardrail, and the next fix for Layer 6.
+- **Key facts are weak.** They were added in the same uncommitted change as the run, so "set before the run" can't be audited. Checks like "clos", "overtak" and "engine" plus "off" would pass many wrong answers. No wrong facts were set. Only 4 questions (10 runs) had a key-fact check that applied, and all 10 passed.
+- **The system answered 14 of 54 answerable runs.** Refusal is the main way it stays correct here, and better retrieval would turn refusals into answers.
+- **24 questions from one author.**
+
+**Reviewed by** the statistical-reviewer agent. It corrected the effective n, retired a claim that the checker caught untraceable numbers (both rejections were false positives), and found that refusal text is never checked.

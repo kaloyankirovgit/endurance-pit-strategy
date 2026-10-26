@@ -34,7 +34,7 @@ Layer 1 is done and the race order is now checked against the official classific
 - In-scope refusal tested (E-018). The 5 unanswerable vague questions that reached the answer step were declined every time (3 runs each, effective n = 5), while 13 of 18 runs where retrieval found the clause were answered. The checker's 2 rejections were false positives, and refusal text isn't checked.
 - A live tool in Le Mans Ultimate is parked until after the optimiser (D-026).
 - Field-wide slow periods are flagged (E-016, D-025). They catch a drying track the rain sensor misses, slow zones and local yellows. They remove 695 laps from the clean set (now 138,189), leave the 18-race traffic figures unchanged and fix most of E-015's loose-rule placebo failures.
-- 161 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
+- 163 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
 
 ## Next
 

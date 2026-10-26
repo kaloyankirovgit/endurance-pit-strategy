@@ -1,0 +1,38 @@
+[
+  {
+    "id": "vr05",
+    "question": "What happens to our minimum drive time if a driver gets disconnected mid-race?",
+    "expected_route": "out_of_scope",
+    "source_number": 5
+  },
+  {
+    "id": "vr18",
+    "question": "Can we exploit the curb limits on this specific track model without triggering the automated penalty system?",
+    "expected_route": "out_of_scope",
+    "source_number": 18
+  },
+  {
+    "id": "vr20",
+    "question": "Does the virtual energy or fuel usage model calculate lifting and coasting accurately?",
+    "expected_route": "out_of_scope",
+    "source_number": 20
+  },
+  {
+    "id": "vr21",
+    "question": "What happens to our fuel calculation if we experience netcode or a micro-stutter on the straight?",
+    "expected_route": "out_of_scope",
+    "source_number": 21
+  },
+  {
+    "id": "vr22",
+    "question": "If our aerodynamic damage is under ten percent, is it faster to skip the repair time or take the top speed hit?",
+    "expected_route": "simulation_request",
+    "source_number": 22
+  },
+  {
+    "id": "vr25",
+    "question": "If the server weather sync glitches and shows rain but the track is dry, which tire model behaves better?",
+    "expected_route": "out_of_scope",
+    "source_number": 25
+  }
+]

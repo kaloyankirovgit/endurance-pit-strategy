@@ -1,0 +1,309 @@
+[
+  {
+    "id": "v01",
+    "season": "2026",
+    "question": "How many required pit stops are there for this race?",
+    "gold_articles": [],
+    "answerable": false,
+    "key_facts": [],
+    "wording": "real",
+    "source_number": 1,
+    "note": "No number of stops is set in the sporting regulations."
+  },
+  {
+    "id": "v02",
+    "season": "2026",
+    "question": "Can I pit outside the pit window?",
+    "gold_articles": [],
+    "answerable": false,
+    "key_facts": [],
+    "wording": "real",
+    "source_number": 2,
+    "note": "No pit window in the regulations. Related: pit entry closes under FCY (14.5.2), the first Safety Car laps (14.6.5) and on the Race Director's order (12.2.1). An answer built on those is acceptable if it says the regulations have no pit window."
+  },
+  {
+    "id": "v03",
+    "season": "2026",
+    "question": "As a GT3 car, do i have to give way to the overtaking cars or can I hold my line?",
+    "gold_articles": [],
+    "answerable": false,
+    "key_facts": [],
+    "wording": "real",
+    "source_number": 3,
+    "note": "Driving conduct and blue flags are in Appendix L / H of the International Sporting Code, which isn't collected."
+  },
+  {
+    "id": "v04",
+    "season": "2026",
+    "question": "Is there a maximum amount of consecutive stints a single driver can do before triggering a DQ?",
+    "gold_articles": [
+      "13.2.3",
+      "13.2.4",
+      "13.2.5"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "real",
+    "source_number": 4,
+    "note": "Partial: only minimum times are set (LMGT3 table, 45 min for points); DQ if a driver doesn't drive at all; 13.2.4 lets the Stewards adjust minimum and maximum times. No maximum is stated."
+  },
+  {
+    "id": "v06",
+    "season": "2026",
+    "question": "Can the same driver do two back-to-back stints if we don't swap drivers at the stop?",
+    "gold_articles": [
+      "13.2.2",
+      "12.2.2"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "real",
+    "source_number": 6,
+    "note": "A stint counts at each pit entry, with a driver change or not (13.2.2)."
+  },
+  {
+    "id": "v07",
+    "season": "2026",
+    "question": "Are we allowed to change tires and fuel at the exact same time without a time penalty?",
+    "gold_articles": [
+      "12.2.2"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "real",
+    "source_number": 7,
+    "note": "Refuelling comes first; during it only grounding, cleaning and visual checks, no tools (12.2.2 c)."
+  },
+  {
+    "id": "v08",
+    "season": "2026",
+    "question": "Can I leave the engine running during a pit stop to save ignition delay?",
+    "gold_articles": [
+      "12.2.1",
+      "12.2.2"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "real",
+    "source_number": 8,
+    "note": "Work and personnel only with the engine off (12.2.1); refuelling and driver change need engine off (12.2.2)."
+  },
+  {
+    "id": "v09",
+    "season": "2026",
+    "question": "Does the game force a fixed pit stop duration even if we only take a splash of fuel?",
+    "gold_articles": [],
+    "answerable": false,
+    "key_facts": [],
+    "wording": "sim",
+    "source_number": 9,
+    "note": "Real equivalent: no minimum stop time in the regulations (docking time is set in BoP, not collected)."
+  },
+  {
+    "id": "v10",
+    "season": "2026",
+    "question": "Can we enter the pit lane the exact second the full course yellow or safety car screen banner appears?",
+    "gold_articles": [
+      "14.5.2",
+      "14.6.5"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "real",
+    "source_number": 10,
+    "note": "Pit entry closes when 'PREPARE FOR FCY' is posted (14.5.2); closed for the first three SC laps (14.6.5)."
+  },
+  {
+    "id": "v11",
+    "season": "2026",
+    "question": "Is the pit lane speed limit enforced by a hard teleport/invisible wall or does it just give a drive-through?",
+    "gold_articles": [
+      "12.1.4"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "sim",
+    "source_number": 11,
+    "note": "Real answer: 60 kph limit, drive-through in the race for 60-70 kph (12.1.4)."
+  },
+  {
+    "id": "v12",
+    "season": "2026",
+    "question": "What is the exact penalty threshold for speeding in pit lane by just 1 kph?",
+    "gold_articles": [
+      "12.1.4"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "real",
+    "source_number": 12,
+    "note": ""
+  },
+  {
+    "id": "v13",
+    "season": "2026",
+    "question": "Can I serve a stop-and-go penalty during a safety car period?",
+    "gold_articles": [
+      "7.4.9"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "real",
+    "source_number": 13,
+    "note": "Near-duplicate of held-out h07 (drive-through under SC). Paraphrase check only."
+  },
+  {
+    "id": "v14",
+    "season": "2026",
+    "question": "If the safety car is out on the final lap, does the race finish under yellow or do we get an extra lap?",
+    "gold_articles": [
+      "14.6.9"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "real",
+    "source_number": 14,
+    "note": ""
+  },
+  {
+    "id": "v15",
+    "season": "2026",
+    "question": "Can I overtake a car that has spun off into the grass or disconnected while under yellow flags?",
+    "gold_articles": [
+      "14.5.1",
+      "14.6.1"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "real",
+    "source_number": 15,
+    "note": "Ambiguous: FCY allows passing a car with an obvious problem (14.5.1); SC forbids overtaking (14.6.1). Local yellow flags are in Appendix H of the Code, not collected."
+  },
+  {
+    "id": "v16",
+    "season": "2026",
+    "question": "How many incident points or track limit warnings can we accumulate before getting a drive-through?",
+    "gold_articles": [
+      "9.1.2"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "real",
+    "source_number": 16,
+    "note": "Partial: 9.1.2 leaves penalties to the Stewards. Warning counts are set in event bulletins, not collected."
+  },
+  {
+    "id": "v17",
+    "season": "2026",
+    "question": "Do track limit warning counts reset after a certain number of hours or driver swaps?",
+    "gold_articles": [],
+    "answerable": false,
+    "key_facts": [],
+    "wording": "real",
+    "source_number": 17,
+    "note": "Warning counts and resets are in event bulletins, not collected."
+  },
+  {
+    "id": "v19",
+    "season": "2026",
+    "question": "How much can we turn down the engine map to save fuel without losing the battery charging rate?",
+    "gold_articles": [],
+    "answerable": false,
+    "key_facts": [],
+    "wording": "real",
+    "source_number": 19,
+    "note": "Technical regulations / BoP territory, not collected; partly a strategy question."
+  },
+  {
+    "id": "v23",
+    "season": "2026",
+    "question": "Does the game physics engine allow us to change brake pads during a standard wheel swap?",
+    "gold_articles": [
+      "12.2.2"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "sim",
+    "source_number": 23,
+    "note": "Real answer: four mechanics may do any type of operation once refuelling ends (12.2.2 d)."
+  },
+  {
+    "id": "v24",
+    "season": "2026",
+    "question": "Can we use a qualifying setup tire pressure matrix for the first stint if the track temperature drops rapidly?",
+    "gold_articles": [
+      "6.5.7"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "real",
+    "source_number": 24,
+    "note": "Reference pressures come from the tyre supplier; minimum stabilised pressure is monitored (6.5.7)."
+  },
+  {
+    "id": "v26",
+    "season": "2026",
+    "question": "Does headlight flashing count as an automated unsportsmanlike conduct penalty on this platform?",
+    "gold_articles": [
+      "6.4.1"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "sim",
+    "source_number": 26,
+    "note": "Real answer: flashing allowed on track, max 2 s and 4 flashes, none in the pit lane (6.4.1)."
+  },
+  {
+    "id": "v27",
+    "season": "2026",
+    "question": "What happens to our grid position if a driver crashes out of the practice or warmup server?",
+    "gold_articles": [
+      "11.1.3"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "sim",
+    "source_number": 27,
+    "note": "Real answer: gaps on the grid are closed up; cars that can't take their place start from the pit lane (11.1.3)."
+  },
+  {
+    "id": "v28",
+    "season": "2026",
+    "question": "Can a driver swap be initiated while the car is still moving down the pit lane before reaching the box?",
+    "gold_articles": [
+      "12.2.2"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "real",
+    "source_number": 28,
+    "note": "Driver change only with the car stopped, engine off, in its stopping area (12.2.2 b)."
+  },
+  {
+    "id": "v29",
+    "season": "2026",
+    "question": "Is there a teleport-to-pits penalty if we run out of fuel right before the pit entry line?",
+    "gold_articles": [
+      "9.1.4",
+      "9.1.5"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "sim",
+    "source_number": 29,
+    "note": "Real answer: the driver may not push the car and no replenishment on track, both DQ (9.1.4, 9.1.5)."
+  },
+  {
+    "id": "v30",
+    "season": "2026",
+    "question": "How close can we get to the car ahead during a rolling start before the game triggers a false start penalty?",
+    "gold_articles": [
+      "11.2.1"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "sim",
+    "source_number": 30,
+    "note": "Real answer: keep formation tight, keep position until the start line (11.2.1). No distance or false-start penalty is given."
+  }
+]

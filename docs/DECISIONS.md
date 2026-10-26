@@ -246,6 +246,14 @@ The 4% sits in a near-empty gap in the distribution, and it was chosen from that
 
 ---
 
+## D-026: A live tool in Le Mans Ultimate is parked until after the optimiser
+
+*2026-10-26*
+
+Running the optimiser live inside Le Mans Ultimate is a possible later application, not part of the current plan. It comes only after Layers 3 to 5 are built and validated on real WEC data. If it happens, LMU data is game output, kept apart from the Al Kamel timing and never pooled with it, and parameters fitted on real races are ASSUMED in the game until re-estimated from LMU sessions. Until an LMU corpus is collected, questions about game behaviour are refusals or out of scope for the regulation assistant.
+
+---
+
 ## Tools
 
 The rule of thumb is to use a few tools properly rather than a lot of them badly. A tool comes in when a real need shows up.

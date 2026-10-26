@@ -751,3 +751,58 @@ So 2024 is reported separately, and the result rests on 2025 and 2026, two races
 - **It misses slow zones that cost little.** One sector under a slow zone may not move the field's median lap by 4%.
 - **It uses laps after the one being flagged,** so it's a cleaning rule for describing races, not something a team knows at lap t.
 - **The slow-lap rule's reference is still the race median including these periods,** so at a race like Imola 2024 that reference is a little slow. Not changed here.
+
+---
+
+## E-017: Does the hybrid beat BM25 on vague, engineer-style questions?
+
+*2026-10-26 · pre-registered before any retriever ran on these questions*
+
+**Question:** E-011's questions were written after reading the clauses, which favours BM25. On questions written without the regulations to hand, does the hybrid (BM25 + embeddings, reciprocal rank fusion) retrieve the answering clause more often?
+
+**Question set:** `questions_vague.json`. Kaloyan wrote 30 questions without reading the regulations. Claude labelled them from the 2026 clause text before any retriever was run on them:
+
+- 18 answerable: 12 in real-world wording and 6 in sim-racing wording whose real-world rule is in the corpus;
+- 6 that the corpus doesn't answer (pit windows, blue flags, track-limit warning counts, engine maps), kept for refusal tests;
+- 6 about game behaviour or strategy, moved to `routing_vague.json` as routing cases.
+
+**Decision rule, fixed before the run:**
+
+- Primary measure: top-5 hit, question by question, hybrid against BM25, answerable questions only, season filter on.
+- The hybrid becomes the default if both hold:
+  1. on the vague set, it wins more questions than it loses;
+  2. pooled over the held-out set (E-011) and the vague set, a two-sided exact sign test on the questions where they differ gives p < 0.05.
+- Otherwise BM25 stays the default and the hybrid stays a candidate (D-020).
+- Embeddings alone are reported but can't become the default on this run.
+- Real and sim wording are reported separately, as description only.
+
+**Labels:** drafted by Claude and not yet spot-checked by Kaloyan. Any label changed after the run is logged here, and the run repeated.
+
+**Found** (run `20261026T125420Z`; the original and held-out rows reproduce E-011 exactly):
+
+| Set | Retriever | recall@1 | recall@3 | recall@5 |
+|---|---|---:|---:|---:|
+| Vague (18) | BM25 | 4 | 9 | 9 |
+| Vague (18) | Embeddings | 2 | 7 | 13 |
+| Vague (18) | Hybrid | 7 | 9 | 11 |
+
+| Hybrid against BM25, top 5 | Hybrid wins | BM25 wins |
+|---|---:|---:|
+| Vague | 3 | 1 |
+| Held-out (E-011) | 2 | 0 |
+| Pooled | 5 | 1 |
+
+- **By the rule, BM25 stays the default.** Condition 1 holds (3 against 1). Condition 2 fails: 5 against 1 gives p = 0.22. That means the hybrid was not shown better, not that the two are equal. With 6 disagreements the test could only pass at 6 to 0.
+- **BM25 found the clause in the top 5 for 9 of 18 vague questions, against 27 of 30 held-out.** The sets also differ in author, labeller, how many articles count as gold (6 of 18 vague questions have several, against none held-out) and topic: 12.2.2 is gold for 5 of 18. So the drop can't be put down to wording alone, and those 5 questions move together, so the effective n is below 18.
+- **Embeddings alone hit more often at rank 5 (13 of 18) but less often at ranks 1 and 3** (2 and 7). All 5 of its wins over BM25 sit at ranks 3 to 5, and 3 of them have several gold articles. The 10-of-12 on real-wording questions is one of about 27 slices looked at after the results, so it's a question for a fresh set, not a finding.
+- **Long chunks:** 12.2.2 is 727 tokens and the model reads the first 512. One embeddings miss (v23) has its answer past that limit; another (v07) does not, so dilution of a long chunk fits as well as truncation. Embedding the sub-clauses separately would test this without new questions.
+- **Missed by all three:** v07 (tyres and fuel at once), v16 (track-limit warnings), v29 (out of fuel before pit entry).
+- **Sensitivity:** with the two partial questions (v04, v16) counted as unanswerable, recall@5 is BM25 9, embeddings 12, hybrid 11 out of 16, and the hybrid's 3 against 1 is unchanged.
+
+**What it doesn't show:**
+
+- **Every label is provisional.** One labeller (Claude), not yet checked. Kaloyan's check happens after the results exist, so the rules for changing a label are fixed here first: a label changes only if the gold article doesn't answer the question or another article answers it better. He checks with the retriever ranks hidden. Results are reported before and after any change, under the same decision rule.
+- **The pooled test includes the held-out 2 to 0, part of the pattern that suggested this test (D-020).** That tilts it towards a pass, and it still failed. A future rule should be tested on a set that played no part in proposing it.
+- **18 answerable questions from one author.** One question moves recall@5 by about 6 points.
+
+**Reviewed by** the statistical-reviewer agent before reporting. It kept the decision and corrected the wording of the recall-drop and embedding claims, and the truncation explanation.

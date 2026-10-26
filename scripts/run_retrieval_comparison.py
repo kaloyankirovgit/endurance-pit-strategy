@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare BM25, embeddings and a hybrid on the original and the held-out question sets."""
+"""Compare BM25, embeddings and a hybrid on the original, held-out and vague question sets."""
 from __future__ import annotations
 
 import json
@@ -20,6 +20,7 @@ def main() -> None:
     question_sets = {
         "original": json.loads((EVAL_DIR / "questions.json").read_text()),
         "heldout": json.loads((EVAL_DIR / "questions_heldout.json").read_text()),
+        "vague": json.loads((EVAL_DIR / "questions_vague.json").read_text()),
     }
     bm25 = BM25(chunks)
     embeddings = EmbeddingRetriever(chunks, INTERIM_DIR)

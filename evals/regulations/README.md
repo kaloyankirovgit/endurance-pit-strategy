@@ -65,6 +65,18 @@ First run, 2026-10-23 (full write-up in E-009 of `docs/EXPERIMENT_LOG.md`):
 
 On the held-out set the differences come down to a few questions, which 30 can't settle, so BM25 stays the default (D-020).
 
+## Vague questions (E-017)
+
+`questions_vague.json` holds 30 questions written without the regulations to hand: 18 answerable, 6 the corpus doesn't answer (kept for refusal tests), and 6 about game behaviour or strategy, moved to `routing_vague.json`. The labels are provisional until checked.
+
+| Retriever | recall@1 | recall@3 | recall@5 (of 18) |
+|---|---:|---:|---:|
+| BM25 | 4 | 9 | 9 |
+| Embeddings | 2 | 7 | 13 |
+| Hybrid | 7 | 9 | 11 |
+
+The switching rule was fixed before the run. The hybrid won 3 questions to BM25's 1 here, but pooled with the held-out set (5 to 1) the sign test gives p = 0.22, so BM25 stays the default.
+
 ## What it can't show
 
 - 30 hand-written questions from one author is a small set. One question moves recall by about 3 points.

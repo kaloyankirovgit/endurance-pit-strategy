@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from endurance_strategy.rag.evaluate import evaluate, season_variants
+from endurance_strategy.rag.evaluate import compare_hits, evaluate, season_variants, sign_test
 from endurance_strategy.rag.retrieve import BM25, tokenise
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -74,3 +74,19 @@ def test_question_set_is_well_formed():
     assert len({q["id"] for q in questions}) == len(questions)
     for q in questions:
         assert bool(q["gold_articles"]) == q["answerable"]
+
+
+def test_sign_test_matches_hand_computed_binomial_tails():
+    assert sign_test(5, 0) == 2 / 32
+    assert sign_test(5, 1) == 2 * 7 / 64
+    assert sign_test(1, 5) == sign_test(5, 1)
+    assert sign_test(0, 0) == 1.0
+    assert sign_test(3, 3) == 1.0
+
+
+def test_compare_hits_counts_only_questions_where_the_two_disagree():
+    result = lambda ranks: {"per_question": [{"id": i, "rank": r} for i, r in enumerate(ranks)]}
+    challenger = result([1, 4, None, 6, 2])
+    baseline = result([None, None, 3, None, 1])
+    out = compare_hits(challenger, baseline, k=5)
+    assert (out["wins"], out["losses"], out["questions"]) == (2, 1, 5)

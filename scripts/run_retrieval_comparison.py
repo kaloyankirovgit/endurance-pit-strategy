@@ -8,7 +8,7 @@ from pathlib import Path
 
 from endurance_strategy.paths import INTERIM_DIR
 from endurance_strategy.rag.embed import DEFAULT_MODEL, EmbeddingRetriever, HybridRetriever
-from endurance_strategy.rag.evaluate import evaluate
+from endurance_strategy.rag.evaluate import compare_hits, evaluate, sign_test
 from endurance_strategy.rag.retrieve import BM25
 
 EVAL_DIR = Path(__file__).resolve().parents[1] / "evals" / "regulations"
@@ -38,6 +38,18 @@ def main() -> None:
             result = evaluate(retriever, questions)
             report["results"][f"{set_name}/{name}"] = result
             print(f"{set_name:9s} {name:10s}", {k: v for k, v in result.items() if k.startswith("recall") or k == "questions"})
+    report["paired_top5"] = {}
+    for set_name in question_sets:
+        for challenger in ("hybrid", "embeddings"):
+            pair = compare_hits(report["results"][f"{set_name}/{challenger}"], report["results"][f"{set_name}/bm25"])
+            report["paired_top5"][f"{set_name}/{challenger}_vs_bm25"] = pair
+            print(f"{set_name:9s} {challenger} vs bm25, top 5:", pair)
+    # The E-017 decision rule: hybrid against BM25, pooled over the held-out and vague sets.
+    pooled = [report["paired_top5"][f"{s}/hybrid_vs_bm25"] for s in ("heldout", "vague")]
+    wins, losses = sum(p["wins"] for p in pooled), sum(p["losses"] for p in pooled)
+    report["e017_rule"] = {"vague_wins_exceed_losses": pooled[1]["wins"] > pooled[1]["losses"],
+                           "pooled_wins": wins, "pooled_losses": losses, "pooled_sign_test_p": sign_test(wins, losses)}
+    print("E-017 rule:", report["e017_rule"])
     results = EVAL_DIR / "results"
     results.mkdir(exist_ok=True)
     (results / f"{report['timestamp_utc']}_comparison.json").write_text(json.dumps(report, indent=2))

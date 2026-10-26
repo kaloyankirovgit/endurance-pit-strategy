@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from math import comb
 from statistics import median
 
 from endurance_strategy.rag.retrieve import BM25
@@ -58,6 +59,25 @@ def evaluate(retriever: BM25, questions: list[dict], ks: tuple[int, ...] = (1, 3
         "top1_right_article_wrong_season": sum(r["top_wrong_season_same_article"] for r in per_question),
         "per_question": per_question,
     }
+
+
+def sign_test(wins: int, losses: int) -> float:
+    """Two-sided exact sign test on the questions where two retrievers disagree (ties dropped)."""
+    n = wins + losses
+    if n == 0:
+        return 1.0
+    tail = sum(comb(n, i) for i in range(min(wins, losses) + 1)) / 2 ** n
+    return min(1.0, 2 * tail)
+
+
+def compare_hits(challenger: dict, baseline: dict, k: int = 5) -> dict:
+    """Question by question: how often the challenger hits in the top k where the baseline misses, and the reverse."""
+    base = {r["id"]: r["rank"] for r in baseline["per_question"]}
+    hit = lambda rank: rank is not None and rank <= k
+    pairs = [(hit(r["rank"]), hit(base[r["id"]])) for r in challenger["per_question"]]
+    wins = sum(c and not b for c, b in pairs)
+    losses = sum(b and not c for c, b in pairs)
+    return {"k": k, "questions": len(pairs), "wins": wins, "losses": losses, "sign_test_p": sign_test(wins, losses)}
 
 
 def top_scores(retriever: BM25, questions: list[dict]) -> dict:

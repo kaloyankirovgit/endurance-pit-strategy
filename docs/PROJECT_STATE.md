@@ -35,15 +35,15 @@ Layer 1 is done and the race order is now checked against the official classific
 - A live tool in Le Mans Ultimate is parked until after the optimiser (D-026).
 - Field-wide slow periods are flagged (E-016, D-025). They catch a drying track the rain sensor misses, slow zones and local yellows. They remove 695 laps from the clean set (now 138,189), leave the 18-race traffic figures unchanged and fix most of E-015's loose-rule placebo failures.
 - The project is described as a DAG, generated into `docs/LINEAGE.md` and the README. Tests tie it to real files, functions and imports, and one enforces that numerical code can't import the LLM layer (D-028).
-- A second retriever test is pre-registered, with 43 questions written by a blind racer agent and labels drafted (E-019, D-027). BM25 stays the default until it runs.
-- 190 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
+- The second retriever test has run on 43 questions from a blind racer agent, 33 answerable (E-019). The hybrid won 4 of the 5 questions that differed, meeting a looser rule set after E-017 failed, so it becomes the default once the answer eval has run on it (D-029). It wasn't shown better (p = 0.375). The answer path still uses BM25 for now.
+- 191 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
 
 ## Next
 
 1. **Pace, stints and pit loss (Layer 3)**
    - The stint-age effect (fuel and tyres together, D-005), pit loss from in-laps and out-laps against normal pace, and pit-lane time distributions, each checked on held-out races.
-2. **Retriever test (E-019)**
-   - Waiting on Kaloyan checking the drafted labels. Then run it.
+2. **Switch the answers to the hybrid (D-029)**
+   - Run the answer eval on the fresh questions with the hybrid, then change the default.
 3. **Regulations, remaining checks**
    - Check refusal text in code, like answers: a refusal that paraphrases a clause is shown unverified (E-018).
    - Cut the checker's false positives: an article number named but not cited, and a number derived from a clause's rule (E-018).

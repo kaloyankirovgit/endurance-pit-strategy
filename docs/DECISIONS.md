@@ -284,6 +284,16 @@ The same test enforces one rule that was only written down before: no numerical 
 
 ---
 
+## D-029: The hybrid becomes the default retriever, once the answer eval has run on it
+
+*2026-11-09 · from E-019*
+
+E-019's rule was met: 5 questions differ at the top 5 and the hybrid wins 4 of them. So the hybrid replaces BM25 as the default. This is the outcome of a decision rule that was set after E-017 failed (D-027), and the sign test on the same comparison gives p = 0.375, so the wording stays "chosen by the rule, not shown better". On the 22 questions with a single gold article the split was 3 to 0, below the rule's gate of 4.
+
+The switch isn't made until the answer eval has run on the fresh questions with the hybrid, because the answer figures so far were all measured on BM25. `fastembed` moves from the comparison only to the answering path at that point.
+
+---
+
 ## Tools
 
 The rule of thumb is to use a few tools properly rather than a lot of them badly. A tool comes in when a real need shows up.

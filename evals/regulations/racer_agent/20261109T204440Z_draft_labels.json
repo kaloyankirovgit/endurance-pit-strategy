@@ -1,0 +1,627 @@
+[
+ {
+  "wording": "racer",
+  "position": 0,
+  "gold_articles": [
+   "13.2.3",
+   "13.2.5"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 1,
+  "gold_articles": [
+   "14.5.2"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 2,
+  "gold_articles": [
+   "13.2.3"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 3,
+  "gold_articles": [
+   "13.2.3"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 4,
+  "gold_articles": [],
+  "answerable": false
+ },
+ {
+  "wording": "racer",
+  "position": 5,
+  "gold_articles": [],
+  "answerable": false
+ },
+ {
+  "wording": "racer",
+  "position": 6,
+  "gold_articles": [
+   "12.2.2"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 7,
+  "gold_articles": [
+   "12.2.2"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 8,
+  "gold_articles": [
+   "14.5.1"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 9,
+  "gold_articles": [],
+  "answerable": false
+ },
+ {
+  "wording": "racer",
+  "position": 10,
+  "gold_articles": [
+   "6.5.4"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 11,
+  "gold_articles": [
+   "14.5.1",
+   "14.5.2",
+   "14.7.1",
+   "14.7.2"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 12,
+  "gold_articles": [
+   "14.6.5"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 13,
+  "gold_articles": [
+   "12.2.2"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 14,
+  "gold_articles": [
+   "14.6.5"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 15,
+  "gold_articles": [
+   "14.6.3",
+   "14.6.4"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 16,
+  "gold_articles": [
+   "6.5.4",
+   "12.2.2"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 17,
+  "gold_articles": [
+   "6.5.4"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 18,
+  "gold_articles": [
+   "14.5.1"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 19,
+  "gold_articles": [],
+  "answerable": false
+ },
+ {
+  "wording": "racer",
+  "position": 20,
+  "gold_articles": [
+   "12.1.4"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 21,
+  "gold_articles": [
+   "9.1.3"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 22,
+  "gold_articles": [
+   "12.1.4"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 23,
+  "gold_articles": [
+   "6.5.4",
+   "6.5.8"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 24,
+  "gold_articles": [
+   "9.1.2"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 25,
+  "gold_articles": [
+   "7.2.2",
+   "9.1.11"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 26,
+  "gold_articles": [
+   "9.1.2"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 27,
+  "gold_articles": [
+   "12.3.2",
+   "9.1.3"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 28,
+  "gold_articles": [
+   "7.2.2",
+   "9.1.11"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 29,
+  "gold_articles": [
+   "9.1.2"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 30,
+  "gold_articles": [
+   "7.2.2",
+   "9.1.11"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 31,
+  "gold_articles": [
+   "7.4.10"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 32,
+  "gold_articles": [
+   "12.3.2",
+   "9.1.3"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 33,
+  "gold_articles": [
+   "12.3.2",
+   "9.1.6"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 35,
+  "gold_articles": [
+   "15.1.4"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 36,
+  "gold_articles": [
+   "14.3.1"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 37,
+  "gold_articles": [
+   "14.6.4",
+   "14.6.12"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 38,
+  "gold_articles": [
+   "14.3.1",
+   "14.3.2"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "racer",
+  "position": 39,
+  "gold_articles": [
+   "6.2.1"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 0,
+  "gold_articles": [],
+  "answerable": false
+ },
+ {
+  "wording": "fan",
+  "position": 1,
+  "gold_articles": [
+   "12.3.2",
+   "9.1.5"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 2,
+  "gold_articles": [],
+  "answerable": false
+ },
+ {
+  "wording": "fan",
+  "position": 3,
+  "gold_articles": [
+   "13.2.3"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 4,
+  "gold_articles": [],
+  "answerable": false
+ },
+ {
+  "wording": "fan",
+  "position": 5,
+  "gold_articles": [
+   "13.2.3"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 6,
+  "gold_articles": [
+   "13.2.3"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 7,
+  "gold_articles": [
+   "12.2.2"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 8,
+  "gold_articles": [
+   "12.2.2"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 9,
+  "gold_articles": [
+   "14.6.5"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 10,
+  "gold_articles": [
+   "12.2.2"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 11,
+  "gold_articles": [
+   "12.3.2",
+   "9.1.3"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 12,
+  "gold_articles": [
+   "6.5.4"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 13,
+  "gold_articles": [
+   "6.2.1"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 14,
+  "gold_articles": [
+   "6.5.4"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 15,
+  "gold_articles": [
+   "14.5.2",
+   "14.6.5",
+   "14.3.1"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 16,
+  "gold_articles": [
+   "12.3.2",
+   "9.1.3"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 17,
+  "gold_articles": [
+   "7.2.2",
+   "9.1.11"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 18,
+  "gold_articles": [],
+  "answerable": false
+ },
+ {
+  "wording": "fan",
+  "position": 19,
+  "gold_articles": [
+   "7.2.2",
+   "9.1.11"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 20,
+  "gold_articles": [
+   "14.6.5"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 22,
+  "gold_articles": [
+   "14.6.1"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 23,
+  "gold_articles": [],
+  "answerable": false
+ },
+ {
+  "wording": "fan",
+  "position": 25,
+  "gold_articles": [
+   "6.5.4"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 26,
+  "gold_articles": [
+   "12.3.1",
+   "15.1.4"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 27,
+  "gold_articles": [
+   "6.5.4",
+   "14.1.1"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 28,
+  "gold_articles": [
+   "9.1.2"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 29,
+  "gold_articles": [
+   "14.3.1",
+   "14.3.2"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 30,
+  "gold_articles": [
+   "12.3.2",
+   "9.1.3"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 31,
+  "gold_articles": [
+   "15.1.4"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 32,
+  "gold_articles": [
+   "14.3.1"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 33,
+  "gold_articles": [
+   "14.5.1"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 34,
+  "gold_articles": [],
+  "answerable": false
+ },
+ {
+  "wording": "fan",
+  "position": 35,
+  "gold_articles": [
+   "6.5.4",
+   "6.5.8"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 36,
+  "gold_articles": [
+   "15.1.1",
+   "15.1.4"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 37,
+  "gold_articles": [
+   "6.4.6"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 38,
+  "gold_articles": [
+   "15.1.5",
+   "15.1.6"
+  ],
+  "answerable": true
+ },
+ {
+  "wording": "fan",
+  "position": 39,
+  "gold_articles": [
+   "9.1.12"
+  ],
+  "answerable": true
+ }
+]

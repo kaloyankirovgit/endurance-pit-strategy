@@ -10,7 +10,7 @@ from pathlib import Path
 
 from endurance_strategy.paths import INTERIM_DIR
 from endurance_strategy.rag.embed import DEFAULT_MODEL, EmbeddingRetriever, HybridRetriever
-from endurance_strategy.rag.evaluate import compare_hits, e019_decision, evaluate
+from endurance_strategy.rag.evaluate import compare_hits, e019_decision, evaluate, gold_ids
 from endurance_strategy.rag.retrieve import BM25
 
 EVAL_DIR = Path(__file__).resolve().parents[1] / "evals" / "regulations"
@@ -30,14 +30,41 @@ def ranks(result: dict) -> dict:
     return {row["id"]: row["rank"] for row in result["per_question"]}
 
 
-def distinct_articles(result: dict, baseline: dict, questions: list[dict]) -> dict:
-    """Wins and losses at top 5, counting questions that share their gold articles once."""
-    gold = {q["id"]: tuple(sorted(q["gold_articles"])) for q in questions}
-    hit = lambda rank: rank is not None and rank <= 5
+def hit_rows(result: dict, baseline: dict, k: int) -> tuple[list[str], list[str]]:
+    hit = lambda rank: rank is not None and rank <= k
     base = ranks(baseline)
-    wins = {gold[r["id"]] for r in result["per_question"] if hit(r["rank"]) and not hit(base[r["id"]])}
-    losses = {gold[r["id"]] for r in result["per_question"] if hit(base[r["id"]]) and not hit(r["rank"])}
-    return {"wins": len(wins), "losses": len(losses)}
+    wins = [r["id"] for r in result["per_question"] if hit(r["rank"]) and not hit(base[r["id"]])]
+    losses = [r["id"] for r in result["per_question"] if hit(base[r["id"]]) and not hit(r["rank"])]
+    return wins, losses
+
+
+def distinct_counts(result: dict, baseline: dict, questions: list[dict], k: int) -> dict:
+    """Wins and losses counting each set of gold articles once, and each article named on those questions once."""
+    gold = {q["id"]: tuple(sorted(q["gold_articles"])) for q in questions}
+    wins, losses = hit_rows(result, baseline, k)
+    return {
+        "k": k,
+        "gold_sets": {"wins": len({gold[i] for i in wins}), "losses": len({gold[i] for i in losses})},
+        "gold_articles": {"wins": len({a for i in wins for a in gold[i]}), "losses": len({a for i in losses for a in gold[i]})},
+    }
+
+
+def all_gold_in_top5(result: dict, questions: list[dict]) -> dict:
+    gold = {q["id"]: gold_ids(q) for q in questions}
+    return {r["id"]: gold[r["id"]] <= set(r["retrieved"][:5]) for r in result["per_question"]}
+
+
+def label_sensitivity(results: dict, retrievers: dict, questions: list[dict]) -> dict:
+    """Reported beside the rule, not part of it: single-gold questions only, and requiring every gold article."""
+    answerable = [q for q in questions if q["answerable"]]
+    single = [q for q in answerable if len(q["gold_articles"]) == 1]
+    hybrid, bm25 = all_gold_in_top5(results["hybrid"], questions), all_gold_in_top5(results["bm25"], questions)
+    return {
+        "multi_gold_questions": len(answerable) - len(single),
+        "single_gold_only": compare_hits(evaluate(retrievers["hybrid"], single), evaluate(retrievers["bm25"], single)),
+        "all_gold_required": {"wins": sum(hybrid[i] and not bm25[i] for i in hybrid),
+                              "losses": sum(bm25[i] and not hybrid[i] for i in hybrid)},
+    }
 
 
 def main() -> None:
@@ -83,7 +110,8 @@ def main() -> None:
         "reproduced": EARLIER_RUN.name,
         "results": results,
         "hybrid_vs_bm25": paired,
-        "hybrid_vs_bm25_distinct_articles_top5": distinct_articles(results["hybrid"], results["bm25"], questions),
+        "hybrid_vs_bm25_distinct": [distinct_counts(results["hybrid"], results["bm25"], questions, k) for k in KS],
+        "label_sensitivity": label_sensitivity(results, retrievers, questions),
         "by_wording_descriptive": by_wording,
         "decision": e019_decision(wins, losses),
     }
@@ -91,7 +119,8 @@ def main() -> None:
     for name, result in results.items():
         print(f"{name:10s}", {key: result[key] for key in ("questions", "recall@1", "recall@3", "recall@5")})
     print("paired:", paired)
-    print("distinct articles:", report["hybrid_vs_bm25_distinct_articles_top5"])
+    print("distinct:", report["hybrid_vs_bm25_distinct"])
+    print("label sensitivity:", report["label_sensitivity"])
     print("by wording:", json.dumps(by_wording))
     base = ranks(results["bm25"])
     for row in results["hybrid"]["per_question"]:

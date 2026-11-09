@@ -851,7 +851,7 @@ So 2024 is reported separately, and the result rests on 2025 and 2026, two races
 
 ## E-019: On fresh questions, does the hybrid win more often than it loses against BM25?
 
-*2026-11-09 · pre-registered and committed before any of its questions were written · not yet run*
+*2026-11-09 · pre-registered and committed before any of its questions were written · run the same day*
 
 **Question:** which retriever should be the default? E-017's rule was not met. This is a second test under a looser rule, chosen after that failure (D-027). It can't show the hybrid is better.
 
@@ -876,7 +876,7 @@ So 2024 is reported separately, and the result rests on 2025 and 2026, two races
 
 - The agent wrote 80 questions. 3 were near-duplicates. Of the other 77, 43 were kept: 22 racer and 21 fan, 33 answerable and 10 not.
 - **That's 43 questions, not the 50 planned.** The questions cluster on a few topics (driving time, pitting under yellow, tyres while refuelling), so the 2-per-article cap ran through the reserve. The size rule of at least 30 answerable is met, so no more were written.
-- The amendment didn't say how the cap applies across the two groups. It was applied with racer and fan alternating by position, main set first, and a question is dropped if any of its gold articles is already at 2. This was chosen after the labels were drafted and before any retriever ran.
+- The amendment didn't say how the cap applies across the two groups. It was applied with racer and fan alternating by position, main set first, and a question is dropped if any of its gold articles is already at 2. This was chosen after the labels were drafted and before any retriever ran. Its effect is UNKNOWN: 4 of the 5 questions that differ touch an article at the cap, and losing 2 of them would have made the outcome inconclusive. The draft labels for all 77 candidates are in `evals/regulations/racer_agent/` so the cap can be re-applied, but only the 43 kept were checked by Kaloyan.
 - Labels came from reading 6.2, 6.5, 7.2, 7.4, 9.1, 12, 13, 14 and 15.1 of the 2026 text in full, plus 1.4.1, 3.1.1, 4.1.3, 4.3.1, 4.3.2, 6.1, 6.3, 6.4.6, 6.6, 9.2.1 and Appendix 4 (1.4.1, 6.3.1 and 6.3.2 only to their first 1,800 characters). "Not answered" therefore means not in those parts. Appendix 4 lost its table's first column in extraction, so it couldn't be used as a source.
 - **Label check:** Kaloyan confirmed on 2026-11-09 that he checked every label on the sheet and changed none. The sheet showed the question and the article text, without Claude's notes. The tick boxes on it were left blank, so the record of the check is that statement. The questions and labels were already committed (`4da29f0`).
 
@@ -908,3 +908,26 @@ Under a flat prior updated on E-017's direction, adoption is about 35% to 76% ac
 - The labels again come from Claude.
 - "No keyword search while labelling" can only be checked from the saved transcript.
 - Reviewed by the statistical-reviewer agent before being fixed. It rejected the first version of this rule (wins at least equal to losses, ties to the hybrid).
+
+**Found** (run `20261109T210117Z`). The chunk hash, `fastembed` version and model snapshot were checked in code, and every question-level rank from the E-017 rerun (`20261026T144012Z`) reproduced.
+
+| 33 answerable questions | recall@1 | recall@3 | recall@5 |
+|---|---:|---:|---:|
+| BM25 | 15 | 17 | 24 |
+| Embeddings | 16 | 22 | 26 |
+| Hybrid | 18 | 24 | 27 |
+
+| Hybrid against BM25 | Hybrid wins | BM25 wins | Exact sign test p (description only) |
+|---|---:|---:|---:|
+| Top 1 | 6 | 3 | 0.51 |
+| Top 3 | 8 | 1 | 0.039 |
+| **Top 5 (the primary measure)** | **4** | **1** | **0.375** |
+
+- **By the rule, the hybrid becomes the default.** 5 questions differ, which is at least 4, and the hybrid wins more than it loses. By distinct gold set the split is 6-3, 8-1 and 4-1 at k = 1, 3 and 5. By individual gold article named on those questions it is 9-3, 11-1 and 5-2.
+- **That's a decision, not a finding that the hybrid is better.** The rule was chosen after E-017 failed, and 4 to 1 on 33 questions is compatible with no difference (p = 0.375). Recall@5 moved by 3 questions of 33.
+- **The top-3 figure isn't a result to quote.** It's one of three cut-offs, it wasn't the primary measure, and p = 0.039 would not survive correction for looking at three.
+- **By who is asking (description only):** racer 16 of 18 for the hybrid against 14 of 18 for BM25 (2 wins, 0 losses). Fan 11 of 15 against 10 of 15 (2 wins, 1 loss). Embeddings alone found 12 of 15 fan questions, one more than the hybrid. Neither subset can carry a claim.
+- **The 5 questions that differ:** the hybrid hits f05 (13.2.3, rank 3), f15 (6.5.4, rank 4), f32 (12.3.1 only, rank 2) and f39 (6.4.6, rank 5). BM25 hits f04 (12.3.2 only, rank 5).
+- **The result leans on the questions with several gold articles.** 11 of the 33 have several, and any one in the top 5 counts as a hit. On the 22 with a single gold article the split is 3 to 0, which the rule would call inconclusive. Requiring every gold article in the top 5 gives 6 to 0. So multi-gold labels don't favour the hybrid, but passing the 4-question gate depends on them.
+- **What this doesn't show:** every question came from one model, and Claude drafted the labels. Kaloyan checked them without notes, but with BM25's misses in mind from earlier work. The hybrid contains BM25, so this measures what adding embeddings changes, and it says nothing about real users or sim-racing wording alone.
+- **Not applied yet.** `rag/answer.py` and the answer eval still use BM25. As fixed above, the E-010, E-012 and E-018 figures don't carry over, and the answer eval runs on the fresh set before the switch is made.

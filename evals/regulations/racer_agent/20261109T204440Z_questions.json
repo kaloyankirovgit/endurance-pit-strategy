@@ -1,9 +1,7 @@
 {
   "timestamp_utc": "20261109T204440Z",
   "canary": {
-    "output": {
-      "mentions": "\"kaloyan12k@gmail.com\" (email address); \"Claude Agent SDK\" (software project); \"Claude Code\" (software project); \"git\" (software project); \"zsh\" (software project); \"Darwin\" (software project); \"Python\" (software project); \"json.py\" (file name)"
-    },
+    "project_terms_visible": [],
     "models": [
       "claude-opus-5-5"
     ]

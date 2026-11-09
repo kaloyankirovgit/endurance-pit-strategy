@@ -24,8 +24,8 @@ def main() -> None:
     args = parser.parse_args()
 
     canary = run_canary()
-    print("canary:", canary)
     leaks = leaked_terms(canary["output"]["mentions"])
+    print("canary leaked terms:", leaks)
     if leaks:
         raise SystemExit(f"not blind, the run can see: {leaks}")
     if args.canary_only:
@@ -36,7 +36,7 @@ def main() -> None:
     earlier = earlier_answerable()
     report = {
         "timestamp_utc": datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ"),
-        "canary": canary,
+        "canary": {"project_terms_visible": leaks, "models": canary["models"]},
         "personas": PERSONAS,
         "models": sorted({model for group in runs.values() for run in group for model in run["models"]}),
         "earlier_answerable_questions": len(earlier),

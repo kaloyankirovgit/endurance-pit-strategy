@@ -1,0 +1,511 @@
+{
+  "timestamp_utc": "20261109T204440Z",
+  "canary": {
+    "output": {
+      "mentions": "\"kaloyan12k@gmail.com\" (email address); \"Claude Agent SDK\" (software project); \"Claude Code\" (software project); \"git\" (software project); \"zsh\" (software project); \"Darwin\" (software project); \"Python\" (software project); \"json.py\" (file name)"
+    },
+    "models": [
+      "claude-opus-5-5"
+    ]
+  },
+  "personas": {
+    "racer": [
+      "You are an amateur driver sharing a GT3 car in a six-hour FIA WEC race, and you've just climbed in for your stint.",
+      "You are a professional driver in a Hypercar, part way through an FIA WEC race.",
+      "You are a sim racer in a long online endurance race, driving with friends in a game that copies the FIA WEC rules.",
+      "You are a sim racer who only knows sprint races and has just joined an online league that runs the FIA WEC rules."
+    ],
+    "fan": [
+      "You are at your first FIA WEC race, sitting in the grandstand at the 6 Hours of Spa with a friend.",
+      "You have followed the FIA WEC for years and are watching tonight's race on the live stream at home.",
+      "You are a Formula 1 fan who has turned on an FIA WEC race for the first time.",
+      "You are a relative of one of the drivers, watching an FIA WEC race from the hospitality area."
+    ]
+  },
+  "models": [
+    "claude-opus-5-5"
+  ],
+  "earlier_answerable_questions": 78,
+  "questions": [
+    {
+      "wording": "racer",
+      "position": 0,
+      "question": "I'm the Bronze in this car, so how long do I actually have to be behind the wheel, and what happens to us if I come up short on my minimum drive time?",
+      "role": "main"
+    },
+    {
+      "wording": "racer",
+      "position": 1,
+      "question": "If I've got a full course yellow coming and I'm right at the pit entry, can I still dive in, or is the pit lane closed until the zone's sorted?",
+      "role": "main"
+    },
+    {
+      "wording": "racer",
+      "position": 2,
+      "question": "How long can one of us stay in the car before we have to swap, and is there a minimum amount of time each driver has to do over the whole race?",
+      "role": "main"
+    },
+    {
+      "wording": "racer",
+      "position": 3,
+      "question": "How long does each driver have to be in the car, and is there a limit on how long one person can drive before they have to swap out?",
+      "role": "main"
+    },
+    {
+      "wording": "racer",
+      "position": 4,
+      "question": "Is there a limit on how long any one of us can drive in a row or in total over the six hours?",
+      "role": "main"
+    },
+    {
+      "wording": "racer",
+      "position": 5,
+      "question": "How long can I stay in the car before I've got to hand over, and what happens if we go over my max driving time?",
+      "role": "main"
+    },
+    {
+      "wording": "racer",
+      "position": 6,
+      "question": "When we come in for a stop, can the guys change tyres and put fuel in at the same time, or does one have to wait for the other?",
+      "role": "main"
+    },
+    {
+      "wording": "racer",
+      "position": 7,
+      "question": "When we come in for a stop, can we change tires and refuel at the same time, or does one have to wait for the other?",
+      "role": "main"
+    },
+    {
+      "wording": "racer",
+      "position": 8,
+      "question": "If the Full Course Yellow comes out while I'm mid-straight, what speed do I have to get down to, and how quickly do I have to do it?",
+      "role": "main"
+    },
+    {
+      "wording": "racer",
+      "position": 9,
+      "question": "If I run over the virtual energy allowance for a stint, what kind of penalty are we looking at and do they tell me straight away?",
+      "role": "main"
+    },
+    {
+      "wording": "racer",
+      "position": 10,
+      "question": "How many sets of tyres do we actually get for the race, and what happens if we run out because of punctures?",
+      "role": "main"
+    },
+    {
+      "wording": "racer",
+      "position": 11,
+      "question": "What's the deal with the Virtual Safety Car or full course yellow, like what speed do I have to hold and can I still pit while it's out?",
+      "role": "main"
+    },
+    {
+      "wording": "racer",
+      "position": 12,
+      "question": "When the safety car's out, can I still come into the pits for fuel, or is the pit lane shut until they say so?",
+      "role": "main"
+    },
+    {
+      "wording": "racer",
+      "position": 13,
+      "question": "When I come in for a stop, how many guys can work on the car at once, and can they change tyres while it's being refuelled?",
+      "role": "main"
+    },
+    {
+      "wording": "racer",
+      "position": 14,
+      "question": "If the safety car comes out, can we still pit, or is the pit lane closed until the field is bunched up behind it?",
+      "role": "main"
+    },
+    {
+      "wording": "racer",
+      "position": 15,
+      "question": "If the safety car comes out, how does that work with the different classes all mixed together, and can lapped cars get their laps back?",
+      "role": "main"
+    },
+    {
+      "wording": "racer",
+      "position": 16,
+      "question": "How many sets of tyres are we allowed for the race, and can the crew change them at the same time as they're refuelling?",
+      "role": "main"
+    },
+    {
+      "wording": "racer",
+      "position": 17,
+      "question": "How many tyres are we allowed for this race, and if I pick up a puncture does that replacement come out of our allocation?",
+      "role": "main"
+    },
+    {
+      "wording": "racer",
+      "position": 18,
+      "question": "What's the difference between a full course yellow and a slow zone, and how fast are we allowed to go in each one?",
+      "role": "main"
+    },
+    {
+      "wording": "racer",
+      "position": 19,
+      "question": "When a Hypercar is coming up behind me in a slower class, do I have to move out of the way, or can I just hold my line and let them find a way past?",
+      "role": "main"
+    },
+    {
+      "wording": "racer",
+      "position": 20,
+      "question": "What's the speed limit in the pit lane, and what do I get hit with if I go a little over it?",
+      "role": "main"
+    },
+    {
+      "wording": "racer",
+      "position": 21,
+      "question": "If I go off and get beached in the gravel, can the marshals pull me out and can I carry on racing afterwards?",
+      "role": "main"
+    },
+    {
+      "wording": "racer",
+      "position": 22,
+      "question": "If I go over the pit lane speed limit by just a tiny bit, what's the penalty, and does it change if I keep doing it?",
+      "role": "main"
+    },
+    {
+      "wording": "racer",
+      "position": 23,
+      "question": "Is there a cap on how many tires we can use over the whole race, and what happens if we go over it?",
+      "role": "main"
+    },
+    {
+      "wording": "racer",
+      "position": 24,
+      "question": "If I get all four wheels over the white lines a few times, how many goes do I get before they give me a penalty?",
+      "role": "main"
+    },
+    {
+      "wording": "racer",
+      "position": 25,
+      "question": "If I tap a GT3 while I'm lapping it and it spins, who decides if that's a penalty, and can they just give me a drive-through or does it have to be a stop-and-hold?",
+      "role": "reserve"
+    },
+    {
+      "wording": "racer",
+      "position": 26,
+      "question": "How many times can I run wide past the white lines before I get hit with a penalty, and what does that penalty look like?",
+      "role": "reserve"
+    },
+    {
+      "wording": "racer",
+      "position": 27,
+      "question": "If my car breaks down out on track, am I allowed to fix it myself and get it back to the pits, or is my race over if it needs a tow?",
+      "role": "reserve"
+    },
+    {
+      "wording": "racer",
+      "position": 28,
+      "question": "If I tap a Hypercar or another GT3 and spin them round, what kind of penalty am I looking at, and do I have to give the place back?",
+      "role": "reserve"
+    },
+    {
+      "wording": "racer",
+      "position": 29,
+      "question": "How many times can I put all four wheels over the white lines before I get a penalty, and does the count reset at any point?",
+      "role": "reserve"
+    },
+    {
+      "wording": "racer",
+      "position": 30,
+      "question": "If I punt a slower car off in a corner, who decides if it's my fault, and what kind of penalties can they give me?",
+      "role": "reserve"
+    },
+    {
+      "wording": "racer",
+      "position": 31,
+      "question": "What happens if I get caught speeding in the pit lane or get a penalty near the end, like do I have to come in and serve it or do they just add time to my result?",
+      "role": "reserve"
+    },
+    {
+      "wording": "racer",
+      "position": 32,
+      "question": "Say the car stops out on track with a problem, am I allowed to fix it myself and carry on, or can it get towed back to the garage and rejoin the race?",
+      "role": "reserve"
+    },
+    {
+      "wording": "racer",
+      "position": 33,
+      "question": "If the car stops out on track with a dead hybrid or electrical issue, am I allowed to get out and fix it myself, and can the team talk me through it on the radio?",
+      "role": "reserve"
+    },
+    {
+      "wording": "racer",
+      "position": 34,
+      "question": "If my car breaks down out on track, am I allowed to get it back to the pits somehow, or is my race over if I can't drive it back?",
+      "role": "near_duplicate"
+    },
+    {
+      "wording": "racer",
+      "position": 35,
+      "question": "Do we need to finish a certain distance or be running at the checkered flag to actually get classified and score points?",
+      "role": "reserve"
+    },
+    {
+      "wording": "racer",
+      "position": 36,
+      "question": "What do the different flags and lights mean for me if I see a black and orange flag or a red flag, and what exactly do I have to do when each one comes out?",
+      "role": "reserve"
+    },
+    {
+      "wording": "racer",
+      "position": 37,
+      "question": "During a safety car, when am I allowed to unlap myself, and what happens at the restart if I pass someone before the line?",
+      "role": "reserve"
+    },
+    {
+      "wording": "racer",
+      "position": 38,
+      "question": "If the race gets red flagged, does the clock keep running, and are we allowed to work on the car while we wait for the restart?",
+      "role": "reserve"
+    },
+    {
+      "wording": "racer",
+      "position": 39,
+      "question": "How does the Balance of Performance and the energy limit per stint work, and what happens if I use more energy than I'm allowed?",
+      "role": "reserve"
+    },
+    {
+      "wording": "fan",
+      "position": 0,
+      "question": "Why are there different kinds of cars out there at once, and are the slower ones supposed to move over when the faster ones come up behind them?",
+      "role": "main"
+    },
+    {
+      "wording": "fan",
+      "position": 1,
+      "question": "If a car runs out of fuel or breaks down out on track, can the driver do anything to get it back to the pits, or is their race basically over once they stop?",
+      "role": "main"
+    },
+    {
+      "wording": "fan",
+      "position": 2,
+      "question": "Why are there totally different-looking cars out there at once, and does the faster lot have to do anything special when they come up behind the slower ones, like blue flags in F1?",
+      "role": "main"
+    },
+    {
+      "wording": "fan",
+      "position": 3,
+      "question": "How long is one person actually allowed to stay in the car, and is there a limit on how much each driver has to do or can do over the whole race?",
+      "role": "main"
+    },
+    {
+      "wording": "fan",
+      "position": 4,
+      "question": "How long is one driver allowed to stay in the car before they have to swap with someone else?",
+      "role": "main"
+    },
+    {
+      "wording": "fan",
+      "position": 5,
+      "question": "How long does a driver have to wait before they can get out and swap, and is there a limit on how long one driver can stay in the car during the race?",
+      "role": "main"
+    },
+    {
+      "wording": "fan",
+      "position": 6,
+      "question": "How long does one driver have to stay in the car, and is there a limit on how much of the race one person can drive?",
+      "role": "main"
+    },
+    {
+      "wording": "fan",
+      "position": 7,
+      "question": "When they come in for a pit stop, can they change the tyres and fill up with fuel at the same time, and how many mechanics are allowed to touch the car?",
+      "role": "main"
+    },
+    {
+      "wording": "fan",
+      "position": 8,
+      "question": "When a car comes into the pits, how many mechanics can work on it, and can they change tyres and put fuel in at the same time?",
+      "role": "main"
+    },
+    {
+      "wording": "fan",
+      "position": 9,
+      "question": "When the safety car comes out, are the pits still open, or do cars get penalised for diving in at the wrong time?",
+      "role": "main"
+    },
+    {
+      "wording": "fan",
+      "position": 10,
+      "question": "When they pit, who's actually allowed to work on the car, and can they refuel and change tyres at the same time?",
+      "role": "main"
+    },
+    {
+      "wording": "fan",
+      "position": 11,
+      "question": "If the car breaks down out on the track, is the driver allowed to get out and try to fix it himself, or does someone have to come and tow it?",
+      "role": "main"
+    },
+    {
+      "wording": "fan",
+      "position": 12,
+      "question": "Is there a limit on how many tyres a team can use during the whole six hours?",
+      "role": "main"
+    },
+    {
+      "wording": "fan",
+      "position": 13,
+      "question": "Why do the Hypercars and GT3s all seem to have different power and weight, and can those numbers get changed in the middle of a race?",
+      "role": "main"
+    },
+    {
+      "wording": "fan",
+      "position": 14,
+      "question": "Are they stuck with a set number of tyres for the whole race, or can they just bolt on fresh ones whenever they feel like it?",
+      "role": "main"
+    },
+    {
+      "wording": "fan",
+      "position": 15,
+      "question": "What's the difference between a full yellow, a safety car and a red flag, and are they allowed to pit during those?",
+      "role": "main"
+    },
+    {
+      "wording": "fan",
+      "position": 16,
+      "question": "If a car breaks down out on the track, can the driver get out and try to fix it, or does it have to be towed back to the garage?",
+      "role": "main"
+    },
+    {
+      "wording": "fan",
+      "position": 17,
+      "question": "When a Hypercar hits a GT3 while lapping it, how do the stewards decide who's at fault, and what sort of penalty would they hand out?",
+      "role": "main"
+    },
+    {
+      "wording": "fan",
+      "position": 18,
+      "question": "I keep hearing about a limit on energy per stint, so what actually happens if a car uses more than it's allowed?",
+      "role": "main"
+    },
+    {
+      "wording": "fan",
+      "position": 19,
+      "question": "If two cars bump each other and one spins off, who decides whose fault it was and what kind of punishment can they get?",
+      "role": "main"
+    },
+    {
+      "wording": "fan",
+      "position": 20,
+      "question": "What's the difference between a full safety car and those slow zones, and can cars still go into the pits while they're happening?",
+      "role": "main"
+    },
+    {
+      "wording": "fan",
+      "position": 21,
+      "question": "How many mechanics are allowed to work on the car during a pit stop, and can they change tyres and refuel at the same time?",
+      "role": "near_duplicate"
+    },
+    {
+      "wording": "fan",
+      "position": 22,
+      "question": "If there's a big crash, is it just a normal safety car like F1, and does everyone get to bunch back up behind it?",
+      "role": "main"
+    },
+    {
+      "wording": "fan",
+      "position": 23,
+      "question": "Those big Hypercars and the smaller GT cars are all out there together, so does a slower car have to move over when a faster one comes up behind it?",
+      "role": "main"
+    },
+    {
+      "wording": "fan",
+      "position": 24,
+      "question": "If two cars crash into each other, who decides whose fault it was, and what kind of punishment can they get?",
+      "role": "near_duplicate"
+    },
+    {
+      "wording": "fan",
+      "position": 25,
+      "question": "Is there a cap on how many tyres a team can use in the race, and what happens if they've used them all and pick up a puncture?",
+      "role": "main"
+    },
+    {
+      "wording": "fan",
+      "position": 26,
+      "question": "If a car breaks down and limps back to the garage, can the mechanics spend an hour fixing it and send it back out, and does it still count in the results?",
+      "role": "main"
+    },
+    {
+      "wording": "fan",
+      "position": 27,
+      "question": "What happens if it starts pouring with rain halfway through? Do they have to switch tyres, and who decides if it's too dangerous to carry on?",
+      "role": "reserve"
+    },
+    {
+      "wording": "fan",
+      "position": 28,
+      "question": "What happens if a driver keeps going off the track at the corners, like at Eau Rouge or Raidillon? Do they lose their lap time or get a penalty?",
+      "role": "reserve"
+    },
+    {
+      "wording": "fan",
+      "position": 29,
+      "question": "If the race gets red-flagged, can teams work on the cars while they're stopped, and does the clock keep running?",
+      "role": "reserve"
+    },
+    {
+      "wording": "fan",
+      "position": 30,
+      "question": "If a driver gets stuck out on track, are they allowed to climb out and fix the car themselves, or does that get them thrown out?",
+      "role": "reserve"
+    },
+    {
+      "wording": "fan",
+      "position": 31,
+      "question": "If a car goes into the garage for repairs for an hour and then comes back out, does it still count in the results, or does it have to finish a certain distance to be classified?",
+      "role": "reserve"
+    },
+    {
+      "wording": "fan",
+      "position": 32,
+      "question": "If it starts pouring with rain, can they stop the race with a red flag, and does the clock keep running while everyone waits?",
+      "role": "reserve"
+    },
+    {
+      "wording": "fan",
+      "position": 33,
+      "question": "How does a Full Course Yellow actually work, and what happens to a driver who's caught going over the speed limit during one?",
+      "role": "reserve"
+    },
+    {
+      "wording": "fan",
+      "position": 34,
+      "question": "What's the deal with the hybrid power, can they use it whenever they want or are there rules about when it kicks in, like at certain speeds?",
+      "role": "reserve"
+    },
+    {
+      "wording": "fan",
+      "position": 35,
+      "question": "Is there a limit on how many sets of tyres or how much fuel or energy they can use, and what happens if they go over it?",
+      "role": "reserve"
+    },
+    {
+      "wording": "fan",
+      "position": 36,
+      "question": "When the six hours run out, does the race end right that second, and does a car have to be moving and cross the line to be counted in the results?",
+      "role": "reserve"
+    },
+    {
+      "wording": "fan",
+      "position": 37,
+      "question": "If a car's lights stop working at night or a bit of bodywork is hanging off, will race control black-and-orange flag it into the pits, and does it have to stop right away?",
+      "role": "reserve"
+    },
+    {
+      "wording": "fan",
+      "position": 38,
+      "question": "How do they decide where the cars finish if it's based on time rather than laps, and what happens if a car is parked up or crawling when the clock runs out?",
+      "role": "reserve"
+    },
+    {
+      "wording": "fan",
+      "position": 39,
+      "question": "If my relative gets hurt or feels unwell during his stint, can another driver just jump in, and do the doctors have to clear him before he can get back in the car?",
+      "role": "reserve"
+    }
+  ]
+}

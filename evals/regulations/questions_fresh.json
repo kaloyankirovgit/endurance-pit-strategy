@@ -1,0 +1,564 @@
+[
+  {
+    "id": "f01",
+    "season": "2026",
+    "question": "I'm the Bronze in this car, so how long do I actually have to be behind the wheel, and what happens to us if I come up short on my minimum drive time?",
+    "gold_articles": [
+      "13.2.3",
+      "13.2.5"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "racer",
+    "source_position": 0,
+    "source_role": "main"
+  },
+  {
+    "id": "f02",
+    "season": "2026",
+    "question": "Why are there different kinds of cars out there at once, and are the slower ones supposed to move over when the faster ones come up behind them?",
+    "gold_articles": [],
+    "answerable": false,
+    "key_facts": [],
+    "wording": "fan",
+    "source_position": 0,
+    "source_role": "main",
+    "note": "Giving way and blue flags are in Appendix L of the International Sporting Code, which isn't collected (same call as v03)."
+  },
+  {
+    "id": "f03",
+    "season": "2026",
+    "question": "If I've got a full course yellow coming and I'm right at the pit entry, can I still dive in, or is the pit lane closed until the zone's sorted?",
+    "gold_articles": [
+      "14.5.2"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "racer",
+    "source_position": 1,
+    "source_role": "main"
+  },
+  {
+    "id": "f04",
+    "season": "2026",
+    "question": "If a car runs out of fuel or breaks down out on track, can the driver do anything to get it back to the pits, or is their race basically over once they stop?",
+    "gold_articles": [
+      "12.3.2",
+      "9.1.5"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "fan",
+    "source_position": 1,
+    "source_role": "main"
+  },
+  {
+    "id": "f05",
+    "season": "2026",
+    "question": "How long can one of us stay in the car before we have to swap, and is there a minimum amount of time each driver has to do over the whole race?",
+    "gold_articles": [
+      "13.2.3"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "racer",
+    "source_position": 2,
+    "source_role": "main"
+  },
+  {
+    "id": "f06",
+    "season": "2026",
+    "question": "Why are there totally different-looking cars out there at once, and does the faster lot have to do anything special when they come up behind the slower ones, like blue flags in F1?",
+    "gold_articles": [],
+    "answerable": false,
+    "key_facts": [],
+    "wording": "fan",
+    "source_position": 2,
+    "source_role": "main",
+    "note": "Giving way and blue flags are in Appendix L of the International Sporting Code, which isn't collected (same call as v03)."
+  },
+  {
+    "id": "f07",
+    "season": "2026",
+    "question": "Is there a limit on how long any one of us can drive in a row or in total over the six hours?",
+    "gold_articles": [],
+    "answerable": false,
+    "key_facts": [],
+    "wording": "racer",
+    "source_position": 4,
+    "source_role": "main",
+    "note": "No maximum driving time in the 2026 sporting regulations; 13.2.3 sets minimums only."
+  },
+  {
+    "id": "f08",
+    "season": "2026",
+    "question": "How long is one driver allowed to stay in the car before they have to swap with someone else?",
+    "gold_articles": [],
+    "answerable": false,
+    "key_facts": [],
+    "wording": "fan",
+    "source_position": 4,
+    "source_role": "main",
+    "note": "No maximum driving time in the 2026 sporting regulations; 13.2.3 sets minimums only."
+  },
+  {
+    "id": "f09",
+    "season": "2026",
+    "question": "How long can I stay in the car before I've got to hand over, and what happens if we go over my max driving time?",
+    "gold_articles": [],
+    "answerable": false,
+    "key_facts": [],
+    "wording": "racer",
+    "source_position": 5,
+    "source_role": "main",
+    "note": "No maximum driving time in the 2026 sporting regulations; 13.2.3 sets minimums only."
+  },
+  {
+    "id": "f10",
+    "season": "2026",
+    "question": "When we come in for a stop, can the guys change tyres and put fuel in at the same time, or does one have to wait for the other?",
+    "gold_articles": [
+      "12.2.2"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "racer",
+    "source_position": 6,
+    "source_role": "main"
+  },
+  {
+    "id": "f11",
+    "season": "2026",
+    "question": "When we come in for a stop, can we change tires and refuel at the same time, or does one have to wait for the other?",
+    "gold_articles": [
+      "12.2.2"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "racer",
+    "source_position": 7,
+    "source_role": "main"
+  },
+  {
+    "id": "f12",
+    "season": "2026",
+    "question": "If the Full Course Yellow comes out while I'm mid-straight, what speed do I have to get down to, and how quickly do I have to do it?",
+    "gold_articles": [
+      "14.5.1"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "racer",
+    "source_position": 8,
+    "source_role": "main"
+  },
+  {
+    "id": "f13",
+    "season": "2026",
+    "question": "If I run over the virtual energy allowance for a stint, what kind of penalty are we looking at and do they tell me straight away?",
+    "gold_articles": [],
+    "answerable": false,
+    "key_facts": [],
+    "wording": "racer",
+    "source_position": 9,
+    "source_role": "main",
+    "note": "No energy allowance or its penalty in the sporting regulations; technical regulations and BoP aren't collected."
+  },
+  {
+    "id": "f14",
+    "season": "2026",
+    "question": "When the safety car comes out, are the pits still open, or do cars get penalised for diving in at the wrong time?",
+    "gold_articles": [
+      "14.6.5"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "fan",
+    "source_position": 9,
+    "source_role": "main"
+  },
+  {
+    "id": "f15",
+    "season": "2026",
+    "question": "How many sets of tyres do we actually get for the race, and what happens if we run out because of punctures?",
+    "gold_articles": [
+      "6.5.4"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "racer",
+    "source_position": 10,
+    "source_role": "main"
+  },
+  {
+    "id": "f16",
+    "season": "2026",
+    "question": "What's the deal with the Virtual Safety Car or full course yellow, like what speed do I have to hold and can I still pit while it's out?",
+    "gold_articles": [
+      "14.5.1",
+      "14.5.2",
+      "14.7.1",
+      "14.7.2"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "racer",
+    "source_position": 11,
+    "source_role": "main"
+  },
+  {
+    "id": "f17",
+    "season": "2026",
+    "question": "If the car breaks down out on the track, is the driver allowed to get out and try to fix it himself, or does someone have to come and tow it?",
+    "gold_articles": [
+      "12.3.2",
+      "9.1.3"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "fan",
+    "source_position": 11,
+    "source_role": "main"
+  },
+  {
+    "id": "f18",
+    "season": "2026",
+    "question": "When the safety car's out, can I still come into the pits for fuel, or is the pit lane shut until they say so?",
+    "gold_articles": [
+      "14.6.5"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "racer",
+    "source_position": 12,
+    "source_role": "main"
+  },
+  {
+    "id": "f19",
+    "season": "2026",
+    "question": "Is there a limit on how many tyres a team can use during the whole six hours?",
+    "gold_articles": [
+      "6.5.4"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "fan",
+    "source_position": 12,
+    "source_role": "main"
+  },
+  {
+    "id": "f20",
+    "season": "2026",
+    "question": "Why do the Hypercars and GT3s all seem to have different power and weight, and can those numbers get changed in the middle of a race?",
+    "gold_articles": [
+      "6.2.1"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "fan",
+    "source_position": 13,
+    "source_role": "main"
+  },
+  {
+    "id": "f21",
+    "season": "2026",
+    "question": "If the safety car comes out, how does that work with the different classes all mixed together, and can lapped cars get their laps back?",
+    "gold_articles": [
+      "14.6.3",
+      "14.6.4"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "racer",
+    "source_position": 15,
+    "source_role": "main"
+  },
+  {
+    "id": "f22",
+    "season": "2026",
+    "question": "When a Hypercar hits a GT3 while lapping it, how do the stewards decide who's at fault, and what sort of penalty would they hand out?",
+    "gold_articles": [
+      "7.2.2",
+      "9.1.11"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "fan",
+    "source_position": 17,
+    "source_role": "main"
+  },
+  {
+    "id": "f23",
+    "season": "2026",
+    "question": "I keep hearing about a limit on energy per stint, so what actually happens if a car uses more than it's allowed?",
+    "gold_articles": [],
+    "answerable": false,
+    "key_facts": [],
+    "wording": "fan",
+    "source_position": 18,
+    "source_role": "main",
+    "note": "No energy allowance or its penalty in the sporting regulations; technical regulations and BoP aren't collected."
+  },
+  {
+    "id": "f24",
+    "season": "2026",
+    "question": "When a Hypercar is coming up behind me in a slower class, do I have to move out of the way, or can I just hold my line and let them find a way past?",
+    "gold_articles": [],
+    "answerable": false,
+    "key_facts": [],
+    "wording": "racer",
+    "source_position": 19,
+    "source_role": "main",
+    "note": "Giving way and blue flags are in Appendix L of the International Sporting Code, which isn't collected (same call as v03)."
+  },
+  {
+    "id": "f25",
+    "season": "2026",
+    "question": "If two cars bump each other and one spins off, who decides whose fault it was and what kind of punishment can they get?",
+    "gold_articles": [
+      "7.2.2",
+      "9.1.11"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "fan",
+    "source_position": 19,
+    "source_role": "main"
+  },
+  {
+    "id": "f26",
+    "season": "2026",
+    "question": "What's the speed limit in the pit lane, and what do I get hit with if I go a little over it?",
+    "gold_articles": [
+      "12.1.4"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "racer",
+    "source_position": 20,
+    "source_role": "main"
+  },
+  {
+    "id": "f27",
+    "season": "2026",
+    "question": "If I go off and get beached in the gravel, can the marshals pull me out and can I carry on racing afterwards?",
+    "gold_articles": [
+      "9.1.3"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "racer",
+    "source_position": 21,
+    "source_role": "main"
+  },
+  {
+    "id": "f28",
+    "season": "2026",
+    "question": "If there's a big crash, is it just a normal safety car like F1, and does everyone get to bunch back up behind it?",
+    "gold_articles": [
+      "14.6.1"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "fan",
+    "source_position": 22,
+    "source_role": "main"
+  },
+  {
+    "id": "f29",
+    "season": "2026",
+    "question": "If I go over the pit lane speed limit by just a tiny bit, what's the penalty, and does it change if I keep doing it?",
+    "gold_articles": [
+      "12.1.4"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "racer",
+    "source_position": 22,
+    "source_role": "main"
+  },
+  {
+    "id": "f30",
+    "season": "2026",
+    "question": "Those big Hypercars and the smaller GT cars are all out there together, so does a slower car have to move over when a faster one comes up behind it?",
+    "gold_articles": [],
+    "answerable": false,
+    "key_facts": [],
+    "wording": "fan",
+    "source_position": 23,
+    "source_role": "main",
+    "note": "Giving way and blue flags are in Appendix L of the International Sporting Code, which isn't collected (same call as v03)."
+  },
+  {
+    "id": "f31",
+    "season": "2026",
+    "question": "If I get all four wheels over the white lines a few times, how many goes do I get before they give me a penalty?",
+    "gold_articles": [
+      "9.1.2"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "racer",
+    "source_position": 24,
+    "source_role": "main"
+  },
+  {
+    "id": "f32",
+    "season": "2026",
+    "question": "If a car breaks down and limps back to the garage, can the mechanics spend an hour fixing it and send it back out, and does it still count in the results?",
+    "gold_articles": [
+      "12.3.1",
+      "15.1.4"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "fan",
+    "source_position": 26,
+    "source_role": "main"
+  },
+  {
+    "id": "f33",
+    "season": "2026",
+    "question": "How many times can I run wide past the white lines before I get hit with a penalty, and what does that penalty look like?",
+    "gold_articles": [
+      "9.1.2"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "racer",
+    "source_position": 26,
+    "source_role": "reserve"
+  },
+  {
+    "id": "f34",
+    "season": "2026",
+    "question": "If the race gets red-flagged, can teams work on the cars while they're stopped, and does the clock keep running?",
+    "gold_articles": [
+      "14.3.1",
+      "14.3.2"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "fan",
+    "source_position": 29,
+    "source_role": "reserve"
+  },
+  {
+    "id": "f35",
+    "season": "2026",
+    "question": "If a car goes into the garage for repairs for an hour and then comes back out, does it still count in the results, or does it have to finish a certain distance to be classified?",
+    "gold_articles": [
+      "15.1.4"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "fan",
+    "source_position": 31,
+    "source_role": "reserve"
+  },
+  {
+    "id": "f36",
+    "season": "2026",
+    "question": "If it starts pouring with rain, can they stop the race with a red flag, and does the clock keep running while everyone waits?",
+    "gold_articles": [
+      "14.3.1"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "fan",
+    "source_position": 32,
+    "source_role": "reserve"
+  },
+  {
+    "id": "f37",
+    "season": "2026",
+    "question": "What happens if I get caught speeding in the pit lane or get a penalty near the end, like do I have to come in and serve it or do they just add time to my result?",
+    "gold_articles": [
+      "7.4.10"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "racer",
+    "source_position": 31,
+    "source_role": "reserve"
+  },
+  {
+    "id": "f38",
+    "season": "2026",
+    "question": "What's the deal with the hybrid power, can they use it whenever they want or are there rules about when it kicks in, like at certain speeds?",
+    "gold_articles": [],
+    "answerable": false,
+    "key_facts": [],
+    "wording": "fan",
+    "source_position": 34,
+    "source_role": "reserve",
+    "note": "Hybrid deployment rules are technical regulations, not collected."
+  },
+  {
+    "id": "f39",
+    "season": "2026",
+    "question": "If a car's lights stop working at night or a bit of bodywork is hanging off, will race control black-and-orange flag it into the pits, and does it have to stop right away?",
+    "gold_articles": [
+      "6.4.6"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "fan",
+    "source_position": 37,
+    "source_role": "reserve"
+  },
+  {
+    "id": "f40",
+    "season": "2026",
+    "question": "During a safety car, when am I allowed to unlap myself, and what happens at the restart if I pass someone before the line?",
+    "gold_articles": [
+      "14.6.4",
+      "14.6.12"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "racer",
+    "source_position": 37,
+    "source_role": "reserve"
+  },
+  {
+    "id": "f41",
+    "season": "2026",
+    "question": "How do they decide where the cars finish if it's based on time rather than laps, and what happens if a car is parked up or crawling when the clock runs out?",
+    "gold_articles": [
+      "15.1.5",
+      "15.1.6"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "fan",
+    "source_position": 38,
+    "source_role": "reserve"
+  },
+  {
+    "id": "f42",
+    "season": "2026",
+    "question": "If my relative gets hurt or feels unwell during his stint, can another driver just jump in, and do the doctors have to clear him before he can get back in the car?",
+    "gold_articles": [
+      "9.1.12"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "fan",
+    "source_position": 39,
+    "source_role": "reserve"
+  },
+  {
+    "id": "f43",
+    "season": "2026",
+    "question": "How does the Balance of Performance and the energy limit per stint work, and what happens if I use more energy than I'm allowed?",
+    "gold_articles": [
+      "6.2.1"
+    ],
+    "answerable": true,
+    "key_facts": [],
+    "wording": "racer",
+    "source_position": 39,
+    "source_role": "reserve"
+  }
+]

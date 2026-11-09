@@ -39,7 +39,7 @@ See [`evals/regulations/`](evals/regulations/).
 ### Checks on the AI tools
 
 - **An eval for the AI review agent:** 16 synthetic write-ups with planted statistical flaws and clean controls, run headless through Claude Code and scored in code against labels. It caught 11 of the 12 flaws (E-008). See [`evals/statistical_reviewer/`](evals/statistical_reviewer/).
-- **183 tests on synthetic data,** run in GitHub Actions on every push, with no real data needed.
+- **190 tests on synthetic data,** run in GitHub Actions on every push, with no real data needed.
 
 The full log of what's been tried, including null results, is in [`docs/EXPERIMENT_LOG.md`](docs/EXPERIMENT_LOG.md), and the reasoning behind the bigger choices is in [`docs/DECISIONS.md`](docs/DECISIONS.md).
 

@@ -8,7 +8,8 @@ class ClaudeCallError(RuntimeError):
     pass
 
 
-def claude_json(prompt: str, system_prompt: str, schema: dict, workdir: str, timeout_s: int = 600) -> dict:
+def claude_json(prompt: str, system_prompt: str, schema: dict, workdir: str, timeout_s: int = 600,
+                extra_args: tuple[str, ...] = ()) -> dict:
     """One headless Claude Code call with no tools and a fixed JSON schema for the answer.
 
     Run from an empty `workdir` so no project instructions or memory load. Returns the
@@ -22,6 +23,7 @@ def claude_json(prompt: str, system_prompt: str, schema: dict, workdir: str, tim
             "--json-schema", json.dumps(schema),
             "--output-format", "json",
             "--no-session-persistence",
+            *extra_args,
         ],
         cwd=workdir, capture_output=True, text=True, timeout=timeout_s,
     )

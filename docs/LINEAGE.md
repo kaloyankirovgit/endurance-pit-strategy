@@ -38,10 +38,12 @@ flowchart LR
   end
   subgraph evals["Evals"]
     n_eval_questions[("Regulation questions")]:::committed
+    n_racer_questions[("Blind racer-agent questions")]:::committed
     n_retrieval_scores[("Retrieval scores")]:::committed
     n_answer_scores[("Answer scores")]:::committed
     n_reviewer_cases[("Planted-flaw write-ups")]:::committed
     n_reviewer_scores[("Reviewer scores")]:::committed
+    n_racer_agent["Write blind questions"]
     n_retrieval_eval["Score retrieval"]
     n_answer_eval["Score answers"]
     n_reviewer_eval["Score the review agent"]
@@ -72,6 +74,7 @@ flowchart LR
   n_chunk --> n_regulation_chunks
   n_regulation_chunks --> n_retrieve
   n_retrieve --> n_answer
+  n_racer_agent --> n_racer_questions
   n_retrieve --> n_retrieval_eval
   n_eval_questions --> n_retrieval_eval
   n_regulation_chunks --> n_retrieval_eval
@@ -115,6 +118,7 @@ It doesn't run anything. The pipeline is one command that takes under 20 seconds
 | Cut into articles | `rag/regulations.py` | pypdf | Chunking on document structure, with season and page metadata |
 | Find the clause | `rag/retrieve.py`<br>`rag/embed.py` | fastembed, numpy | BM25 (the default), embeddings, reciprocal rank fusion, season filter |
 | Route, answer, check | `rag/answer.py`<br>`llm.py` | standard library | Routing, prompt chaining, structured output, deterministic checker, refusal |
+| Write blind questions | `rag/racer_agent.py`<br>`scripts/run_racer_agent.py`<br>`llm.py` | standard library | Isolated headless agent, persona prompts, canary check, order fixed before the run |
 | Score retrieval | `rag/evaluate.py`<br>`scripts/run_retrieval_eval.py`<br>`scripts/run_retrieval_comparison.py`<br>`scripts/measure_retrieval_cost.py` | standard library | recall@k, held-out sets, pre-registered paired sign test |
 | Score answers | `rag/evaluate.py`<br>`scripts/run_answer_eval.py` | standard library | Repeated runs, full trace logging, scoring in code against labels |
 | Score the review agent | `evals/reviewer.py`<br>`scripts/run_reviewer_eval.py`<br>`llm.py` | standard library | Planted flaws and clean controls, headless runs, exact-match scoring |
@@ -155,6 +159,7 @@ flowchart LR
     n_rag_answer["answer"]
     n_rag_embed["embed"]
     n_rag_evaluate["evaluate"]
+    n_rag_racer_agent["racer_agent"]
     n_rag_regulations["regulations"]
     n_rag_retrieve["retrieve"]
   end
@@ -167,6 +172,7 @@ flowchart LR
     n_scripts_guard_commit["guard_commit"]
     n_scripts_measure_retrieval_cost["measure_retrieval_cost"]
     n_scripts_run_answer_eval["run_answer_eval"]
+    n_scripts_run_racer_agent["run_racer_agent"]
     n_scripts_run_retrieval_comparison["run_retrieval_comparison"]
     n_scripts_run_retrieval_eval["run_retrieval_eval"]
     n_scripts_run_reviewer_eval["run_reviewer_eval"]
@@ -205,6 +211,7 @@ flowchart LR
   n_rag_embed --> n_rag_retrieve
   n_rag_evaluate --> n_rag_answer
   n_rag_evaluate --> n_rag_retrieve
+  n_rag_racer_agent --> n_llm
   n_reconstruct_race_clock --> n_paths
   n_scripts_measure_retrieval_cost --> n_paths
   n_scripts_measure_retrieval_cost --> n_rag_embed
@@ -213,6 +220,7 @@ flowchart LR
   n_scripts_run_answer_eval --> n_rag_answer
   n_scripts_run_answer_eval --> n_rag_evaluate
   n_scripts_run_answer_eval --> n_rag_retrieve
+  n_scripts_run_racer_agent --> n_rag_racer_agent
   n_scripts_run_retrieval_comparison --> n_paths
   n_scripts_run_retrieval_comparison --> n_rag_embed
   n_scripts_run_retrieval_comparison --> n_rag_evaluate

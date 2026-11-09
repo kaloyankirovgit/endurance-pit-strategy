@@ -99,10 +99,12 @@ flowchart LR
   end
   subgraph evals["Evals"]
     n_eval_questions[("Regulation questions")]:::committed
+    n_racer_questions[("Blind racer-agent questions")]:::committed
     n_retrieval_scores[("Retrieval scores")]:::committed
     n_answer_scores[("Answer scores")]:::committed
     n_reviewer_cases[("Planted-flaw write-ups")]:::committed
     n_reviewer_scores[("Reviewer scores")]:::committed
+    n_racer_agent["Write blind questions"]
     n_retrieval_eval["Score retrieval"]
     n_answer_eval["Score answers"]
     n_reviewer_eval["Score the review agent"]
@@ -133,6 +135,7 @@ flowchart LR
   n_chunk --> n_regulation_chunks
   n_regulation_chunks --> n_retrieve
   n_retrieve --> n_answer
+  n_racer_agent --> n_racer_questions
   n_retrieve --> n_retrieval_eval
   n_eval_questions --> n_retrieval_eval
   n_regulation_chunks --> n_retrieval_eval

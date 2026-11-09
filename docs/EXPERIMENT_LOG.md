@@ -864,6 +864,14 @@ So 2024 is reported separately, and the result rests on 2025 and 2026, two races
 - **Size:** at least 30 answerable questions, and at most 2 per gold article. If there are fewer, more are written before any run.
 - **Primary measure:** top-5 hit, question by question, hybrid against BM25, answerable questions only, season filter on.
 
+**Amendment, 2026-11-09, committed before any question was generated.** Kaloyan chose to have the questions written by a blind model instead of people, to get to Layer 3 sooner. It changes who writes the questions and nothing else in this entry:
+
+- **Author:** the racer agent (`rag/racer_agent.py`), run headless from an empty folder with no tools and without user, project or MCP settings. A canary run with the same isolation is asked what it can see, and the script stops if it can quote the project.
+- **Personas, replacing the real and sim split:** 4 people competing (2 real drivers, 2 sim racers), `wording: racer`, and 4 people watching, `wording: fan`. Each writes 10 questions in one independent run.
+- **Selection, fixed by code:** within each group the questions are taken one per persona in turn, in the order written. A question with content-word Jaccard overlap of at least 0.6 with one of the 78 earlier answerable questions, or with one already kept, is dropped. The first 25 kept per group are the main set. Later ones are the reserve, and are used in the same order only to reach 30 answerable or to replace a question over the 2-per-article cap.
+- **Every question it wrote is committed,** dropped ones included, in `evals/regulations/racer_agent/`.
+- **Limits this adds:** a model isn't an outside person. It may know WEC rules from training, and all 80 questions come from one model, so the variety may be narrower than 8 people would give. The prompt steers it to questions about the rules, because a fan left alone asks mostly things the rulebook can't answer. The result says what this model's questions show, and doesn't stand in for real users.
+
 **Rule:**
 
 | Outcome | Decision |

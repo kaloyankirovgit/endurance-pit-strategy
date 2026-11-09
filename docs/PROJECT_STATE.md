@@ -2,7 +2,7 @@
 
 Where things are right now. Updated at the end of each working session.
 
-*Last updated: 2026-10-26*
+*Last updated: 2026-11-09*
 
 ## Current stage
 
@@ -34,20 +34,24 @@ Layer 1 is done and the race order is now checked against the official classific
 - In-scope refusal tested (E-018). The 5 unanswerable vague questions that reached the answer step were declined every time (3 runs each, effective n = 5), while 13 of 18 runs where retrieval found the clause were answered. The checker's 2 rejections were false positives, and refusal text isn't checked.
 - A live tool in Le Mans Ultimate is parked until after the optimiser (D-026).
 - Field-wide slow periods are flagged (E-016, D-025). They catch a drying track the rain sensor misses, slow zones and local yellows. They remove 695 laps from the clean set (now 138,189), leave the 18-race traffic figures unchanged and fix most of E-015's loose-rule placebo failures.
-- 163 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
+- The project is described as a DAG, generated into `docs/LINEAGE.md` and the README. Tests tie it to real files, functions and imports, and one enforces that numerical code can't import the LLM layer (D-028).
+- A second retriever test is pre-registered and waiting on its questions (E-019, D-027). BM25 stays the default until it runs.
+- 183 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
 
 ## Next
 
-1. **Regulations, remaining checks**
+1. **Pace, stints and pit loss (Layer 3)**
+   - The stint-age effect (fuel and tyres together, D-005), pit loss from in-laps and out-laps against normal pace, and pit-lane time distributions, each checked on held-out races.
+2. **Retriever test (E-019)**
+   - Waiting on 50 fresh questions, written with the regulations closed.
+3. **Regulations, remaining checks**
    - Check refusal text in code, like answers: a refusal that paraphrases a clause is shown unverified (E-018).
    - Cut the checker's false positives: an article number named but not cited, and a number derived from a clause's rule (E-018).
    - Embed the long chunks (12.2.2 is 727 tokens, cut at 512) by sub-clause, tested on fresh questions.
    - A cleaner extraction of the tyre tables (6.5.3, 6.5.4).
-2. **Pace, stints and pit loss (Layer 3)**
-   - The stint-age effect (fuel and tyres together, D-005), pit loss from in-laps and out-laps against normal pace, and pit-lane time distributions, each checked on held-out races.
-3. **Slow-lap reference**
+4. **Slow-lap reference**
    - The slow-lap rule's reference median still includes field-slow periods (E-016). Recompute it without them if Layer 3 shows it matters.
-4. **Reviewer eval, second round**
+5. **Reviewer eval, second round**
    - A fresh held-out case set before changing the agent prompt (it rated "measured overtakes" as minor), then the other three agents.
 
 ## Key facts

@@ -30,7 +30,7 @@ These are associations with inferred traffic, not a measured cost per overtake. 
 ### Regulation assistant (layer 6, mostly built)
 
 - **Retrieval:** the 2024 to 2026 sporting regulations are split into article-level chunks with season and page, and searched with BM25. It finds the right 2026 clause in the top 5 for 24 of 30 hand-written questions (E-009).
-- **BM25 against embeddings:** a hybrid of BM25 and a small embedding model won 5 questions to 1 on fresh and vague questions, but the sign test fixed before the run gave p = 0.22, so BM25 stays the default. On the vague questions BM25 found the clause for only 9 of 18, so retrieval is where the assistant most needs to improve (E-011, E-017).
+- **BM25 against embeddings:** a hybrid of BM25 and a small embedding model won 5 questions to 1 on fresh and vague questions, but the sign test fixed before the run gave p = 0.22, so BM25 stays the default. On the vague questions BM25 found the clause for only 9 of 18, so retrieval is where the assistant most needs to improve (E-011, E-017). A second test on fresh questions, with its rule fixed before the questions exist, is set up (E-019).
 - **Grounded answers:** a router sends strategy questions away, because pit timing has to come from the simulator. Rules questions are answered only from the retrieved clauses, and a plain-code checker rejects any answer whose citations, quotes or numbers don't trace back. For the 24 questions where retrieval found the right clause, the answer cited it in all 3 runs of each (E-010).
 - **Declining what it can't support:** on 5 real racing questions the regulations don't cover, it declined every time instead of guessing. The checker also rejected 2 correct answers, and refusal text isn't checked yet. Both are next on the list (E-018).
 
@@ -39,7 +39,7 @@ See [`evals/regulations/`](evals/regulations/).
 ### Checks on the AI tools
 
 - **An eval for the AI review agent:** 16 synthetic write-ups with planted statistical flaws and clean controls, run headless through Claude Code and scored in code against labels. It caught 11 of the 12 flaws (E-008). See [`evals/statistical_reviewer/`](evals/statistical_reviewer/).
-- **163 tests on synthetic data,** run in GitHub Actions on every push, with no real data needed.
+- **183 tests on synthetic data,** run in GitHub Actions on every push, with no real data needed.
 
 The full log of what's been tried, including null results, is in [`docs/EXPERIMENT_LOG.md`](docs/EXPERIMENT_LOG.md), and the reasoning behind the bigger choices is in [`docs/DECISIONS.md`](docs/DECISIONS.md).
 
@@ -61,6 +61,101 @@ The build goes in layers. Each one has to work before the next one leans on it.
    - An LLM that can look up the sporting regulations, call the simulator as a tool and explain the result with citations. It explains the answer but never makes the numbers up.
 
 Reinforcement learning is a maybe for the very end, and only if the simulator holds up against real races first. An RL agent trained on a bad simulator just learns the simulator's mistakes.
+
+## How the data moves
+
+Cylinders are stored files and rectangles are steps. Dashed cylinders stay on my laptop because the source data can't be shared, and the faint boxes aren't built yet. The graph is generated, and a test fails if it stops matching the code. [`docs/LINEAGE.md`](docs/LINEAGE.md) adds the files and libraries behind each step and the import graph.
+
+<!-- lineage:begin -->
+```mermaid
+flowchart LR
+  subgraph race["Race data"]
+    n_race_csv[("Race timing CSVs")]:::local
+    n_weather_csv[("Weather CSVs")]:::local
+    n_classification_csv[("Official classifications")]:::local
+    n_laps[("laps.parquet")]:::local
+    n_stints[("stints.parquet")]:::local
+    n_pit_stops[("pit_stops.parquet")]:::local
+    n_classification_check[("classification_check.parquet")]:::local
+    n_load["Parse and type"]
+    n_stint_flags["Pit stops and stints"]
+    n_race_order["Race order and gaps"]
+    n_weather["Weather join"]
+    n_clean_flags["Clean-lap flags"]
+    n_write_laps["Schema check and write"]
+    n_marts["Stint and pit tables"]
+    n_classification["Check against official results"]
+  end
+  subgraph traffic["Traffic"]
+    n_traffic_results[("Traffic results")]:::local
+    n_traffic["Traffic association"]
+  end
+  subgraph rules["Regulation assistant"]
+    n_regulation_pdf[("Regulation PDFs")]:::local
+    n_regulation_chunks[("regulation_chunks.jsonl")]:::local
+    n_chunk["Cut into articles"]
+    n_retrieve["Find the clause"]
+    n_answer["Route, answer, check"]
+  end
+  subgraph evals["Evals"]
+    n_eval_questions[("Regulation questions")]:::committed
+    n_retrieval_scores[("Retrieval scores")]:::committed
+    n_answer_scores[("Answer scores")]:::committed
+    n_reviewer_cases[("Planted-flaw write-ups")]:::committed
+    n_reviewer_scores[("Reviewer scores")]:::committed
+    n_retrieval_eval["Score retrieval"]
+    n_answer_eval["Score answers"]
+    n_reviewer_eval["Score the review agent"]
+  end
+  subgraph planned["Planned, not built"]
+    n_pace["Stint-age pace and pit loss"]:::planned
+    n_simulator["Race simulator"]:::planned
+    n_optimiser["Strategy optimiser"]:::planned
+    n_simulator_tool["Simulator as an LLM tool"]:::planned
+  end
+  n_race_csv --> n_load
+  n_load --> n_stint_flags
+  n_stint_flags --> n_race_order
+  n_race_order --> n_weather
+  n_weather_csv --> n_weather
+  n_weather --> n_clean_flags
+  n_clean_flags --> n_write_laps
+  n_write_laps --> n_laps
+  n_laps --> n_marts
+  n_marts --> n_stints
+  n_marts --> n_pit_stops
+  n_laps --> n_classification
+  n_classification_csv --> n_classification
+  n_classification --> n_classification_check
+  n_laps --> n_traffic
+  n_traffic --> n_traffic_results
+  n_regulation_pdf --> n_chunk
+  n_chunk --> n_regulation_chunks
+  n_regulation_chunks --> n_retrieve
+  n_retrieve --> n_answer
+  n_retrieve --> n_retrieval_eval
+  n_eval_questions --> n_retrieval_eval
+  n_regulation_chunks --> n_retrieval_eval
+  n_retrieval_eval --> n_retrieval_scores
+  n_answer --> n_answer_eval
+  n_eval_questions --> n_answer_eval
+  n_regulation_chunks --> n_answer_eval
+  n_answer_eval --> n_answer_scores
+  n_reviewer_cases --> n_reviewer_eval
+  n_reviewer_eval --> n_reviewer_scores
+  n_laps --> n_pace
+  n_stints --> n_pace
+  n_pit_stops --> n_pace
+  n_pace --> n_simulator
+  n_traffic_results --> n_simulator
+  n_simulator --> n_optimiser
+  n_optimiser --> n_simulator_tool
+  n_answer --> n_simulator_tool
+  classDef local stroke-dasharray:5 4
+  classDef committed stroke-width:2px
+  classDef planned stroke-dasharray:2 3,opacity:0.6
+```
+<!-- lineage:end -->
 
 ## A few things I'm being careful about
 

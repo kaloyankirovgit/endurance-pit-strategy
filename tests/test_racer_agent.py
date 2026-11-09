@@ -1,3 +1,4 @@
+from endurance_strategy.rag.evaluate import e019_decision
 from endurance_strategy.rag.racer_agent import PERSONAS, SYSTEM_PROMPT, leaked_terms, overlap, round_robin, select_questions
 
 
@@ -37,3 +38,10 @@ def test_prompt_gives_the_agent_nothing_from_the_project():
 def test_canary_check_fires_when_the_project_is_visible():
     assert leaked_terms("Repo: endurance-pit-strategy-planner") == ["endurance-pit"]
     assert leaked_terms("NONE") == []
+
+
+def test_e019_decision_follows_the_registered_rule():
+    assert e019_decision(3, 0).startswith("inconclusive")
+    assert e019_decision(3, 1) == "adopt the hybrid as the default"
+    assert e019_decision(2, 2) == "BM25 stays and this hybrid configuration is dropped"
+    assert e019_decision(1, 5) == "BM25 stays and this hybrid configuration is dropped"

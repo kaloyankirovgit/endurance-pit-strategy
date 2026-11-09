@@ -878,6 +878,7 @@ So 2024 is reported separately, and the result rests on 2025 and 2026, two races
 - **That's 43 questions, not the 50 planned.** The questions cluster on a few topics (driving time, pitting under yellow, tyres while refuelling), so the 2-per-article cap ran through the reserve. The size rule of at least 30 answerable is met, so no more were written.
 - The amendment didn't say how the cap applies across the two groups. It was applied with racer and fan alternating by position, main set first, and a question is dropped if any of its gold articles is already at 2. This was chosen after the labels were drafted and before any retriever ran.
 - Labels came from reading 6.2, 6.5, 7.2, 7.4, 9.1, 12, 13, 14 and 15.1 of the 2026 text in full, plus 1.4.1, 3.1.1, 4.1.3, 4.3.1, 4.3.2, 6.1, 6.3, 6.4.6, 6.6, 9.2.1 and Appendix 4 (1.4.1, 6.3.1 and 6.3.2 only to their first 1,800 characters). "Not answered" therefore means not in those parts. Appendix 4 lost its table's first column in extraction, so it couldn't be used as a source.
+- **Label check:** Kaloyan confirmed on 2026-11-09 that he checked every label on the sheet and changed none. The sheet showed the question and the article text, without Claude's notes. The tick boxes on it were left blank, so the record of the check is that statement. The questions and labels were already committed (`4da29f0`).
 
 **Rule:**
 

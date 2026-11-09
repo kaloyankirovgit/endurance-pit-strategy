@@ -138,6 +138,7 @@ flowchart LR
   n_racer_agent --> n_racer_questions
   n_retrieve --> n_retrieval_eval
   n_eval_questions --> n_retrieval_eval
+  n_racer_questions --> n_retrieval_eval
   n_regulation_chunks --> n_retrieval_eval
   n_retrieval_eval --> n_retrieval_scores
   n_answer --> n_answer_eval

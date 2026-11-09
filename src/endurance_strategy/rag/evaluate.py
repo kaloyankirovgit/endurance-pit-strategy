@@ -80,6 +80,15 @@ def compare_hits(challenger: dict, baseline: dict, k: int = 5) -> dict:
     return {"k": k, "questions": len(pairs), "wins": wins, "losses": losses, "sign_test_p": sign_test(wins, losses)}
 
 
+def e019_decision(wins: int, losses: int) -> str:
+    """The rule fixed in E-019 before its questions existed. A decision rule, not a test of superiority."""
+    if wins + losses < 4:
+        return "inconclusive: BM25 stays, the hybrid stays a candidate"
+    if wins > losses:
+        return "adopt the hybrid as the default"
+    return "BM25 stays and this hybrid configuration is dropped"
+
+
 def top_scores(retriever: BM25, questions: list[dict]) -> dict:
     """Best BM25 score for answerable and unanswerable questions, to see whether a score cut-off could support refusal."""
     scores = {True: [], False: []}

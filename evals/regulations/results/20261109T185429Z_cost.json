@@ -1,0 +1,17 @@
+{
+  "timestamp_utc": "20261109T185429Z",
+  "embedding_model": "BAAI/bge-small-en-v1.5",
+  "questions": 40,
+  "bm25_build_s": 0.069,
+  "embedding_load_with_cached_vectors_s": 2.15,
+  "query_ms": {
+    "bm25": {
+      "median": 2.4,
+      "max": 4.9
+    },
+    "hybrid": {
+      "median": 26.5,
+      "max": 64.8
+    }
+  }
+}

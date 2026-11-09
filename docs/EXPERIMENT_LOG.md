@@ -846,3 +846,49 @@ So 2024 is reported separately, and the result rests on 2025 and 2026, two races
 - **24 questions from one author.**
 
 **Reviewed by** the statistical-reviewer agent. It corrected the effective n, retired a claim that the checker caught untraceable numbers (both rejections were false positives), and found that refusal text is never checked.
+
+---
+
+## E-019: On fresh questions, does the hybrid win more often than it loses against BM25?
+
+*2026-11-09 · pre-registered and committed before any of its questions were written · not yet run*
+
+**Question:** which retriever should be the default? E-017's rule was not met. This is a second test under a looser rule, chosen after that failure (D-027). It can't show the hybrid is better.
+
+**Fixed before the questions exist:**
+
+- **Retrievers:** BM25 and the hybrid as in E-011 and E-017: k1 = 1.5, b = 0.75, `BAAI/bge-small-en-v1.5` (which resolves to `Qdrant/bge-small-en-v1.5-onnx-Q`, snapshot `aa8f8b06`), reciprocal rank fusion with constant 60, depth 50 and equal weights, `fastembed` 0.9.0. Nothing tuned. The chunk file is SHA-256 `6e12122e`. The sub-clause embedding idea is not applied. The run first reproduces the E-017 rows, and stops if they differ.
+- **Questions:** `evals/regulations/questions_fresh.json`, 50 written with the regulations closed: 25 in real race-engineer wording and 25 in sim-racer wording. At least half come from someone who hasn't seen this project, if that can be arranged. Otherwise a topic list is committed first. Near-duplicates of the 78 earlier answerable questions are rejected.
+- **Labels:** the answering 2026 articles are drafted by Claude from the clause text, reading the regulations by section and not by running a retriever or keyword search, with the transcript saved. Kaloyan checks every label before any run, without Claude's notes. The questions and labels are committed before any run.
+- **Frozen labels decide.** A later change needs E-017's grounds, is made with ranks hidden, and is reported only as sensitivity. Any gold article in the top 5 counts as a hit. Partial questions count as answerable, as in E-017.
+- **Size:** at least 30 answerable questions, and at most 2 per gold article. If there are fewer, more are written before any run.
+- **Primary measure:** top-5 hit, question by question, hybrid against BM25, answerable questions only, season filter on.
+
+**Rule:**
+
+| Outcome | Decision |
+|---|---|
+| Fewer than 4 questions differ | Inconclusive. BM25 stays, and the hybrid stays a candidate |
+| At least 4 differ and the hybrid wins more than it loses | The hybrid becomes the default |
+| At least 4 differ and the hybrid doesn't win more | BM25 stays and this configuration is dropped. Any changed retriever is a new candidate needing new questions |
+
+**What the rule can and can't do.** It's a decision rule, not a test of superiority. The number of disagreements is random, so the table gives the overall chance of adoption for 30 answerable questions, at the disagreement rates seen so far (12.5% pooled, 22% on the vague set):
+
+| Hybrid's true share of disagreements won | 20% | 30% | 50% | 70% | 83% |
+|---|---:|---:|---:|---:|---:|
+| Adopted, 12.5% disagreement (under 4 differ: 47%) | 2% | 6% | 21% | 40% | 49% |
+| Adopted, 22% disagreement (under 4 differ: 8%) | 2% | 9% | 39% | 75% | 88% |
+| Net recall@5 change at 12.5% / 22%, points | −7.5 / −13 | −5 / −9 | 0 | +5 / +9 | +8 / +15 |
+
+Under a flat prior updated on E-017's direction, adoption is about 35% to 76% across those rates and the 5-1 or 3-1 evidence. So the outcome isn't settled in advance, and at the lower rate it will often be inconclusive.
+
+**Reported either way:** wins and losses at k = 1, 3 and 5, by question and by distinct article, recall@k for BM25, the hybrid and embeddings alone, and the exact sign-test p as description. Real and sim wording are shown separately, as description only. No result from this run is worded as "the hybrid is better".
+
+**If the hybrid is adopted:** the BM25 answer figures (E-010, E-012, E-018) don't carry over. The answer eval runs first on the fresh set. Reruns on the E-017 vague set are partly in-sample for the retriever choice and are labelled that way.
+
+**Known limits:**
+
+- Kaloyan prefers the hybrid, knows BM25's misses, has seen E-017's questions and read the clause text for 24 labels on 2026-10-26. Wording overlap with the clause text is the thing that separates the retrievers, which is why outside authors matter here.
+- The labels again come from Claude.
+- "No keyword search while labelling" can only be checked from the saved transcript.
+- Reviewed by the statistical-reviewer agent before being fixed. It rejected the first version of this rule (wins at least equal to losses, ties to the hybrid).

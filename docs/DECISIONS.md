@@ -254,6 +254,36 @@ Running the optimiser live inside Le Mans Ultimate is a possible later applicati
 
 ---
 
+## D-027: Choosing a retriever gets a second test, on fresh questions, under a looser rule set after the first one failed
+
+*2026-11-09*
+
+E-017's result stands: the hybrid was not shown better than BM25 (5 wins to 1, p = 0.22), and BM25 stays the default until E-019 has run.
+
+- **E-017 set the rule for choosing the default, and the hybrid failed it, so BM25 stayed.** After seeing that result I judged the rule too strict for a low-stakes choice. Given 6 disagreements, passing needed 6 to 0: a 12% chance if the hybrid truly wins 70% of disagreements, 33% at 83%, 53% at 90%. That judgement came after the failure, so this is a post-hoc change of threshold and carries that weakness.
+- **"Not shown better" was never evidence for BM25.** It's a statement about the burden of proof. Only the vague set's 3 to 1 is fully untouched by the choice to run these tests.
+- **This departs from the baseline rule in `scientific-method.md`, which would keep BM25.** It's a one-off exception, made after the result was known, and the rule itself is unchanged. The reason for the exception is cost. No parameters were fitted to this corpus. The configuration uses defaults that were never varied, so its sensitivity to them is UNKNOWN. The hybrid fuses BM25's ranking with the embedding ranking, and it can demote a BM25 hit (v23).
+- **The cost, measured** (`scripts/measure_retrieval_cost.py`, one laptop, 40 questions): a median query of about 26 ms against 2 ms, and 2 s to load the model against 0.07 s for BM25. Latency is immaterial next to an LLM call. The real costs are 74 MB of `onnxruntime`, a 64 MB model fetched over the network on first use, 26 of 855 chunks truncated at the model's limit, and rerunning E-010, E-012 and E-018.
+- **So the new rule is E-019, fixed before its questions exist.** E-017 itself says a future rule should be tested on a set that played no part in proposing it. The new rule is E-017's condition 1 on fresh data, with the significance leg dropped and a minimum number of disagreements added.
+- **Pooling all three sets is not used as evidence.** It gives 8 wins to 1 (p = 0.04), but the original set is the one whose misses motivated trying embeddings, and E-017 fixed its pool without it.
+- **Whichever way E-019 goes, the wording stays "not shown better".** A switch would rest on low cost and a favourable direction, never on a claim of superiority.
+
+"Modern" isn't an argument in either direction. On the 6 sim-worded questions in E-017 the hybrid and BM25 each found 4 but not the same 4 (the hybrid gained v27 and lost v23), and embeddings alone found 3. So nothing yet shows that embeddings help that wording (n = 6, one slice of many, description only).
+
+---
+
+## D-028: The project is described as a DAG, and an orchestrator stays out
+
+*2026-11-09*
+
+`lineage.py` declares what each step reads and writes, and reads the import graph from the code. Tests hold both to the repo: no cycles, every named file and function exists, every listed library is imported by that step, and every Python file has a place. A diagram drawn by hand goes out of date, and this one fails CI first.
+
+It's a description and doesn't execute anything. Layer 1 is close to a straight line that takes under 20 seconds, runs on one machine and has no schedule, so Airflow or Dagster would add a scheduler with nothing to schedule. The stdlib's `graphlib` does the cycle check. If the pipeline ever needs scheduling, retries or partial reruns, the declared steps are what would move over.
+
+The same test enforces one rule that was only written down before: no numerical module may import the LLM layer (`rag.md`). The module list already includes `simulator` and `optimiser`, so the boundary holds from their first commit.
+
+---
+
 ## Tools
 
 The rule of thumb is to use a few tools properly rather than a lot of them badly. A tool comes in when a real need shows up.

@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 import numpy as np
 import pandas as pd
 
+from endurance_strategy.io.load import CORPUS_V1
 from endurance_strategy.features.traffic import CLASS_RANK, add_class_pair_counts
 from endurance_strategy.models.traffic import analysis_mask, joint_fit, sample_sizes, stint_residuals, t_interval
 from endurance_strategy.paths import INTERIM_DIR, PROJECT_ROOT
@@ -40,6 +41,7 @@ def fit_class(counted: pd.DataFrame, own: str, slow_lap_rule: str, races: list[s
 
 def main() -> None:
     laps = pd.read_parquet(INTERIM_DIR / "laps.parquet")
+    laps = laps[laps["event_key"].isin(CORPUS_V1)]
     laps = laps[laps["event_key"].str.contains("LE_MANS")]
     counted = add_class_pair_counts(laps)
     all_races = sorted(counted["event_key"].unique())

@@ -12,7 +12,9 @@ flowchart LR
     n_race_csv[("Race timing CSVs")]:::local
     n_weather_csv[("Weather CSVs")]:::local
     n_classification_csv[("Official classifications")]:::local
+    n_practice_csv[("Practice timing CSVs")]:::local
     n_laps[("laps.parquet")]:::local
+    n_practice_laps[("practice_laps.parquet")]:::local
     n_stints[("stints.parquet")]:::local
     n_pit_stops[("pit_stops.parquet")]:::local
     n_classification_check[("classification_check.parquet")]:::local
@@ -22,6 +24,7 @@ flowchart LR
     n_weather["Weather join"]
     n_clean_flags["Clean-lap flags"]
     n_write_laps["Schema check and write"]
+    n_practice["Practice laps"]
     n_marts["Stint and pit tables"]
     n_classification["Check against official results"]
   end
@@ -62,6 +65,8 @@ flowchart LR
   n_weather --> n_clean_flags
   n_clean_flags --> n_write_laps
   n_write_laps --> n_laps
+  n_practice_csv --> n_practice
+  n_practice --> n_practice_laps
   n_laps --> n_marts
   n_marts --> n_stints
   n_marts --> n_pit_stops
@@ -113,6 +118,7 @@ It doesn't run anything. The pipeline is one command that takes under 20 seconds
 | Weather join | `features/weather.py`<br>`reconstruct/race_clock.py`<br>`io/weather.py` | pandas | As-of join on UTC, with each circuit's time zone |
 | Clean-lap flags | `features/clean_laps.py` | pandas, numpy | Flag and keep, never delete. Rule-based exclusions |
 | Schema check and write | `pipeline.py`<br>`validation/schema.py` | pandera, pandas | Data contract validated on write, Parquet storage |
+| Practice laps | `pipeline.py`<br>`reconstruct/stints.py` | pandas | One table per session type, no clean-lap rule until one is registered |
 | Stint and pit tables | `pipeline.py` | duckdb | SQL aggregation into analysis tables |
 | Check against official results | `validation/classification.py` | duckdb, pandas | Reconciling a rebuilt result with an independent source |
 | Traffic association | `features/traffic.py`<br>`models/traffic.py`<br>`scripts/run_traffic_baseline.py`<br>`scripts/run_traffic_followup.py`<br>`scripts/run_traffic_le_mans.py` | pandas, numpy | Within-stint comparison, cluster bootstrap over races, placebo windows, temporal holdout |
@@ -128,7 +134,8 @@ Files that do real work but aren't a stage in the flow:
 
 - `paths.py`: Where each data folder lives
 - `lineage.py`: This file
-- `io/download.py`: Fetches the timing, weather and classification files
+- `io/download.py`: Finds and fetches new race, practice, weather and classification files
+- `scripts/ingest.py`: One command: fetch anything new, check it and rebuild the tables
 - `io/regulations.py`: Fetches the regulation PDFs
 - `validation/quality.py`: Structural checks, run from the tests
 - `scripts/guard_commit.py`: Blocks commits of git-ignored files
@@ -171,6 +178,7 @@ flowchart LR
   end
   subgraph g6["scripts"]
     n_scripts_guard_commit["guard_commit"]
+    n_scripts_ingest["ingest"]
     n_scripts_measure_retrieval_cost["measure_retrieval_cost"]
     n_scripts_run_answer_eval["run_answer_eval"]
     n_scripts_run_e019["run_e019"]
@@ -215,6 +223,10 @@ flowchart LR
   n_rag_evaluate --> n_rag_retrieve
   n_rag_racer_agent --> n_llm
   n_reconstruct_race_clock --> n_paths
+  n_scripts_ingest --> n_io_download
+  n_scripts_ingest --> n_paths
+  n_scripts_ingest --> n_pipeline
+  n_scripts_ingest --> n_validation_classification
   n_scripts_measure_retrieval_cost --> n_paths
   n_scripts_measure_retrieval_cost --> n_rag_embed
   n_scripts_measure_retrieval_cost --> n_rag_retrieve
@@ -237,12 +249,15 @@ flowchart LR
   n_scripts_run_reviewer_eval --> n_evals_reviewer
   n_scripts_run_reviewer_eval --> n_llm
   n_scripts_run_traffic_baseline --> n_features_traffic
+  n_scripts_run_traffic_baseline --> n_io_load
   n_scripts_run_traffic_baseline --> n_models_traffic
   n_scripts_run_traffic_baseline --> n_paths
   n_scripts_run_traffic_followup --> n_features_traffic
+  n_scripts_run_traffic_followup --> n_io_load
   n_scripts_run_traffic_followup --> n_models_traffic
   n_scripts_run_traffic_followup --> n_paths
   n_scripts_run_traffic_le_mans --> n_features_traffic
+  n_scripts_run_traffic_le_mans --> n_io_load
   n_scripts_run_traffic_le_mans --> n_models_traffic
   n_scripts_run_traffic_le_mans --> n_paths
   n_validation_classification --> n_io_download

@@ -39,7 +39,7 @@ See [`evals/regulations/`](evals/regulations/).
 ### Checks on the AI tools
 
 - **An eval for the AI review agent:** 16 synthetic write-ups with planted statistical flaws and clean controls, run headless through Claude Code and scored in code against labels. It caught 11 of the 12 flaws (E-008). See [`evals/statistical_reviewer/`](evals/statistical_reviewer/).
-- **191 tests on synthetic data,** run in GitHub Actions on every push, with no real data needed.
+- **199 tests on synthetic data,** run in GitHub Actions on every push, with no real data needed.
 
 The full log of what's been tried, including null results, is in [`docs/EXPERIMENT_LOG.md`](docs/EXPERIMENT_LOG.md), and the reasoning behind the bigger choices is in [`docs/DECISIONS.md`](docs/DECISIONS.md).
 
@@ -73,7 +73,9 @@ flowchart LR
     n_race_csv[("Race timing CSVs")]:::local
     n_weather_csv[("Weather CSVs")]:::local
     n_classification_csv[("Official classifications")]:::local
+    n_practice_csv[("Practice timing CSVs")]:::local
     n_laps[("laps.parquet")]:::local
+    n_practice_laps[("practice_laps.parquet")]:::local
     n_stints[("stints.parquet")]:::local
     n_pit_stops[("pit_stops.parquet")]:::local
     n_classification_check[("classification_check.parquet")]:::local
@@ -83,6 +85,7 @@ flowchart LR
     n_weather["Weather join"]
     n_clean_flags["Clean-lap flags"]
     n_write_laps["Schema check and write"]
+    n_practice["Practice laps"]
     n_marts["Stint and pit tables"]
     n_classification["Check against official results"]
   end
@@ -123,6 +126,8 @@ flowchart LR
   n_weather --> n_clean_flags
   n_clean_flags --> n_write_laps
   n_write_laps --> n_laps
+  n_practice_csv --> n_practice
+  n_practice --> n_practice_laps
   n_laps --> n_marts
   n_marts --> n_stints
   n_marts --> n_pit_stops
@@ -188,7 +193,7 @@ The tests run on a small synthetic race in `tests/fixtures/`, so they don't need
 
 The timing data belongs to Al Kamel Systems and can't be redistributed, so none of it is in this repo. That covers the raw files and anything derived from them.
 
-It's free to download for your own use from <https://fiawec.alkamelsystems.com/>. Pick a season and event, open the race session and grab the `23_Analysis_Race_Hour NN.CSV` file with the highest hour (it covers the whole race). Save it as `data/raw/wec/<YEAR>_<CIRCUIT>.CSV`, for example `2025_LE_MANS.CSV`, and then:
+It's free to download for your own use from <https://fiawec.alkamelsystems.com/>. `python scripts/ingest.py` fetches every race and practice session you don't have yet, checks them and rebuilds the tables, and running it again after a race weekend picks up only what's new. To load a single race by hand, save the `23_Analysis_Race_Hour NN.CSV` file with the highest hour as `data/raw/wec/<YEAR>_<CIRCUIT>.CSV`, for example `2025_LE_MANS.CSV`, and then:
 
 ```python
 from endurance_strategy.io.load import load_race_csv

@@ -36,7 +36,8 @@ Layer 1 is done and the race order is now checked against the official classific
 - Field-wide slow periods are flagged (E-016, D-025). They catch a drying track the rain sensor misses, slow zones and local yellows. They remove 695 laps from the clean set (now 138,189), leave the 18-race traffic figures unchanged and fix most of E-015's loose-rule placebo failures.
 - The project is described as a DAG, generated into `docs/LINEAGE.md` and the README. Tests tie it to real files, functions and imports, and one enforces that numerical code can't import the LLM layer (D-028).
 - The second retriever test has run on 43 questions from a blind racer agent, 33 answerable (E-019). The hybrid won 4 of the 5 questions that differed, meeting a looser rule set after E-017 failed, so it becomes the default once the answer eval has run on it (D-029). It wasn't shown better (p = 0.375). The answer path still uses BM25 for now.
-- 191 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
+- `python scripts/ingest.py` fetches and checks new races and practice sessions and rebuilds the tables (D-030). The tables now hold 24 races, 197,503 laps. Reported results stay on the first 21 (`CORPUS_V1`). Practice laps are in `practice_laps.parquet` for all 24 race weekends.
+- 199 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
 
 ## Next
 

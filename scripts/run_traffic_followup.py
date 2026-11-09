@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 import numpy as np
 import pandas as pd
 
+from endurance_strategy.io.load import CORPUS_V1
 from endurance_strategy.features.traffic import add_placebo_counts, add_traffic_exposure, class_pace_gap
 from endurance_strategy.models.traffic import (
     add_previous_residual,
@@ -41,6 +42,7 @@ def main() -> None:
     args = parser.parse_args()
 
     laps = pd.read_parquet(INTERIM_DIR / "laps.parquet")
+    laps = laps[laps["event_key"].isin(CORPUS_V1)]
     laps = laps[~laps["event_key"].str.contains("LE_MANS")]
     gap = class_pace_gap(laps)
     report = {"timestamp_utc": datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")}

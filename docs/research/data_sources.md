@@ -36,6 +36,14 @@ Anyone who wants to reproduce this downloads the files themselves. The README sa
 
 The event selector sometimes serves the **wrong event**. Ask for Imola 2026 and occasionally you get Fuji 2026. If you trust it blindly, one race's laps end up labelled as another's, and no later check would notice. My downloader confirms the page's selected season and event match the request, and that the file path has the right event folder, retrying until it does.
 
+### The site was rebuilt in November 2026
+
+The site changed on 3 November 2026. It's now a single-page app with optional accounts and paid season passes for some clients. The old direct file links return a web page with status 200 instead of the CSV, so a naive downloader would save HTML and report success.
+
+For WEC, the site's own settings mark results as free with no login (`dataAccess: free`, `requiresAuth: false`). It reads a public file listing at `files.alkamelcloud.com/wec/manifests/`, which names every file by season, event and session. `io/download.py` uses that listing, fetches only files not already on disk, waits between requests and refuses anything that isn't a CSV with the expected columns. Going by listing path also removes the wrong-event problem above.
+
+The site links to terms and conditions, but the page didn't render for a script on 2026-11-09, so they are **UNKNOWN: requires checking in a browser**. The ownership notice above still applies: nothing from the source goes in this repo.
+
 ### The modern era, audited
 
 I downloaded and parsed every WEC race from 2023 to 2026. All 28 files have **the same 29-column schema**, so one parser covers the lot.

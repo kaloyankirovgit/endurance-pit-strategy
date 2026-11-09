@@ -18,6 +18,19 @@ _STRING_COLUMNS = [
 
 _DURATION_COLUMNS = ["LAP_TIME", "PIT_TIME", "ELAPSED"]
 
+# The races behind every result reported up to E-019. New races join the tables but not these figures.
+CORPUS_V1 = tuple(
+    f"{season}_{circuit}"
+    for season, circuits in {
+        "2024": ("BAHRAIN_INTERNATIONAL_CIRCUIT", "CIRCUIT_OF_THE_AMERICAS", "FUJI_SPEEDWAY", "IMOLA", "LE_MANS", "LOSAIL",
+                 "SAO_PAULO", "SPA_FRANCORCHAMPS"),
+        "2025": ("BAHRAIN_INTERNATIONAL_CIRCUIT", "CIRCUIT_OF_THE_AMERICAS", "FUJI_SPEEDWAY", "IMOLA", "LE_MANS", "LOSAIL",
+                 "SAO_PAULO", "SPA_FRANCORCHAMPS"),
+        "2026": ("CIRCUIT_OF_THE_AMERICAS", "IMOLA", "LE_MANS", "SAO_PAULO", "SPA_FRANCORCHAMPS"),
+    }.items()
+    for circuit in circuits
+)
+
 
 def parse_duration(value: object) -> float:
     """Seconds from "51.908", "3:54.555" or "0:01:15.964". NaN if blank or bad."""

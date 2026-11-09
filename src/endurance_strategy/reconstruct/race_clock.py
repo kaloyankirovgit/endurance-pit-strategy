@@ -16,6 +16,8 @@ CIRCUIT_TIMEZONES = {
     "FUJI_SPEEDWAY": "Asia/Tokyo",
     "BAHRAIN_INTERNATIONAL_CIRCUIT": "Asia/Bahrain",
     "LOSAIL": "Asia/Qatar",
+    "BARCELONA_CATALUNYA": "Europe/Madrid",
+    "AUTODROMO_NAZIONALE_DI_MONZA": "Europe/Rome",
 }
 
 

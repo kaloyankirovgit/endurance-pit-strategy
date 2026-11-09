@@ -294,6 +294,18 @@ The switch isn't made until the answer eval has run on the fresh questions with 
 
 ---
 
+## D-030: New races come in by one command, and reported results stay on a fixed list
+
+*2026-11-09*
+
+`python scripts/ingest.py` finds race and free-practice files the public listing has and the disk doesn't, checks them, records their provenance and rebuilds the tables. A race that's still running is left out.
+
+Every result reported up to E-019 used 21 races. They're now named in `CORPUS_V1`, and the traffic scripts filter to that list, so a new race can't quietly change a published number. After adding Fuji, Barcelona and Monza 2026, all 179,259 laps of those 21 races were identical to the earlier table.
+
+The ingest writes 2026 into the tables but doesn't analyse it. 2026 stays sealed for Layer 3 (fit on 2024, check on 2025), and the three new races join the test.
+
+---
+
 ## Tools
 
 The rule of thumb is to use a few tools properly rather than a lot of them badly. A tool comes in when a real need shows up.

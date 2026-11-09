@@ -36,6 +36,10 @@ Anyone who wants to reproduce this downloads the files themselves. The README sa
 
 The event selector sometimes serves the **wrong event**. Ask for Imola 2026 and occasionally you get Fuji 2026. If you trust it blindly, one race's laps end up labelled as another's, and no later check would notice. My downloader confirms the page's selected season and event match the request, and that the file path has the right event folder, retrying until it does.
 
+### The 2026 season as run
+
+8 rounds: Imola, Spa, Le Mans, Sao Paulo, COTA, Fuji, Barcelona (18 October) and Monza (8 November, the finale). Qatar and Bahrain were cancelled in July 2026 because of the conflict in the Middle East, and Barcelona and Monza replaced them.
+
 ### The site was rebuilt in November 2026
 
 The site changed on 3 November 2026. It's now a single-page app with optional accounts and paid season passes for some clients. The old direct file links return a web page with status 200 instead of the CSV, so a naive downloader would save HTML and report success.

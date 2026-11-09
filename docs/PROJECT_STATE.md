@@ -42,7 +42,10 @@ Layer 1 is done and the race order is now checked against the official classific
 ## Next
 
 1. **Pace, stints and pit loss (Layer 3)**
-   - The stint-age effect (fuel and tyres together, D-005), pit loss from in-laps and out-laps against normal pace, and pit-lane time distributions, each checked on held-out races.
+   - Agreed and ready to start. The design is in D-031, and the first step is writing it up as E-020 before anything is fitted.
+   - The stint-age effect (fuel and tyres together, D-005), pit loss from in-laps and out-laps against normal pace, and pit-lane time distributions.
+   - Practice against last season's race as predictors of race pace, by class.
+   - Fit on 2024, check on 2025, refit on both. 2026 stays sealed, with LMGT3 reported separately (its tyre allocation changed) and Barcelona and Monza as a new-circuit test.
 2. **Switch the answers to the hybrid (D-029)**
    - Run the answer eval on the fresh questions with the hybrid, then change the default.
 3. **Regulations, remaining checks**
@@ -62,7 +65,8 @@ Layer 1 is done and the race order is now checked against the official classific
 - Outside Le Mans, 2024 to 2026 is two-class (Hypercar and LMGT3). LMP2 only races at Le Mans.
 - Only Le Mans (2025 and 2026) and COTA 2026 have the 15-point intra-lap timing.
 - Weather is available every minute for every race. `ELAPSED` stops during red flags, so the weather join uses `HOUR`.
-- The site's event selector sometimes returns the wrong event, so downloads must be verified.
+- The timing site was rebuilt on 3 November 2026 and its old file links no longer work. `scripts/ingest.py` uses its public listing instead (D-030).
+- 2026 had 8 rounds. Qatar and Bahrain were cancelled, and Barcelona and Monza replaced them.
 - `B` in `CROSSING_FINISH_LINE_IN_PIT` is the in-lap, and `PIT_TIME` is on the out-lap.
 - Environment: Python 3.13, with a project venv in `.venv/`. `uv` and the DuckDB CLI aren't installed; the DuckDB Python package will do.
 

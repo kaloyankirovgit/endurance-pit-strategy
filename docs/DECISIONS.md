@@ -306,6 +306,42 @@ The ingest writes 2026 into the tables but doesn't analyse it. 2026 stays sealed
 
 ---
 
+## D-031: How Layer 3 is validated, agreed before anything is fitted
+
+*2026-11-09 · design agreed, E-020 not yet written*
+
+**Which data sees what:** fit on 2024, check on 2025, refit on 2024 and 2025, and only then open 2026 once. 2026 stays sealed until the simulator's final test.
+
+**Rule changes that break the assumption that seasons are alike,** from comparing the regulations and not the 2026 results:
+
+| Rule | Change | Consequence |
+|---|---|---|
+| LMGT3 dry tyres (6h / 8h / 10h) | 18 / 26 / 32 in 2024 and 2025, 24 / 32 / 40 in 2026 | 2026 LMGT3 is declared a known rule break and reported separately. If the model fails there, that's a finding, with no adjustment afterwards |
+| Hypercar dry tyres | Unchanged | Expected to carry over |
+| Virtual Safety Car | Absent in 2024, present from 2025 | Mainly Layer 4. The pit entry stays open under it |
+| Maximum driving time | Penalty dropped after 2024 | Minor |
+| Pit lane limit and stop procedure | 60 km/h throughout, procedure text nearly unchanged | Pit loss should carry over better |
+
+Balance of Performance sets refuelling time per event and those documents aren't collected, so an unchanged rulebook doesn't prove conditions were the same. 2024 against 2025 is compared as a stability check on open data.
+
+**2026 is reported in two groups, fixed in advance:** six races at circuits in the fit data (Imola, Spa, Le Mans, Sao Paulo, COTA, Fuji), and Barcelona and Monza as a new-circuit test. Barcelona isn't in 2024 or 2025 at all and the only Monza file is from 2023, so a per-circuit pit loss can't exist for them.
+
+**Practice as a predictor of race pace.** Practice is known before the race, so it can't leak the result. E-020 compares three predictors of each race's clean pace, by class:
+
+1. the same circuit's race pace the previous season, where there is one;
+2. this weekend's practice plus a class offset learned from other races;
+3. raw practice with no offset, as the baseline.
+
+Offsets are learned on 2024 and each 2025 race is predicted all three ways. That's about 16 race-class comparisons (8 races, 2 main classes), enough to show a clear gap and not a small one. Barcelona and Monza only have the practice routes, so they test whether offsets carry to new circuits. What counts as a clean practice lap is fixed in E-020 before any result.
+
+**To record in E-020:** while planning, 2026 median `PIT_TIME_S` and stop counts by class were printed. It's a small look at the sealed year.
+
+**Before 2026 is opened:** check Monza's classification (12 of 27 finishing positions match on a file one day old, and 5 cars have time differences), and check whether the 2026 regulations were revised after the calendar changed (the corpus has `v1.2`).
+
+**Before the simulator's final test:** the traffic result used all 18 non-Le Mans races including 2026, so it must be refitted on 2024 and 2025 or that test won't be clean.
+
+---
+
 ## Tools
 
 The rule of thumb is to use a few tools properly rather than a lot of them badly. A tool comes in when a real need shows up.

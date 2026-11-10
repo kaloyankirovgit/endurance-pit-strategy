@@ -34,7 +34,9 @@ The rules and the code were committed before anything was fitted (E-020). The mo
 - **Stint age:** no model of how lap time changes with laps since a stop beat a flat baseline on the 2025 races, in either class. The 2024 slopes were 0.018 s per lap for Hypercars (−0.016 to 0.051) and 0.044 for LMGT3 (−0.005 to 0.093), over 7 races. So it was not shown useful for prediction. That isn't evidence the effect is zero. Seven races give little power, fuel and tyres can't be separated from timing data (D-005), and laps since a stop isn't tyre age.
 - **What a routine stop costs:** about 77 s without a driver change and 91 s with one for Hypercars, and 75 s and 88 s for LMGT3 (2024 medians of in-lap plus out-lap against the car's own pace). The difference with a driver change is an association, because what's serviced at a stop isn't recorded. The previous year's figure for the same circuit was not shown to beat a class-wide median on the 2025 races.
 - **Predicting race pace:** practice had about 0.9 s less error than the previous year's race at the same circuit, but on 7 races the interval reaches zero, so it's "no clear gap".
-- **Two things this turned up:** a wet race (COTA 2025) got through the clean-lap rules because the slow-lap test compares each race with its own median. And 139 of 2,503 stops cost over 60 s more than their pit-lane time. Most have a caution nearby, so the upper tail of the stop figures can't be read as a clean green-flag stop. Both were found after the check and are labelled that way.
+- **Two things this turned up:** a wet race (COTA 2025) got through the clean-lap rules because the slow-lap test compared each race with its own median. And 139 of 2,503 stops cost over 60 s more than their pit-lane time. Most have a caution nearby, so the upper tail of the stop figures can't be read as a clean green-flag stop. Both were found after the check and are labelled that way.
+- **The wet-race fix (E-021):** a race that ran more than 4% slower than that weekend's practice is now measured against practice instead. Only COTA 2025 switched, and every other race kept its flags exactly. A rerun left the stint-age decision unchanged. Refitting traffic on 2024 and 2025 alone, so that 2026 stays a clean test, gave 0.35 s per car for Hypercars and 0.17 s for GT3 cars, close to the earlier figures.
+- **Checked against how the sport works:** each choice is compared with what teams and the rule-makers say they do in [`docs/research/industry_practice.md`](docs/research/industry_practice.md).
 
 ### Regulation assistant (layer 6, mostly built)
 
@@ -48,7 +50,7 @@ See [`evals/regulations/`](evals/regulations/).
 ### Checks on the AI tools
 
 - **An eval for the AI review agent:** 16 synthetic write-ups with planted statistical flaws and clean controls, run headless through Claude Code and scored in code against labels. It caught 11 of the 12 flaws (E-008). See [`evals/statistical_reviewer/`](evals/statistical_reviewer/).
-- **259 tests on synthetic data,** run in GitHub Actions on every push, with no real data needed.
+- **273 tests on synthetic data,** run in GitHub Actions on every push, with no real data needed.
 
 The full log of what's been tried, including null results, is in [`docs/EXPERIMENT_LOG.md`](docs/EXPERIMENT_LOG.md), and the reasoning behind the bigger choices is in [`docs/DECISIONS.md`](docs/DECISIONS.md).
 

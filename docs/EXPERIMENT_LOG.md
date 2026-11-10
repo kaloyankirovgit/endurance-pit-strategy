@@ -1115,7 +1115,7 @@ Run with `--stage posthoc`.
 
 ## E-021: Does measuring a wet race against practice keep wet running out, and what changes when Layer 3 and traffic are rerun?
 
-*Written 2026-11-10 · registered with its code before the tables were rebuilt*
+*Written 2026-11-10 · registered with its code (`b3fc570`) before the tables were rebuilt · run 2026-11-10*
 
 **Why.** E-020 found that COTA 2025 was wet and got through the clean-lap rules. The slow-lap rule (D-012) and the field-slow rule (D-025) measure each lap against that race's own median. In a mostly wet race the median is a wet lap, so wet laps look normal.
 
@@ -1167,3 +1167,56 @@ On 2024 and 2025 only. The rebuild computes 2026 flags too, but nothing from 202
 - **Must-fix, all addressed:** practice and race references weren't measured the same way, one fast session could become the reference, and Part 1 had no code. The switch rule, the minimum practice size and `check_clean_rule.py` came from these.
 - **Should-fix:** also addressed. The industry comparison was softened in three places, Part D is skipped in code, the race-reference copy of the field-slow ratio was added, circuit intervals and the loose rule went into the traffic refit, and the 2026 test for a different holder was written down.
 - **Not reviewed again:** the switch rule itself.
+
+
+### Found (run 2026-11-10, after commit `b3fc570`; tables rebuilt with `python -m endurance_strategy.pipeline`, then `scripts/check_clean_rule.py`, `scripts/run_layer3.py --run e021` for fit, check and refit, and `scripts/run_traffic_refit.py`; output in `reports/outputs/`, which stays local)
+
+**Part 1: only COTA 2025 switched, and every gate passed.**
+
+- **COTA 2025 switched** in both classes. Its trimmed dry median was 12.4% slower than practice for Hypercars and 9.9% for LMGT3.
+- **Every other race-class sat between 0.991 and 1.007** of practice, including all three Le Mans 2024 classes. So their flags are unchanged and the 1.04 switch threshold was never close to the line.
+- **The old flags reproduce E-020's analysis-lap counts exactly** (41,501 and 37,467).
+- **At COTA 2025** the usable share fell from 37% to 0% of Hypercar laps and from 46% to 4% of LMGT3 laps.
+  - For Hypercars the rule works like dropping the race.
+  - For LMGT3 it keeps 53 laps, from 10 cars and 10 stints, all in hours 5 and 6 as the track dried. That matters below.
+- **Le Mans 2024 doesn't switch.** Its problem in E-015 was mixed conditions within the race, which the field-slow rule is meant to handle (D-025). This rule doesn't change it.
+
+**Part 2: reruns.** These aren't fresh tests.
+
+- **The 2024 fit is identical to E-020's,** because no 2024 race switched: the same slopes, age limits (35 and 30) and warm-up figures.
+- **The 2025 check:** 7 races, 225 car entries, 1,627 stints, 36,171 analysis laps. COTA 2025 has no Hypercar analysis laps, so the Hypercar check has 6 races. The LMGT3 ladder also uses 6 races, because the COTA stints are too short for the anchor test, while its 2025 slope uses 7.
+  - F still holds in both classes. Hypercar L saves 0.019 s (interval −0.062 to 0.100, 6 races). LMGT3 L saves 0.055 s (−0.112 to 0.222, 6 races).
+  - So E-020's decision stands, and no different holder needs testing on 2026.
+- **Refit for the simulator** (14 races at 7 circuits; 39,639 Hypercar and 32,985 LMGT3 laps):
+
+| Simulator input | Hypercar | LMGT3 |
+|---|---|---|
+| Stint-age slope, s per lap, t-interval over races | 0.016 (−0.002 to 0.033), 13 races | 0.026 (−0.014 to 0.065), 14 races |
+| Same, averaged by circuit first (7) | 0.013 (−0.012 to 0.039) | 0.026 (−0.028 to 0.080) |
+| Warm-up, stint lap 2 against ages 3 to 7, s | 0.34 (E-020 refit 0.21) | 0.19 (E-020 refit 0.14) |
+
+  - **Hypercar:** the t-interval includes zero. The race bootstrap (0.001 to 0.031) excludes it. With 13 races at 7 circuits, neither settles it.
+  - **LMGT3:** the 53 drying-track laps at COTA give a race slope of −0.164, the lowest of the 14. With equal race weights, that one race moves the mean from 0.041 (0.015 to 0.066) without it to 0.026, and takes the interval across zero. So whether the LMGT3 interval excludes zero depends on one 53-lap race.
+  - **What goes to the simulator:** the registered 14-race range, as an ASSUMED sensitivity. It's the wider of the two and covers both means. These ranges are for the mean slope. A new race can sit well outside them.
+  - **The warm-up figures changed more than either slope.** Only COTA 2025's flags changed, so both moves come from that one race. That shows how far one race can shift a figure that has no interval.
+- **Routine stop medians** moved by at most 0.2 s (Hypercar 78.1 and 90.9 s, LMGT3 76.9 and 87.0 s, without and with a driver change, 2024 and 2025 pooled). The driver-change 90th percentiles fell by about 1.7 s.
+- **Pit loss on 2025:** 6 races in each class, since COTA's stops lose their reference laps.
+  - The same circuit's 2024 median still doesn't beat the class figure (Hypercar 1.6 s better, interval −3.8 to 6.9; LMGT3 0.2 s worse, interval −4.5 to 4.1).
+  - Coverage meets the 70 to 90% band for the median race-class in both classes (80%), with 2 of 6 outside it.
+  - The driver-change splits still fail in three of four cases.
+
+**Traffic on 2024 and 2025 only (D-031):** seconds per other-class car, races in brackets after each figure. Intervals resample races, then circuits.
+
+| | E-021 rule | E-020 rule | E-014 Part 3, same seasons, before D-025 |
+|---|---|---|---|
+| Hypercar behind LMGT3, race gap window | 0.353 (0.311 to 0.397; circuits 0.296 to 0.414), 13 | 0.356 (0.314 to 0.400), 14 | 0.36 (0.31 to 0.40), 14 |
+| Hypercar, past-only window | 0.343 (0.301 to 0.386), 13 | 0.346, 14 | |
+| LMGT3 ahead of Hypercar, race gap window | 0.173 (0.149 to 0.198; circuits 0.139 to 0.207), 13 | 0.175 (0.150 to 0.202), 14 | 0.18 (0.15 to 0.20), 14 |
+| LMGT3, past-only window | 0.168 (0.143 to 0.194), 14 | 0.170, 14 | |
+
+- **Sample** (Hypercar, race gap window, E-021 rule): 13 races, 238 car entries, 1,703 stints, 42,949 laps. The loose slow-lap rule moves each figure by under 0.005 s.
+- **Why the race counts differ:** Hypercars lose COTA 2025 in both windows because none of their laps there are clean. LMGT3 loses it only in the race gap window, because that window needs the pace gap between the classes, and there's no clean Hypercar pace there.
+- **What goes to the simulator:** these figures become its traffic inputs, in place of E-013's and E-014's 18-race figures, which included the 2026 test races.
+- **Still associations with inferred exposure (D-004),** not a cost per overtake.
+
+**Reviewed before reporting.** The statistical-reviewer agent checked this against the run output. It found two wrong figures (LMGT3 ladder races, and an hourly pace figure with no source) and a misreading of Part 1 for LMGT3, plus overclaims and missing sample sizes. All were corrected, and its figures were recomputed from the output before use.

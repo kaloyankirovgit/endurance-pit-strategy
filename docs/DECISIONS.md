@@ -342,13 +342,20 @@ Offsets are learned on 2024 and each 2025 race is predicted all three ways. That
 
 ## D-032: What Layer 3 hands to the simulator
 
-*2026-11-10 · from E-020. The treatment of wet races is still open*
+*2026-11-10 · from E-020, updated by E-021 the same day*
 
-- **Stint age:** the flat model held in both classes on the 2025 races, so the simulator starts with no fitted age effect. The refit on 14 races gives the range to test instead, labelled ASSUMED: 0.003 s per lap for Hypercars (−0.028 to 0.034) and 0.021 for LMGT3 (−0.027 to 0.069). That is for the mean slope. One new race can sit well outside it, so the sensitivity also has to run the single-race range.
-- **Warm-up:** stint lap 2 is 0.35 s slower for Hypercars and 0.09 s for LMGT3 than ages 3 to 7, from 2024 with no interval. The simulator charges it so a stop isn't made to look too cheap (E-020 on Santillana).
+- **Stint age:** the flat model held in both classes on the 2025 races, in E-020 and again in E-021's rerun. So the simulator starts with no fitted age effect.
+  - The E-021 refit gives the range to test instead, labelled ASSUMED: 0.016 s per lap for Hypercars (−0.002 to 0.033) and 0.026 for LMGT3 (−0.014 to 0.065).
+  - That range is for the mean slope. One new race can sit well outside it, so the sensitivity also runs a single-race range.
+  - Whether the LMGT3 interval excludes zero depends on 53 drying-track laps from COTA 2025 (E-021).
+- **Warm-up:** stint lap 2 is 0.34 s slower for Hypercars and 0.19 s for LMGT3 than ages 3 to 7 (E-021 refit, no interval). The simulator charges it, so a stop isn't made to look too cheap.
 - **Age limits:** 35 laps for Hypercars and 30 for LMGT3. The simulator doesn't extrapolate past them without saying so, and a negative slope isn't an invitation to run longer.
-- **Pit loss:** per class, split by driver change, using empirical medians. The class figure beat nothing and nothing beat it, so per-circuit figures aren't adopted. The upper tail isn't used until the long stops are dealt with.
-- **Open: wet races.** COTA 2025 is in the registered 14-race refit. The slow-lap reference uses each race's own median, so a mostly wet race counts wet pace as normal. A rule for that has to be fixed before 2026 is opened, stated as an amendment, and the traffic refit in D-031 has to use it too.
+- **Pit loss:** per class, split by driver change, using empirical medians from 2024 and 2025: Hypercar 78.1 and 90.9 s, LMGT3 76.9 and 87.0 s.
+  - Per-circuit figures aren't adopted, because they were not shown to beat the class figure.
+  - The upper tail isn't used, because some long stops sit next to cautions (E-020).
+  - A driver-change stop can't be separated from a tyre change in timing data.
+- **Traffic:** E-021's 2024 to 2025 refit under the new clean-lap rule. Hypercar 0.353 s per LMGT3 car ahead, LMGT3 0.173 s per Hypercar behind. The past-only window gives 0.343 and 0.168, and it's the one the simulator uses (D-023).
+- **Wet races:** handled by D-033.
 
 ## D-033: A race that ran slow as a whole is measured against the weekend's practice pace
 

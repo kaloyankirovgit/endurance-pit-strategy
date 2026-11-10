@@ -6,7 +6,7 @@ Where things are right now. Updated at the end of each working session.
 
 ## Current stage
 
-Layer 1 is done and the race order is now checked against the official classifications. The first traffic result is in (E-013). A commit guard now enforces the no-data rule (D-016). The statistical-reviewer agent has an eval (E-008), and regulation retrieval and grounded answers are built and measured, now with the car class as an input (E-009 to E-012). Layer 3 is done and reported (E-020, D-032). The simulator is next, once the treatment of wet races is decided.
+Layer 1 is done and the race order is now checked against the official classifications. The first traffic result is in (E-013). A commit guard now enforces the no-data rule (D-016). The statistical-reviewer agent has an eval (E-008), and regulation retrieval and grounded answers are built and measured, now with the car class as an input (E-009 to E-012). Layer 3 is done and reported (E-020), and the wet-race fix and reruns are done (E-021, D-033). The simulator's inputs are set out in D-032. The deterministic simulator (Layer 4) is next.
 
 ## Done
 
@@ -42,14 +42,18 @@ Layer 1 is done and the race order is now checked against the official classific
   - Routine green-flag stops: medians of about 77 and 91 s for Hypercars, 75 and 88 s for LMGT3, without and with a driver change (2024).
   - Practice against last season's race: no clear gap on 7 races.
   - Found afterwards: COTA 2025 is a wet race the clean-lap rules didn't catch, and 5.6% of eligible stops have a loss over 60 s above their pit-lane time, mostly near a caution.
-- 259 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
+- Wet races are fixed (E-021, D-033).
+  - A race that ran more than 4% slower than practice as a whole is now measured against practice pace. Only COTA 2025 switched, and every other 2024 to 2025 race-class kept its flags exactly.
+  - The Layer 3 rerun leaves the decision unchanged (no age effect).
+  - The traffic refit on 2024 to 2025 gives 0.353 s (Hypercar) and 0.173 s (LMGT3) per car. It is the simulator's input in place of the 18-race figures, which included 2026.
+  - How each choice compares with what teams and the rule-makers do is in `docs/research/industry_practice.md`.
+- 273 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
 
 ## Next
 
-1. **Decide how wet races are handled (D-032)**
-   - The slow-lap reference uses each race's own median, so COTA 2025 got through. A rule needs fixing as an amendment before 2026 is opened, and the traffic refit has to use it too.
-   - Decide what to do with the stops that cost over 60 s more than their pit-lane time.
-   - Then build the deterministic simulator (Layer 4).
+1. **Deterministic simulator (Layer 4)**
+   - Built from D-032's inputs, with invariant tests before any randomness.
+   - Before 2026 is opened: check Monza's classification and any later 2026 regulations revision (D-031).
 2. **Switch the answers to the hybrid (D-029)**
    - Run the answer eval on the fresh questions with the hybrid, then change the default.
 3. **Regulations, remaining checks**

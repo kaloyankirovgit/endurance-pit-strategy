@@ -9,7 +9,7 @@ The question I'm working towards:
 
 ## Where it's at
 
-The data pipeline and the traffic study are done, and the regulation assistant is mostly built and tested. The simulator is next, after the pace and pit-loss models.
+The data pipeline, the traffic study and the pace and pit-loss study are done, and the regulation assistant is mostly built and tested. The simulator is next.
 
 ### Data pipeline (layer 1, done)
 
@@ -27,6 +27,15 @@ The data pipeline and the traffic study are done, and the regulation assistant i
 
 These are associations with inferred traffic, not a measured cost per overtake. Timing data can't see passes.
 
+### Pace and pit stops (layer 3, done)
+
+The rules and the code were committed before anything was fitted (E-020). The models were fitted on 7 races from 2024 and checked once on 7 races from 2025. 2026 stays sealed for the simulator's final test.
+
+- **Stint age:** no model of how lap time changes with laps since a stop beat a flat baseline on the 2025 races, in either class. The 2024 slopes were 0.018 s per lap for Hypercars (−0.016 to 0.051) and 0.044 for LMGT3 (−0.005 to 0.093), over 7 races. So it was not shown useful for prediction. That isn't evidence the effect is zero. Seven races give little power, fuel and tyres can't be separated from timing data (D-005), and laps since a stop isn't tyre age.
+- **What a routine stop costs:** about 77 s without a driver change and 91 s with one for Hypercars, and 75 s and 88 s for LMGT3 (2024 medians of in-lap plus out-lap against the car's own pace). The difference with a driver change is an association, because what's serviced at a stop isn't recorded. The previous year's figure for the same circuit was not shown to beat a class-wide median on the 2025 races.
+- **Predicting race pace:** practice had about 0.9 s less error than the previous year's race at the same circuit, but on 7 races the interval reaches zero, so it's "no clear gap".
+- **Two things this turned up:** a wet race (COTA 2025) got through the clean-lap rules because the slow-lap test compares each race with its own median. And 139 of 2,503 stops cost over 60 s more than their pit-lane time. Most have a caution nearby, so the upper tail of the stop figures can't be read as a clean green-flag stop. Both were found after the check and are labelled that way.
+
 ### Regulation assistant (layer 6, mostly built)
 
 - **Retrieval:** the 2024 to 2026 sporting regulations are split into article-level chunks with season and page, and searched with BM25. It finds the right 2026 clause in the top 5 for 24 of 30 hand-written questions (E-009).
@@ -39,7 +48,7 @@ See [`evals/regulations/`](evals/regulations/).
 ### Checks on the AI tools
 
 - **An eval for the AI review agent:** 16 synthetic write-ups with planted statistical flaws and clean controls, run headless through Claude Code and scored in code against labels. It caught 11 of the 12 flaws (E-008). See [`evals/statistical_reviewer/`](evals/statistical_reviewer/).
-- **199 tests on synthetic data,** run in GitHub Actions on every push, with no real data needed.
+- **259 tests on synthetic data,** run in GitHub Actions on every push, with no real data needed.
 
 The full log of what's been tried, including null results, is in [`docs/EXPERIMENT_LOG.md`](docs/EXPERIMENT_LOG.md), and the reasoning behind the bigger choices is in [`docs/DECISIONS.md`](docs/DECISIONS.md).
 
@@ -51,7 +60,7 @@ The build goes in layers. Each one has to work before the next one leans on it.
    - Raw files to clean, validated tables (Parquet and DuckDB).
 2. **Race order and traffic** (done)
    - Rebuild who was where on track, then look at how lap times change when a faster car is working through slower traffic.
-3. **Pace, stints and pit loss** (next)
+3. **Pace, stints and pit loss** (done)
    - How pace fades through a stint, and what a stop actually costs.
 4. **Simulator**
    - A lap-by-lap race model, deterministic first, then with randomness added one piece at a time and checked against real races.

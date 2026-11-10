@@ -23,6 +23,10 @@ OUTPUT_DIR = PROJECT_ROOT / "reports" / "outputs"
 FIT_FILE = OUTPUT_DIR / "e020_fit.json"
 CHECK_FILE = OUTPUT_DIR / "e020_check.json"
 REFIT_FILE = OUTPUT_DIR / "e020_refit.json"
+POSTHOC_FILE = OUTPUT_DIR / "e020_posthoc.json"
+# Chosen after the check was seen (E-020, "Added after the check"). Neither changes any registered decision.
+WET_RACE = "2025_CIRCUIT_OF_THE_AMERICAS"
+LONG_STOP_EXCESS_S = 60.0
 BETWEEN_RACE_SEED = 20261109
 OTHER_SEED = 20261110
 TRAFFIC_CAP = 6
@@ -284,17 +288,101 @@ def stage_refit(n_boot: int) -> None:
     write(REFIT_FILE, report)
 
 
+def flagged_near_stop(laps: pd.DataFrame, stops: pd.DataFrame, margin: int = 2) -> pd.Series:
+    """Per stop: was any lap from `margin` laps before the in-lap to `margin` after the out-lap under a caution flag?"""
+    flagged = laps[~laps["FLAG_AT_FL"].isin(["GF", "FF"])]
+    caution = {key: group["LAP_NUMBER"].to_numpy() for key, group in flagged.groupby(["event_key", "NUMBER"])}
+    near = []
+    for stop in stops.itertuples():
+        numbers = caution.get((stop.event_key, stop.NUMBER))
+        low, high = stop.out_lap - 1 - margin, stop.out_lap + margin
+        near.append(numbers is not None and bool(((numbers >= low) & (numbers <= high)).any()))
+    return pd.Series(near, index=stops.index)
+
+
+def posthoc_checks(laps: pd.DataFrame, frame: pd.DataFrame, check: dict, stops: pd.DataFrame) -> dict:
+    """The figures the results review asked for, computed here so that each one can be rerun."""
+    keep_wet = frame["event_key"] != WET_RACE
+    limits = json.loads(FIT_FILE.read_text())["part_a"]["support_limits"]
+    with_wet, without_wet = pace.slope_summary(frame, limits), pace.slope_summary(frame[keep_wet], limits)
+    wet_laps = laps[laps["event_key"] == WET_RACE]
+    wet_clean = wet_laps[wet_laps["is_usable_for_pace_model"] & wet_laps["CLASS"].eq("HYPERCAR")]
+    near = flagged_near_stop(laps, stops)
+    long_stop = stops["excess_s"] > LONG_STOP_EXCESS_S
+    check_slopes = check["part_b"]["slopes_2025"]
+    holdout = check["part_c"]["holdout"]
+    predictions = pd.DataFrame(check["part_d"]["predictions"])
+    lmgt3 = predictions[predictions["CLASS"] == "LMGT3"]
+    out = {
+        "wet_race_usable_share": {c: float(g["is_usable_for_pace_model"].mean()) for c, g in wet_laps[wet_laps["CLASS"].isin(pace.CLASSES)].groupby("CLASS")},
+        "wet_race_hypercar_rain_share": float(wet_laps.loc[wet_laps["CLASS"].eq("HYPERCAR"), "RAIN"].gt(0).mean()),
+        "wet_race_flag_first_lap": {flag: int(group["LAP_NUMBER"].min()) for flag, group in wet_laps[wet_laps["FLAG_AT_FL"].isin(["SF", "RF"])].groupby("FLAG_AT_FL")},
+        "wet_race_hypercar_usable_median_by_hour": {int(h): float(v) for h, v in wet_clean.groupby((wet_clean["ELAPSED_S"] // 3600).astype(int))["LAP_TIME_S"].median().items()},
+        "long_stop_non_green_near": {"long": int(near[long_stop].sum()), "of_long": int(long_stop.sum()), "other": int(near[~long_stop].sum()), "of_other": int((~long_stop).sum())},
+        "one_new_race_prediction_interval_s": {},
+        "circuit_level_t_interval_s": {},
+        "slope_2025_without_wet_race": {},
+        "pit_holdout_without_wet_race": {},
+        "pit_mean_error_s": {},
+    }
+    for c in pace.CLASSES:
+        all_races = with_wet[c]["s_per_lap"]["race_slopes"]
+        kept = without_wet[c]["s_per_lap"]["race_slopes"]
+        out["one_new_race_prediction_interval_s"][c] = {"all_14": pace.prediction_interval(list(all_races.values())), "without_wet_race": pace.prediction_interval(list(kept.values()))}
+        by_circuit = pd.Series(all_races).groupby(lambda event: pace.circuit_of(event)).mean()
+        out["circuit_level_t_interval_s"][c] = pace.mean_with_t_interval(by_circuit)
+        out["slope_2025_without_wet_race"][c] = pace.mean_with_t_interval([v for e, v in check_slopes[c]["s_per_lap"]["race_slopes"].items() if e != WET_RACE])
+        races = pd.DataFrame(holdout[c]["races"]).set_index("event_key")
+        kept_races = races.drop(index=WET_RACE)
+        out["pit_holdout_without_wet_race"][c] = pace.paired_comparison(kept_races["circuit_error_s"], kept_races["class_error_s"])
+        out["pit_mean_error_s"][c] = {"class": float(races["class_error_s"].mean()), "circuit": float(races["circuit_error_s"].mean())}
+    gap = lambda table: pace.mean_with_t_interval(table["P1_abs_error_s"] - table["P2_abs_error_s"])
+    out["lmgt3_p2_vs_p1_leave_one_out"] = {"all": gap(lmgt3), **{event: gap(lmgt3[lmgt3["event_key"] != event]) for event in sorted(lmgt3["event_key"].unique())}}
+    return out
+
+
+def stage_posthoc() -> None:
+    """Diagnostics chosen after the 2025 check was seen. Description only: no registered decision is revisited."""
+    if not REFIT_FILE.exists():
+        raise SystemExit("run the registered stages first")
+    check = json.loads(CHECK_FILE.read_text())
+    errors = pd.DataFrame(check["part_b"]["errors_by_race"])
+    without_wet = errors[errors["event_key"] != WET_RACE]
+    predictions = pd.DataFrame(check["part_d"]["predictions"])
+    limits = json.loads(FIT_FILE.read_text())["part_a"]["support_limits"]
+    laps, _ = load(("2024", "2025"))
+    fit_laps = outside_le_mans(laps)
+    frame = pace.analysis_laps(fit_laps)
+    stops = pace.eligible_stops(pace.routine_stop_events(fit_laps))
+    stops["excess_s"] = stops["pit_loss_s"] - stops["pit_time_s"]
+    short = stops[stops["excess_s"] <= LONG_STOP_EXCESS_S]
+    report = {
+        "ladder_without_wet_race": {c: pace.decision_ladder(without_wet, c) for c in pace.CLASSES},
+        "pace_comparisons_without_wet_race": pace.pace_comparisons(predictions[predictions["event_key"] != WET_RACE], expected_races=6),
+        "refit_without_wet_race": pace.slope_summary(frame[frame["event_key"] != WET_RACE], limits),
+        "wet_race_analysis_laps": pace.sample_counts(frame[frame["event_key"] == WET_RACE]),
+        "long_stops": {"threshold_s": LONG_STOP_EXCESS_S, "long": int(len(stops) - len(short)), "of": int(len(stops)),
+                       "by_race": {event: int(count) for event, count in stops[stops["excess_s"] > LONG_STOP_EXCESS_S].groupby("event_key").size().items()}},
+        "stops_without_long_stops": pace.stop_quantiles(short.drop(columns="circuit"), ["CLASS", "driver_changed"]),
+        "stops_all": pace.stop_quantiles(stops.drop(columns="circuit"), ["CLASS", "driver_changed"]),
+    }
+    report.update(posthoc_checks(laps, frame, check, stops))
+    write(POSTHOC_FILE, report)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--stage", choices=["fit", "check", "refit"], required=True)
+    parser.add_argument("--stage", choices=["fit", "check", "refit", "posthoc"], required=True)
     parser.add_argument("--n-boot", type=int, default=2000)
     args = parser.parse_args()
     if args.stage == "fit":
         stage_fit(args.n_boot)
     elif args.stage == "check":
         stage_check()
-    else:
+    elif args.stage == "refit":
         stage_refit(args.n_boot)
+    else:
+        stage_posthoc()
 
 
 if __name__ == "__main__":

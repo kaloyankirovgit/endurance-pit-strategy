@@ -936,7 +936,7 @@ Under a flat prior updated on E-017's direction, adoption is about 35% to 76% ac
 
 ## E-020: How does pace change with stint age, what does a routine stop cost, and what predicts a race's pace?
 
-*Written 2026-11-09, committed 2026-11-10 · pre-registered, with the code that runs it, before any Layer 3 quantity was computed · not yet run*
+*Written 2026-11-09, committed 2026-11-10 · pre-registered, with the code that runs it, before any Layer 3 quantity was computed · run 2026-11-10*
 
 **Questions:** (A) what range of stint ages can the data support, (B) how does lap time change with laps since the last stop, by class, (C) how much time does a routine green-flag stop cost, by class and circuit, and (D) does practice or last season's race predict a race's clean pace better? The design comes from D-031. This entry fixes the definitions and decision rules. The code is `models/pace.py` and `scripts/run_layer3.py`.
 
@@ -1041,3 +1041,72 @@ Any change is a dated amendment to this entry saying what was known when it was 
 **Known limits:** one race per circuit per fit season, so a circuit effect and a one-off race are the same thing in 2024. Seven fit races means wide intervals. The races share cars, teams and circuits across seasons, and that isn't resampled. Deliberate fuel or tyre saving isn't visible in timing data and is tied to strategy, which is what's being modelled.
 
 **Reviewed before being fixed.** The statistical-reviewer agent raised 14 objections to the first draft, and Kaloyan accepted all of them on 2026-11-09, including the decision ladder and the wet-session rule. The change to leave stint lap 2 out of L and the pit-loss reference came from working through that review, and wasn't checked by the reviewer separately. The code-reviewer agent then compared the code with this entry. Its findings were fixed or written in here before this was committed, except a missing 2024 stop count at a circuit, which stops the run with an error.
+
+### Found (run 2026-11-10, after commit `f4d8ff4`, by `python scripts/run_layer3.py --stage fit`, then `check`, then `refit`, output in `reports/outputs/`, which stays local)
+
+**Sample.** Fit, 2024: 7 races at 7 circuits, 254 car entries, 120 drivers, 1,845 stints, 41,501 analysis laps. Check, 2025: 7 races at 7 circuits, 249 car entries, 123 drivers, 1,737 stints, 37,467 analysis laps. The races are the independent unit, and there are 7 in each season. The caution flag covered more of 2025 (8.2% of Hypercar laps) than 2024 (4.4%), and the slow-lap flag more too (15.3% against 12.1%).
+
+**Support (Part A).** Ages are supported up to 35 for Hypercars and 30 for LMGT3. The 2024 fit leaves out 717 and 214 laps past those limits, and 2025 scoring leaves out 881 and 392.
+
+**Stint age (Part B): not shown to be useful for prediction.**
+
+| | Hypercar | LMGT3 |
+|---|---|---|
+| 2024 slope, s per lap of stint age (t-interval over 7 races) | 0.018 (−0.016 to 0.051) | 0.044 (−0.005 to 0.093) |
+| 2024 slope, % of the race's median clean lap | 0.015 (−0.014 to 0.045) | 0.035 (−0.003 to 0.074) |
+| Range of the 7 race slopes, s per lap | −0.027 to 0.067 | −0.022 to 0.117 |
+| 2025 slope, s per lap | −0.011 (−0.073 to 0.051) | −0.002 (−0.100 to 0.096) |
+| Warm-up: stint lap 2 against ages 3 to 7, s | 0.35 | 0.09 |
+| 2025 mean absolute error, F / B / L, s | 1.054 / 1.045 / 1.056 | 1.076 / 1.067 / 1.093 |
+| B against F, s saved (interval) | 0.009 (−0.053 to 0.070) | 0.009 (−0.134 to 0.153) |
+| L against F, s saved (interval) | −0.002 (−0.085 to 0.081) | −0.017 (−0.237 to 0.204) |
+| **Holder after the ladder** | **F** | **F** |
+| 2025 race slopes inside the 95% prediction interval (width) | 6 of 7 (0.189 s/lap) | 6 of 7 (0.276 s/lap) |
+
+- These are within-stint associations with laps since a stop, combining fuel, tyres on an unknown mix of used and new sets, and anything else that moves with stint age. They aren't tyre degradation (D-005). Neither class's 2024 t-interval excludes zero. The LMGT3 bootstrap interval does (0.009 to 0.081), but with 7 races that one runs narrow, as registered.
+- F holding means no model improved held-out error by more than the uncertainty on 7 races. It doesn't show the effect is zero. The synthetic power quoted above (46% at 0.02 s/lap, 97% at 0.04) assumed a race-slope SD of 0.01, far below the 0.036 and 0.053 measured here, so real power is lower and wasn't measured.
+- The two coverage checks pass, but with intervals that wide a pass says little.
+- All nine 2024 sensitivities were stable under the registered definition (largest move 0.0075 s/lap). None of them removes a steady track trend, which isn't identified alongside stint age.
+- The 2025 slopes are pulled down by COTA 2025, the only race outside the prediction interval in each class. Without it (post hoc, 6 races) they are 0.013 (−0.010 to 0.036) for Hypercars and 0.036 (0.004 to 0.069) for LMGT3.
+- **What goes to the simulator:** the holder is F, so no fitted age effect. L's range goes in as an ASSUMED sensitivity. From the registered refit on 14 races: Hypercar 0.003 (−0.028 to 0.034) s per lap and LMGT3 0.021 (−0.027 to 0.069). That range is for the mean slope only, and 14 races are 7 circuits twice (averaging by circuit first gives −0.039 to 0.046 and −0.042 to 0.084). For one new race, the 95% prediction interval is −0.117 to 0.124 for Hypercars and −0.166 to 0.208 for LMGT3. Its lower bound comes from the wet COTA 2025 race. Without that race (post hoc) the prediction intervals are −0.051 to 0.082 and −0.056 to 0.137.
+
+**Routine green-flag stops (Part C).** 2024 stops: 665 eligible of 886 for Hypercars and 706 of 1,001 for LMGT3. 2025: 568 of 830 and 564 of 931. The remainder are listed by reason in the run output. Pit loss is INFERRED, with an ASSUMED reference rule.
+
+| 2024, s | Hypercar | LMGT3 |
+|---|---|---|
+| Class median of race medians (interval over races) | 84.4 (76.3 to 87.6) | 81.9 (77.4 to 83.8) |
+| Driver stays: 10th / 50th / 90th percentile | 57.1 / 77.0 / 93.0 | 35.6 / 75.4 / 90.6 |
+| Driver changes: 10th / 50th / 90th percentile | 76.3 / 90.6 / 117.8 | 73.9 / 87.6 / 101.3 |
+
+- The higher median with a driver change (13.7 s for Hypercars and 12.1 s for LMGT3, no interval) is an association: those stops differ in other ways too, and service content isn't observed.
+- These stops are green at the line only. The upper tail is affected by long stops, set out below, so the 90th percentiles aren't a clean description of a green-flag stop. The share of stops at a caution was 9 to 17% by class and season.
+- The same circuit's 2024 median did not beat the class-wide median on 2025 (Hypercar, 2.5 s better, interval −2.3 to 7.4; LMGT3, 0.8 s worse, interval −4.6 to 2.9), so the class figure stays by the rule (mean error, class figure against circuit figure: Hypercars 8.6 against 6.0 s, LMGT3 3.0 against 3.8 s). With one race per circuit per season and BoP changing by event, a single earlier race was not shown to help. That doesn't show circuits are alike. Without COTA 2025 (post hoc) the result is unchanged (1.6 s, interval −3.8 to 6.9; and −0.2 s, interval −4.5 to 4.1). The class-wide median also pools stops about 13 s apart by driver change, and the simulator's actions separate those.
+- Class-wide error on individual 2025 races runs from 1.4 to 24.4 s for Hypercars and 0.3 to 6.4 s for LMGT3.
+- **Coverage is mixed.** The median race-class had 80% of its 2025 stops inside the 2024 range for each class, which meets the registered 70 to 90% band, but 3 of 7 race-classes fell outside it in each class. Split by driver change it fails three times out of four: no driver change 67% for both classes, and driver change 66% for LMGT3 (85% for Hypercars). The range is a loose guide and not a calibrated distribution.
+- Median pit loss minus `PIT_TIME_S` in 2025 is 4.8 s for Hypercars and 1.3 s for LMGT3, so pit-lane time is near the median cost, but not the same quantity and not at the tails.
+
+**What predicts a race's clean pace (Part D): no clear gap on 7 races.** Comparing 2025 absolute error, seconds saved by the first-named predictor:
+
+| Comparison | Mean | Interval over 7 races |
+|---|---|---|
+| Practice × class ratio against raw practice | 0.00 | −0.04 to 0.04 |
+| Practice × class ratio against last season's race | 0.88 | −0.03 to 1.80 |
+| Last season's race against raw practice | −0.88 | −1.78 to 0.01 |
+
+- The practice routes have the lower error in the point estimate by about 0.9 s, with intervals that reach zero. This is "no clear gap" on 7 races, not evidence that they're equal.
+- Taken alone, LMGT3 shows a gap for practice over last season's race (0.77 s, interval 0.02 to 1.53). Because the class ratio and raw practice are nearly equal, the matching figure for raw practice (0.79 s) is the same gap counted twice. It isn't robust: leaving out any one of 6 of the 7 races takes the interval across zero, such as without COTA 2025 (0.73 s, −0.20 to 1.66) or Spa (0.54 s, −0.08 to 1.16). Treat it as a weak lead from one class of two.
+- With the fastest-session version, the class ratio does beat raw practice (0.39 s, interval 0.09 to 0.69), since the fastest session tends to run quicker than the race. That one is a sensitivity and doesn't replace the primary.
+- Le Mans 2025, shown apart: P1 (from the compromised 2024 race) has errors of 2.3 s and 1.9 s for Hypercars and LMGT3, against 0.2 and 0.7 s for P2. One race per class.
+
+**Le Mans, described only and not fitted.** Within-race slopes are negative: Hypercars −0.19 s per lap in 2024 and −0.11 in 2025, LMGT3 −0.14 and −0.07. Only stint ages from 3 up are used and no support limit applies. One race each, with 2024 compromised (E-015). For comparison, the 2024 seven-race mean is positive and the 2025 mean is near zero because of COTA. No explanation for the difference was tested. Routine stops at Le Mans, median and 10th to 90th percentile, in seconds: 2024 Hypercar 73.6 (67.5 to 115.6) and LMGT3 82.1 (70.0 to 111.3) with 169 and 172 stops; 2025 Hypercar 76.0 (70.3 to 103.6) and LMGT3 79.3 (70.3 to 103.2) with 516 and 509 stops.
+
+### Added after the check (2026-11-10). These were chosen after seeing it and change no registered decision
+
+Run with `--stage posthoc`.
+
+- **COTA 2025 looks like a wet race the clean-lap rules didn't catch.** Wetness is INFERRED from the timing: `FLAG_AT_FL` is SF from lap 1 and RF first appears on lap 14. RAIN is above zero on 22% of Hypercar laps. 34% of Hypercar laps and 41% of LMGT3 laps pass the filters. The usable Hypercar median by hour runs from about 131 to 126 s, against about 115 s in the dry 2024 race, and every predictor is 13 to 15 s out there. A [RACER race report](https://racer.com/2025/09/07/no-6-porsche-wins-wet-and-wild-lone-star-le-mans-at-cota) is titled "wet and wild", and other reports describe rain and a red flag. I saw those as search results and couldn't open the page. The slow-lap reference is the race's own median, so in a mostly wet race wet pace counts as normal (the open reference issue from E-016). This is a known gap in D-012 and D-025 and it reached the fit.
+- Without COTA 2025 the ladder is unchanged: F still holds in both classes (L saves 0.019 s for Hypercars, interval −0.062 to 0.100, and 0.055 s for LMGT3, interval −0.112 to 0.222, on 6 races). The Part D comparisons also show no clear gap.
+- Without COTA 2025, the 13-race refit gives Hypercars 0.016 (−0.002 to 0.033) and LMGT3 0.041 (0.015 to 0.066) s per lap, so the LMGT3 interval excludes zero. This is one exclusion chosen after seeing the data, and it's reported as such. The registered 14-race figures stand.
+- **139 of 2,503 eligible stops (5.6%, 2024 and 2025 pooled) cost over 60 s more than their pit-lane time.** 126 of those 139 have a caution-flag lap within two laps of the stop, against 92 of the other 2,364. One Spa 2025 in-lap took 319 s and still showed green at the line. A caution starting during the lap would look like this, but the timing can't confirm it, since the flag is only read at the line. Without them the median moves by up to 1.0 s and the 90th percentile drops by up to 13.4 s (pooled, Hypercar with driver change). The 60 s line was chosen after looking. So the medians are usable and the upper tail isn't a clean description of a stop that was green throughout.
+
+**Reviewed before reporting.** The statistical-reviewer agent checked these results against the run output. It found four errors in the first draft and eight smaller problems. All were corrected. Every figure it asked for is computed in `--stage posthoc`, and it was recomputed from the code rather than copied, which corrected one reviewer figure (the first red-flag lap is 14). No registered decision changed.

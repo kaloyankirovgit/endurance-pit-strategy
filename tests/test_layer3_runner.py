@@ -32,7 +32,7 @@ def synthetic_laps(event: str, rng: np.random.Generator) -> pd.DataFrame:
                                  "stint_lap": stint_lap, "LAP_TIME_S": time, "ELAPSED_S": elapsed, "S1_S": 30.0, "S2_S": 30.0, "S3_S": 40.0,
                                  "PIT_TIME_S": 40.0 if out_lap else np.nan, "is_in_lap": in_lap, "is_out_lap": out_lap, "is_garage_stop": False,
                                  "FLAG_AT_FL": "GF", "CROSSING_FINISH_LINE_IN_PIT": "B" if in_lap else "", "DRIVER_NUMBER": str(stint % 2),
-                                 "DRIVER_NAME": f"{number}-{stint % 2}", "TRACK_TEMP": 30.0 + rng.normal(0, 0.5)})
+                                 "DRIVER_NAME": f"{number}-{stint % 2}", "TRACK_TEMP": 30.0 + rng.normal(0, 0.5), "RAIN": 0.0})
     frame = pd.DataFrame(rows)
     for flag in EXCLUSION_FLAGS:
         frame[flag] = False
@@ -60,6 +60,7 @@ def runner(tmp_path, monkeypatch):
     monkeypatch.setattr(module, "FIT_FILE", tmp_path / "fit.json")
     monkeypatch.setattr(module, "CHECK_FILE", tmp_path / "check.json")
     monkeypatch.setattr(module, "REFIT_FILE", tmp_path / "refit.json")
+    monkeypatch.setattr(module, "POSTHOC_FILE", tmp_path / "posthoc.json")
     return module
 
 
@@ -102,6 +103,15 @@ def test_stages_run_in_order_and_recover_the_planted_effects(runner):
     refit = json.loads(runner.REFIT_FILE.read_text())
     assert len(refit["races"]) == 14
     assert refit["support_limits"] == fit["part_a"]["support_limits"]
+
+    runner.stage_posthoc()
+    posthoc = json.loads(runner.POSTHOC_FILE.read_text())
+    assert posthoc["ladder_without_wet_race"]["HYPERCAR"]["steps"][0]["races"] == 6
+    assert posthoc["refit_without_wet_race"]["HYPERCAR"]["s_per_lap"]["races"] == 13
+    assert posthoc["long_stops"]["long"] == 0
+    assert posthoc["slope_2025_without_wet_race"]["HYPERCAR"]["races"] == 6
+    assert posthoc["circuit_level_t_interval_s"]["HYPERCAR"]["races"] == 7
+    assert posthoc["lmgt3_p2_vs_p1_leave_one_out"]["all"]["races"] == 7
 
 
 def test_runner_cannot_load_the_sealed_season(runner):

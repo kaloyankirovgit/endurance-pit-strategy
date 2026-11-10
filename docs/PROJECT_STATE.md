@@ -2,11 +2,11 @@
 
 Where things are right now. Updated at the end of each working session.
 
-*Last updated: 2026-11-09*
+*Last updated: 2026-11-10*
 
 ## Current stage
 
-Layer 1 is done and the race order is now checked against the official classifications. The first traffic result is in (E-013). A commit guard now enforces the no-data rule (D-016). The statistical-reviewer agent has an eval (E-008), and regulation retrieval and grounded answers are built and measured, now with the car class as an input (E-009 to E-012). The next choice is between the remaining regulation checks and the traffic work.
+Layer 1 is done and the race order is now checked against the official classifications. The first traffic result is in (E-013). A commit guard now enforces the no-data rule (D-016). The statistical-reviewer agent has an eval (E-008), and regulation retrieval and grounded answers are built and measured, now with the car class as an input (E-009 to E-012). Layer 3 is done and reported (E-020, D-032). The simulator is next, once the treatment of wet races is decided.
 
 ## Done
 
@@ -37,15 +37,19 @@ Layer 1 is done and the race order is now checked against the official classific
 - The project is described as a DAG, generated into `docs/LINEAGE.md` and the README. Tests tie it to real files, functions and imports, and one enforces that numerical code can't import the LLM layer (D-028).
 - The second retriever test has run on 43 questions from a blind racer agent, 33 answerable (E-019). The hybrid won 4 of the 5 questions that differed, meeting a looser rule set after E-017 failed, so it becomes the default once the answer eval has run on it (D-029). It wasn't shown better (p = 0.375). The answer path still uses BM25 for now.
 - `python scripts/ingest.py` fetches and checks new races and practice sessions and rebuilds the tables (D-030). The tables now hold 24 races, 197,503 laps. Reported results stay on the first 21 (`CORPUS_V1`). Practice laps are in `practice_laps.parquet` for all 24 race weekends.
-- 199 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
+- Layer 3 is done (E-020, D-032). The rules and code were committed before any fit, then fitted on 7 races from 2024 and checked once on 7 from 2025.
+  - A flat model held in both classes, so a stint-age effect was not shown useful for prediction, which isn't evidence it's zero.
+  - Routine green-flag stops: medians of about 77 and 91 s for Hypercars, 75 and 88 s for LMGT3, without and with a driver change (2024).
+  - Practice against last season's race: no clear gap on 7 races.
+  - Found afterwards: COTA 2025 is a wet race the clean-lap rules didn't catch, and 5.6% of eligible stops have a loss over 60 s above their pit-lane time, mostly near a caution.
+- 259 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
 
 ## Next
 
-1. **Pace, stints and pit loss (Layer 3)**
-   - Agreed and ready to start. The design is in D-031, and the first step is writing it up as E-020 before anything is fitted.
-   - The stint-age effect (fuel and tyres together, D-005), pit loss from in-laps and out-laps against normal pace, and pit-lane time distributions.
-   - Practice against last season's race as predictors of race pace, by class.
-   - Fit on 2024, check on 2025, refit on both. 2026 stays sealed, with LMGT3 reported separately (its tyre allocation changed) and Barcelona and Monza as a new-circuit test.
+1. **Decide how wet races are handled (D-032)**
+   - The slow-lap reference uses each race's own median, so COTA 2025 got through. A rule needs fixing as an amendment before 2026 is opened, and the traffic refit has to use it too.
+   - Decide what to do with the stops that cost over 60 s more than their pit-lane time.
+   - Then build the deterministic simulator (Layer 4).
 2. **Switch the answers to the hybrid (D-029)**
    - Run the answer eval on the fresh questions with the hybrid, then change the default.
 3. **Regulations, remaining checks**
@@ -53,9 +57,7 @@ Layer 1 is done and the race order is now checked against the official classific
    - Cut the checker's false positives: an article number named but not cited, and a number derived from a clause's rule (E-018).
    - Embed the long chunks (12.2.2 is 727 tokens, cut at 512) by sub-clause, tested on fresh questions.
    - A cleaner extraction of the tyre tables (6.5.3, 6.5.4).
-4. **Slow-lap reference**
-   - The slow-lap rule's reference median still includes field-slow periods (E-016). Recompute it without them if Layer 3 shows it matters.
-5. **Reviewer eval, second round**
+4. **Reviewer eval, second round**
    - A fresh held-out case set before changing the agent prompt (it rated "measured overtakes" as minor), then the other three agents.
 
 ## Key facts
@@ -88,7 +90,7 @@ Layer 1 is done and the race order is now checked against the official classific
 | Weather join and garage flag | Built and run on the full corpus |
 | Interim / processed layers | Built as one command, writing schema-checked Parquet |
 | Race order and gaps | Built, and the final order checked against the official classifications (E-007) |
-| Traffic, pace and pit-loss models | Traffic done: both directions and Le Mans pairs, reviewed (E-013 to E-015, D-024). Pace and pit loss not started |
+| Traffic, pace and pit-loss models | Traffic done: both directions and Le Mans pairs, reviewed (E-013 to E-015, D-024). Pace and pit loss done and reviewed (E-020, D-032) |
 | Simulator and optimiser | Not started |
 | Regulations and LLM layer | Retrieval (E-009, E-011, E-017), grounded answers with a code checker (E-010), in-scope refusal (E-018) and class-aware answers (E-012) built and measured; no simulator tool yet |
 | CI | Running on GitHub Actions, passing |

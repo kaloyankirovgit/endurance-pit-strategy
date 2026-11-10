@@ -931,3 +931,113 @@ Under a flat prior updated on E-017's direction, adoption is about 35% to 76% ac
 - **The result leans on the questions with several gold articles.** 11 of the 33 have several, and any one in the top 5 counts as a hit. On the 22 with a single gold article the split is 3 to 0, which the rule would call inconclusive. Requiring every gold article in the top 5 gives 6 to 0. So multi-gold labels don't favour the hybrid, but passing the 4-question gate depends on them.
 - **What this doesn't show:** every question came from one model, and Claude drafted the labels. Kaloyan checked them without notes, but with BM25's misses in mind from earlier work. The hybrid contains BM25, so this measures what adding embeddings changes, and it says nothing about real users or sim-racing wording alone.
 - **Not applied yet.** `rag/answer.py` and the answer eval still use BM25. As fixed above, the E-010, E-012 and E-018 figures don't carry over, and the answer eval runs on the fresh set before the switch is made.
+
+---
+
+## E-020: How does pace change with stint age, what does a routine stop cost, and what predicts a race's pace?
+
+*Written 2026-11-09, committed 2026-11-10 · pre-registered, with the code that runs it, before any Layer 3 quantity was computed · not yet run*
+
+**Questions:** (A) what range of stint ages can the data support, (B) how does lap time change with laps since the last stop, by class, (C) how much time does a routine green-flag stop cost, by class and circuit, and (D) does practice or last season's race predict a race's clean pace better? The design comes from D-031. This entry fixes the definitions and decision rules. The code is `models/pace.py` and `scripts/run_layer3.py`.
+
+**Who sees what:**
+
+| Data | Role |
+|---|---|
+| 2024, 7 races outside Le Mans | Fitting, including every offset, support limit and reference |
+| 2025, 7 races outside Le Mans | Checked once, after the fit is frozen |
+| 2024 and 2025 Le Mans | Described apart, with a within-race slope and stop percentiles for each, and never used to fit or tune anything, because 2024 is compromised (E-015) |
+| 2024 and 2025 together | Refit after the check, to give the parameters the simulator uses. The age limits stay frozen on 2024, so no age untested on 2025 goes through. C isn't refitted, since a circuit then has two races |
+| 2026, all 8 races | Sealed. The analysis loader raises an error on the 2026 season unless explicitly opened, and a test enforces it |
+
+The runner has two stages. `--stage fit` reads 2024 only and writes the frozen parameters. `--stage check` refuses to run without that file. Neither overwrites its own output, so a rerun takes a deliberate amendment.
+
+**What has already been seen.** This isn't a blind analysis:
+
+- While planning, 2026 median `PIT_TIME_S` and stop counts by class were printed (D-031). That's a small look at the sealed year.
+- 2024 and 2025 were seen in Layers 1 and 2: pit-column checks, per-event `PIT_TIME_S` medians, stint counts and clean-lap rates (E-003 to E-005). No stint-age effect, pit loss or practice comparison has been computed for any season.
+- The traffic fits used within-stint trends from 2024, 2025 and 2026 only as nuisance terms, and those slopes were not reported.
+
+**Outside evidence, read before this was fixed** (`docs/research/literature.md`). Excluding in-laps, out-laps and safety-car laps is common practice in the papers read, and they don't agree beyond that. Nothing read supports the 1.07 slow-lap ratio in particular, so it stays a choice (D-012) with the loose rule as its check. Three things changed this entry: a lap that is both an out-lap and an in-lap gets its own status (Fieni et al.), the warm-up lap is measured separately so the simulator can charge it (Santillana), and flagged-lap shares are reported by season, since a green-flag filter can remove more from one season than another (Joshi). Those searches found no open WEC study fitting stint age from timing data.
+
+### What stint age measures
+
+- **`stint_lap` is laps since the car last had a `PIT_TIME` entry (RECONSTRUCTED). It isn't tyre age, and refuelling isn't observed.** Teams carry tyres across stops, the timing doesn't record which stops changed them, and any `PIT_TIME` resets the count, including a penalty.
+- **The fitted effect is one combined quantity (INFERRED):** fuel burn, tyre wear on an unknown mix of new and used tyres, and anything else that moves steadily with laps since a stop. Fuel and tyres are not separated (D-005), and no result is worded as tyre degradation.
+- **A steady change in the track over the race can't be separated from stint age.** With one intercept per stint, age equals race time minus the stint's start time, so a linear race-time trend is not identified alongside it (the age-period-cohort problem). The track temperature check below is a partial control. A field-relative adjustment isn't used, because pit cycles are roughly synchronised and the field median would absorb part of the age effect.
+- **What the fit is weighted towards.** Within-stint least squares weights a stint by its spread of ages, so long stints count for much more. The estimate is conditional on a stint having reached that age, and stint length is a choice teams make. The support rule limits extrapolation and doesn't remove that selection.
+- **Caution laps count towards `stint_lap`** while adding far less fuel use and wear, and unevenly by race. The no-caution sensitivity below checks this.
+
+### Part A: support, measured first
+
+Laps are `is_usable_for_pace_model` (D-012, D-025), classes HYPERCAR and LMGT3, in stints with at least 5 such laps, not starting from a garage stop. Counts are reported by class and circuit in races, cars, drivers, stints and laps, with the share of laps excluded by each flag, per season.
+
+**Support rule:** an age is supported for a class if at least 30 stints from at least 4 races have an analysis lap at that age in 2024. The limit is the highest age up to which every age from 3 is supported. Fits and scoring stop at it. The number of laps dropped by this rule is reported. Long ages come from cars that chose to run long, so the simulator can't extrapolate past the limit without saying so.
+
+### Part B: the stint-age effect
+
+All per class. The out-lap is excluded, so ages start at 2. **Stint lap 2 is treated as warm-up and left out of L, Q and C**, because one slow early lap tilts a straight line. It's reported as its own quantity: the median lap at age 2 minus the median at ages 3 to 7, per race, averaged equally over races.
+
+| Name | Model | Role |
+|---|---|---|
+| F | No age effect | Null comparator |
+| B | Median lap at each age minus the median at ages 3 to 7, per race, averaged equally over races, held flat past the support limit | Baseline, no stint intercepts |
+| L | Within-stint least squares, lap time on age, ages 3 and above, one intercept per stint, fitted per race, then the equal-weight mean of the race slopes | **Primary** |
+| Q | As L with age squared added | Is the shape curved |
+| C | L, using the same circuit's 2024 race slope | Does the circuit matter. Partly a test of lap length, since slopes are in seconds |
+
+- **Estimate:** seconds per lap of stint age, and the same slope as a percentage of that race's median clean lap, because races pool circuits of different lengths. Per class. Intervals are a 95% t-interval over the 7 race slopes and a percentile bootstrap of whole races (2,000 draws, seed 20261109). With 7 races the bootstrap runs narrow, so the t-interval is the headline, as in E-014.
+- **Held-out test.** On 2025 stints with at least 10 analysis laps at age 3 or above, the first 5 of those laps are the anchor, for every model. Later laps up to the 2024 support limit are predicted: anchor mean, plus f(age), minus the mean of f over the anchor ages. The score is mean absolute error per race and class. Mean signed error is also reported, since strategy depends on accumulated time. The level comes from the stint's first laps and f from 2024 alone, but lap selection uses whole-race information (the slow-lap median and the field-slow window), and the 10-lap filter conditions on the future. So this test is retrospective and doesn't replay what was known at the time.
+- **Decision ladder.** Models are compared with the current holder in a fixed order, for each class. A challenger takes over only if the t-interval (6 degrees of freedom) on the paired difference in race-level error excludes zero in its favour.
+  1. F holds to start.
+  2. B challenges the holder.
+  3. L challenges the holder.
+  4. Q and C each challenge L, and only if L holds. If both win, the one with lower mean error holds. If L doesn't hold, Q and C are shown as description only.
+
+  That's up to 4 comparisons per class with no multiplicity adjustment, stated with the result.
+- **If F holds,** the finding is that a stint-age effect was **not shown to be useful for prediction**, which doesn't mean the effect is zero. L's interval goes to the simulator as an ASSUMED sensitivity range. As a rough guide from a synthetic run with assumed noise (lap SD 0.6 s, autocorrelation 0.3, race-slope SD 0.01), L passes this rule 46% of the time at a true 0.02 s/lap and 97% at 0.04.
+- **Coverage.** A 95% prediction interval for a new race's slope, 2024 mean ± t × SD × √(1 + 1/7), checked against 2025 race slopes, by class, in both units, with the interval's width alongside. Fewer than 6 of 7 inside for a class counts as under-coverage. That check can only detect a gross failure: with 7 races, 6 of 7 is expected about 96% of the time at true 95% and about 58% at true 80%.
+- **Sensitivity (each one fixed now, each on 2024):** the loose slow-lap rule (1.25 × class median), because the standard rule may remove slow late-stint laps; including stint lap 2; dropping the last 2 analysis laps of a stint (possible saving before the stop); at least 10 analysis laps per stint; ages up to the class's 2024 median stint length (out-lap through in-lap, analysis stints only); stints with no caution lap (the finish flag, `FF`, doesn't count as one); within-stint track temperature added; the E-013 and E-014 traffic count added, with the window from 2024 only; another bootstrap seed.
+- **What counts as unstable.** A sensitivity is unstable if its slope moves by more than the primary interval's half-width, or if the sign flips while the primary interval excludes zero. An unstable result is reported as the finding.
+
+**Expected:** the sign is unknown, since fuel burn and wear pull in opposite directions. A negative slope isn't an error. Santillana reports that blended slopes are often negative in F1 and that an optimiser will exploit them to run impossibly long stints, so the simulator must respect the support limit.
+
+### Part C: the routine green-flag stop
+
+The unit is the pit event. `PIT_TIME_S` is read as time in the pit lane (the value is OBSERVED, its meaning INFERRED from its size in E-003, and no source names the timing lines). It isn't the time a stop costs.
+
+- **Pit loss:** in-lap time + out-lap time − 2 × reference pace. The arithmetic is RECONSTRUCTED. The reference rule is ASSUMED. Reading the result as what the stop cost the car is INFERRED, because the laps the car would otherwise have driven aren't observed.
+- **Reference:** the median over the same car's analysis laps from its last 5 before the in-lap, in the stint ending at the stop, and its first 5 at age 3 or above after the out-lap, in the stint starting at the stop, with at least 3 on each side. Using both sides balances old and new stint states. It uses laps after the stop, so it's a calibration quantity from past seasons and isn't available during a race. It includes normal traffic.
+- **Eligible stops, called "routine green-flag stops":** in-lap and out-lap consecutive, neither of them also the other kind of pit lap, both showing `FLAG_AT_FL` = GF at the line (the flag is only read at the line), dry, not field-slow, not a garage stop. Each stop that isn't eligible is counted with its reason, because the side-count rule drops last stops and stops next to cautions.
+- **Caution stops** are counted with their `PIT_TIME_S` and get no pit-loss figure, because the reference pace doesn't apply. A pit-lane start is counted as its own status.
+- **Reported:** 10th, 50th and 90th percentiles of pit loss and `PIT_TIME_S`, by class and circuit, and split by whether the driver changed (RECONSTRUCTED). The median of pit loss minus `PIT_TIME_S` is given by class, as description. Empirical quantiles only, with no fitted distribution, because stop types can't be told apart and the distribution may be multi-modal. Per-circuit intervals resample cars within the race, so they show within-race uncertainty only. Class-level intervals resample races.
+- **Held-out test.** Two predictors of each 2025 race-class median: the 2024 class median of race medians, and the same circuit's 2024 median. For each class, 7 race-level paired differences with 6 degrees of freedom. The per-circuit figure replaces the class figure only if the interval excludes zero in its favour.
+- **Coverage.** The share of 2025 stops inside the same circuit's 2024 10th to 90th range, per race-class (nominal 80%), by class and split by driver change. It carries over for a class if the median race-class coverage is between 70% and 90%, and the number of race-classes outside that band is reported beside it. A race-class needs at least 5 stops in the 2024 range it's compared with, and the number skipped is reported. Stops within a race-class aren't independent, and the band is a judgement.
+
+**Confounds, stated here too:** service content isn't observed (tyres or no tyres, refuel time). Balance of Performance sets refuelling time by event and those documents aren't collected, so a change between seasons can't be separated into BoP and team behaviour.
+
+### Part D: what predicts a race's clean pace
+
+- **Target (RECONSTRUCTED):** the class median of `is_usable_for_pace_model` laps in the race.
+- **Clean practice lap, fixed now:** `FLAG_AT_FL` = GF, not an in-lap or out-lap, `stint_lap` at least 2, lap time and all three sectors present, and at most 1.07 times the median of green non-pit laps for that class and session.
+- **Practice pace:** the class median over clean laps pooled across FP sessions, after dropping any session whose class median is more than 1.04 times the fastest session's. The ratio is the field-slow ratio from D-025, reused as a choice. It's there because no weather is joined to practice and a wet session would pass the per-session rule whole. Fuel loads and run plans in practice aren't observed.
+- **Predictors:** P1, the same circuit's 2024 race target; P2, this weekend's practice pace × a class ratio (race target / practice pace) averaged over the 7 fit races; P3, raw practice pace.
+- **Size:** 7 independent races with 2 classes each, plus 2025 Le Mans shown apart because P1 there rests on the compromised 2024 race. D-031's "about 16" counted race-classes and included Le Mans.
+- **Decision rule.** A clear gap needs the t-interval over the 7 race-level paired differences in absolute error (the two classes averaged within a race) to exclude zero. Otherwise it's "no clear gap", which doesn't mean the two are equal. Comparisons: P2 vs P3, P2 vs P1, P1 vs P3, with no multiplicity adjustment. Each class is also shown alone. On 6 degrees of freedom, 80% power needs a mean difference of about 1.3 race standard deviations, so this can show a clear gap and not a small one.
+- **Sensitivity:** practice pace from the fastest FP session only.
+
+### Checks before any real data is fitted
+
+- Synthetic stints with a known slope, race-to-race slope variation, a slow warm-up lap and stints ending at age-dependent lengths: L recovers the mean slope to within 0.005 s/lap and the t-interval's coverage over 500 synthetic datasets lies between 92% and 98%.
+- Pit loss recovers a known injected loss to within 0.05 s.
+- The bootstrap resamples whole races, shown by a test that fails under row resampling.
+- The 2026 seal raises an error.
+- If any of these fails, no real data is fitted until it's fixed.
+
+### Changes after this point
+
+Any change is a dated amendment to this entry saying what was known when it was made. The 2025 check is run once. If a model fails on 2025 it isn't adjusted and re-checked on 2025.
+
+**Known limits:** one race per circuit per fit season, so a circuit effect and a one-off race are the same thing in 2024. Seven fit races means wide intervals. The races share cars, teams and circuits across seasons, and that isn't resampled. Deliberate fuel or tyre saving isn't visible in timing data and is tied to strategy, which is what's being modelled.
+
+**Reviewed before being fixed.** The statistical-reviewer agent raised 14 objections to the first draft, and Kaloyan accepted all of them on 2026-11-09, including the decision ladder and the wet-session rule. The change to leave stint lap 2 out of L and the pit-loss reference came from working through that review, and wasn't checked by the reviewer separately. The code-reviewer agent then compared the code with this entry. Its findings were fixed or written in here before this was committed, except a missing 2024 stop count at a circuit, which stops the run with an error.

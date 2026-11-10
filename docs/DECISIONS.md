@@ -308,7 +308,7 @@ The ingest writes 2026 into the tables but doesn't analyse it. 2026 stays sealed
 
 ## D-031: How Layer 3 is validated, agreed before anything is fitted
 
-*2026-11-09 · design agreed, E-020 not yet written*
+*2026-11-09 · design agreed, written up as E-020*
 
 **Which data sees what:** fit on 2024, check on 2025, refit on 2024 and 2025, and only then open 2026 once. 2026 stays sealed until the simulator's final test.
 

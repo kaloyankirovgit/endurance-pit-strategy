@@ -93,6 +93,10 @@ flowchart LR
     n_traffic_results[("Traffic results")]:::local
     n_traffic["Traffic association"]
   end
+  subgraph pace["Pace and pit loss"]
+    n_pace_results[("Pace and pit-loss results")]:::local
+    n_pace["Stint-age pace and pit loss"]
+  end
   subgraph rules["Regulation assistant"]
     n_regulation_pdf[("Regulation PDFs")]:::local
     n_regulation_chunks[("regulation_chunks.jsonl")]:::local
@@ -113,7 +117,6 @@ flowchart LR
     n_reviewer_eval["Score the review agent"]
   end
   subgraph planned["Planned, not built"]
-    n_pace["Stint-age pace and pit loss"]:::planned
     n_simulator["Race simulator"]:::planned
     n_optimiser["Strategy optimiser"]:::planned
     n_simulator_tool["Simulator as an LLM tool"]:::planned
@@ -153,8 +156,8 @@ flowchart LR
   n_reviewer_cases --> n_reviewer_eval
   n_reviewer_eval --> n_reviewer_scores
   n_laps --> n_pace
-  n_stints --> n_pace
-  n_pit_stops --> n_pace
+  n_practice_laps --> n_pace
+  n_pace --> n_pace_results
   n_pace --> n_simulator
   n_traffic_results --> n_simulator
   n_simulator --> n_optimiser

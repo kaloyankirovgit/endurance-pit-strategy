@@ -32,6 +32,10 @@ flowchart LR
     n_traffic_results[("Traffic results")]:::local
     n_traffic["Traffic association"]
   end
+  subgraph pace["Pace and pit loss"]
+    n_pace_results[("Pace and pit-loss results")]:::local
+    n_pace["Stint-age pace and pit loss"]
+  end
   subgraph rules["Regulation assistant"]
     n_regulation_pdf[("Regulation PDFs")]:::local
     n_regulation_chunks[("regulation_chunks.jsonl")]:::local
@@ -52,7 +56,6 @@ flowchart LR
     n_reviewer_eval["Score the review agent"]
   end
   subgraph planned["Planned, not built"]
-    n_pace["Stint-age pace and pit loss"]:::planned
     n_simulator["Race simulator"]:::planned
     n_optimiser["Strategy optimiser"]:::planned
     n_simulator_tool["Simulator as an LLM tool"]:::planned
@@ -92,8 +95,8 @@ flowchart LR
   n_reviewer_cases --> n_reviewer_eval
   n_reviewer_eval --> n_reviewer_scores
   n_laps --> n_pace
-  n_stints --> n_pace
-  n_pit_stops --> n_pace
+  n_practice_laps --> n_pace
+  n_pace --> n_pace_results
   n_pace --> n_simulator
   n_traffic_results --> n_simulator
   n_simulator --> n_optimiser
@@ -129,6 +132,7 @@ It doesn't run anything. The pipeline is one command that takes under 20 seconds
 | Score retrieval | `rag/evaluate.py`<br>`scripts/run_retrieval_eval.py`<br>`scripts/run_retrieval_comparison.py`<br>`scripts/measure_retrieval_cost.py`<br>`scripts/run_e019.py` | standard library | recall@k, held-out sets, pre-registered paired sign test |
 | Score answers | `rag/evaluate.py`<br>`scripts/run_answer_eval.py` | standard library | Repeated runs, full trace logging, scoring in code against labels |
 | Score the review agent | `evals/reviewer.py`<br>`scripts/run_reviewer_eval.py`<br>`llm.py` | standard library | Planted flaws and clean controls, headless runs, exact-match scoring |
+| Stint-age pace and pit loss | `models/pace.py`<br>`scripts/run_layer3.py` | pandas, numpy, pyarrow | Within-stint fits with races as the unit, decision ladder against baselines, frozen fit then one held-out check, sealed season |
 
 Files that do real work but aren't a stage in the flow:
 
@@ -161,6 +165,7 @@ flowchart LR
     n_io_weather["weather"]
   end
   subgraph g3["models"]
+    n_models_pace["pace"]
     n_models_traffic["traffic"]
   end
   subgraph g4["rag"]
@@ -182,6 +187,7 @@ flowchart LR
     n_scripts_measure_retrieval_cost["measure_retrieval_cost"]
     n_scripts_run_answer_eval["run_answer_eval"]
     n_scripts_run_e019["run_e019"]
+    n_scripts_run_layer3["run_layer3"]
     n_scripts_run_racer_agent["run_racer_agent"]
     n_scripts_run_retrieval_comparison["run_retrieval_comparison"]
     n_scripts_run_retrieval_eval["run_retrieval_eval"]
@@ -205,6 +211,9 @@ flowchart LR
   n_io_download --> n_paths
   n_io_regulations --> n_paths
   n_lineage --> n_paths
+  n_models_pace --> n_features_clean_laps
+  n_models_pace --> n_io_load
+  n_models_pace --> n_models_traffic
   n_models_traffic --> n_features_clean_laps
   n_pipeline --> n_features_clean_laps
   n_pipeline --> n_features_weather
@@ -238,6 +247,10 @@ flowchart LR
   n_scripts_run_e019 --> n_rag_embed
   n_scripts_run_e019 --> n_rag_evaluate
   n_scripts_run_e019 --> n_rag_retrieve
+  n_scripts_run_layer3 --> n_features_clean_laps
+  n_scripts_run_layer3 --> n_features_traffic
+  n_scripts_run_layer3 --> n_models_pace
+  n_scripts_run_layer3 --> n_paths
   n_scripts_run_racer_agent --> n_rag_racer_agent
   n_scripts_run_retrieval_comparison --> n_paths
   n_scripts_run_retrieval_comparison --> n_rag_embed

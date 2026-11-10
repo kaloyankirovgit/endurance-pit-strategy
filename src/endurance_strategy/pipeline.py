@@ -7,6 +7,7 @@ import duckdb
 import pandas as pd
 
 from endurance_strategy.features.clean_laps import add_clean_lap_flags
+from endurance_strategy.features.practice import practice_reference_table
 from endurance_strategy.features.weather import join_weather
 from endurance_strategy.io.download import PRACTICE_DIR, WEATHER_DIR
 from endurance_strategy.io.load import load_corpus, load_race_csv
@@ -51,11 +52,11 @@ ORDER BY event_key, NUMBER, out_lap
 
 
 def build_interim_laps(race_dir: Path = WEC_DIR, weather_dir: Path = WEATHER_DIR,
-                       race_dates: dict[str, date] | None = None) -> pd.DataFrame:
+                       race_dates: dict[str, date] | None = None, practice: pd.DataFrame | None = None) -> pd.DataFrame:
     laps = add_garage_stop_flag(add_stint_columns(load_corpus(race_dir)))
     laps = add_race_order(laps)
     laps = join_weather(add_lap_utc(laps, race_dates), load_weather_corpus(weather_dir))
-    laps = add_clean_lap_flags(laps).reset_index(drop=True)
+    laps = add_clean_lap_flags(laps, practice=practice).reset_index(drop=True)
     return INTERIM_LAPS.validate(laps)
 
 
@@ -84,15 +85,18 @@ def run(race_dir: Path = WEC_DIR, weather_dir: Path = WEATHER_DIR, interim_dir: 
     interim_dir.mkdir(parents=True, exist_ok=True)
     processed_dir.mkdir(parents=True, exist_ok=True)
 
-    laps = build_interim_laps(race_dir, weather_dir, race_dates)
+    practice = None
+    if practice_dir is not None and any(practice_dir.glob("*.CSV")):
+        practice = build_practice_laps(practice_dir)
+    laps = build_interim_laps(race_dir, weather_dir, race_dates,
+                              practice=practice_reference_table(practice) if practice is not None else None)
     laps.to_parquet(interim_dir / "laps.parquet", index=False)
 
     counts = {"laps": len(laps)}
     for name, table in build_processed(laps).items():
         table.to_parquet(processed_dir / f"{name}.parquet", index=False)
         counts[name] = len(table)
-    if practice_dir is not None and any(practice_dir.glob("*.CSV")):
-        practice = build_practice_laps(practice_dir)
+    if practice is not None:
         practice.to_parquet(interim_dir / "practice_laps.parquet", index=False)
         counts["practice_laps"] = len(practice)
     return counts

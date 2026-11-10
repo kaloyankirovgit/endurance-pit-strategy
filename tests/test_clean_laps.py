@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import numpy as np
+import pytest
 import pandas as pd
 
 from endurance_strategy.features.clean_laps import (
@@ -164,3 +165,100 @@ def test_field_slow_threshold_can_be_changed():
     frame = field(12, [100] * 10 + [103] * 6 + [100] * 10)
     assert not run(frame, slow_lap_ratio=1.5)["is_field_slow"].any()
     assert run(frame, slow_lap_ratio=1.5, field_slow_ratio=1.02)["is_field_slow"].any()
+
+
+# --- E-021: a wet race switches to the weekend's practice pace (synthetic laps) ---
+
+def _wet_race() -> pd.DataFrame:
+    """Most of the race slow (wet), a dry end. Every lap here is synthetic."""
+    return pd.concat([laps(c, [100.0] + [120.0] * 12 + [101.0] * 6) for c in "ABCDEFGHIJKL"], ignore_index=True)
+
+
+def _dry_race() -> pd.DataFrame:
+    return pd.concat([laps(c, [100.0] + [101.0] * 10 + [112.0]) for c in "ABCDEFGHIJKL"], ignore_index=True)
+
+
+def practice_table(pace: float = 100.0, cars: int = 12, practice_laps: int = 200, event: str = "SYNTH") -> pd.DataFrame:
+    index = pd.MultiIndex.from_tuples([(event, "HYPERCAR")], names=["event_key", "CLASS"])
+    return pd.DataFrame({"pace": [pace], "cars": [cars], "laps": [practice_laps]}, index=index)
+
+
+def test_race_median_reference_lets_a_wet_race_through():
+    out = run(_wet_race())
+    assert not out.loc[out["LAP_TIME_S"].eq(120.0), "is_slow_lap"].any()
+
+
+def test_a_wet_race_switches_to_practice_and_its_wet_laps_are_flagged():
+    out = run(_wet_race(), practice=practice_table(100.0))
+    wet, dry = out["LAP_TIME_S"].eq(120.0), out["LAP_TIME_S"].eq(101.0)
+    assert (out["slow_lap_reference_source"] == "practice").all()
+    assert out.loc[wet, "is_slow_lap"].all()
+    assert not out.loc[dry, "is_slow_lap"].any()
+    assert not out.loc[wet, "is_usable_for_pace_model"].any()
+
+
+def test_a_dry_race_close_to_practice_keeps_its_flags_exactly():
+    out = run(_dry_race(), practice=practice_table(99.0))
+    assert (out["slow_lap_reference_source"] == "race").all()
+    for flag in ["is_slow_lap", "is_field_slow", "is_usable_for_pace_model"]:
+        assert out[flag].tolist() == run(_dry_race())[flag].tolist()
+
+
+def test_a_wet_practice_cannot_loosen_the_rule():
+    out = run(_dry_race(), practice=practice_table(130.0))
+    assert (out["slow_lap_reference_source"] == "race").all()
+    assert out["is_slow_lap"].tolist() == run(_dry_race())["is_slow_lap"].tolist()
+
+
+@pytest.mark.parametrize("cars, practice_laps", [(5, 200), (12, 60)])
+def test_thin_practice_is_not_used(cars, practice_laps):
+    out = run(_wet_race(), practice=practice_table(100.0, cars=cars, practice_laps=practice_laps))
+    assert (out["slow_lap_reference_source"] == "race").all()
+
+
+def test_missing_practice_keeps_the_race_median():
+    out = run(_wet_race(), practice=practice_table(100.0, event="OTHER"))
+    assert out["is_slow_lap"].tolist() == out["is_slow_lap_race_ref"].tolist()
+    assert (out["slow_lap_reference_source"] == "race").all()
+
+
+def test_old_flags_are_kept_beside_the_new_ones():
+    out = run(_wet_race(), practice=practice_table(100.0))
+    plain = run(_wet_race())
+    for flag, old in [("is_slow_lap", "is_slow_lap_race_ref"), ("is_field_slow", "is_field_slow_race_ref"),
+                      ("is_usable_for_pace_model", "is_usable_race_ref")]:
+        assert out[old].tolist() == plain[flag].tolist()
+    assert out["field_pace_ratio_race_ref"].tolist() == pytest.approx(plain["field_pace_ratio"].tolist(), nan_ok=True)
+
+
+def test_field_slow_uses_practice_once_switched():
+    out = run(_wet_race(), practice=practice_table(100.0))
+    wet = out["LAP_TIME_S"].eq(120.0) & ~out["is_first_lap"]
+    assert out.loc[wet, "is_field_slow"].mean() > 0.9
+    assert not out.loc[wet, "is_field_slow_race_ref"].all()
+
+
+def test_apply_clean_rule_swaps_in_the_old_flags():
+    from endurance_strategy.features.clean_laps import apply_clean_rule
+    out = run(_wet_race(), practice=practice_table(100.0))
+    old = apply_clean_rule(out, "race")
+    assert old["is_usable_for_pace_model"].tolist() == out["is_usable_race_ref"].tolist()
+    assert apply_clean_rule(out, "practice") is out
+    with pytest.raises(ValueError):
+        apply_clean_rule(out, "neither")
+
+
+def test_practice_reference_table_counts_cars_laps_and_dropped_sessions():
+    from endurance_strategy.features.practice import practice_pace, practice_reference_table
+    rows = []
+    for session, scale in (("FP1", 1.0), ("FP2", 1.2)):
+        for car in "ABC":
+            for lap in range(1, 6):
+                rows.append({"event_key": "SYNTH", "session": session, "CLASS": "HYPERCAR", "NUMBER": car, "LAP_NUMBER": lap,
+                             "LAP_TIME_S": 100.0 * scale, "S1_S": 30.0, "S2_S": 30.0, "S3_S": 40.0, "FLAG_AT_FL": "GF",
+                             "is_in_lap": False, "is_out_lap": False, "stint_lap": lap})
+    practice = pd.DataFrame(rows)
+    table = practice_reference_table(practice)
+    row = table.loc[("SYNTH", "HYPERCAR")]
+    assert (row["pace"], row["cars"], row["laps"], row["sessions_dropped"]) == (100.0, 3, 12, 1)
+    assert practice_pace(practice).loc[("SYNTH", "HYPERCAR")] == row["pace"]

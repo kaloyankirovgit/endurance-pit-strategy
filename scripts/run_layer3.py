@@ -14,16 +14,26 @@ from datetime import datetime, timezone
 import numpy as np
 import pandas as pd
 
-from endurance_strategy.features.clean_laps import EXCLUSION_FLAGS
+from endurance_strategy.features.clean_laps import EXCLUSION_FLAGS, apply_clean_rule
 from endurance_strategy.features.traffic import add_traffic_exposure, class_pace_gap
 from endurance_strategy.models import pace
 from endurance_strategy.paths import INTERIM_DIR, PROJECT_ROOT
 
 OUTPUT_DIR = PROJECT_ROOT / "reports" / "outputs"
+# E-020 used each race's own median for the slow-lap rules. E-021 reruns parts A to C with the practice reference.
+RUNS = {"e020": "race", "e021": "practice"}
+CLEAN_RULE = "race"
 FIT_FILE = OUTPUT_DIR / "e020_fit.json"
 CHECK_FILE = OUTPUT_DIR / "e020_check.json"
 REFIT_FILE = OUTPUT_DIR / "e020_refit.json"
 POSTHOC_FILE = OUTPUT_DIR / "e020_posthoc.json"
+
+
+def configure(run: str) -> None:
+    global CLEAN_RULE, FIT_FILE, CHECK_FILE, REFIT_FILE, POSTHOC_FILE
+    CLEAN_RULE = RUNS[run]
+    FIT_FILE, CHECK_FILE = OUTPUT_DIR / f"{run}_fit.json", OUTPUT_DIR / f"{run}_check.json"
+    REFIT_FILE, POSTHOC_FILE = OUTPUT_DIR / f"{run}_refit.json", OUTPUT_DIR / f"{run}_posthoc.json"
 # Chosen after the check was seen (E-020, "Added after the check"). Neither changes any registered decision.
 WET_RACE = "2025_CIRCUIT_OF_THE_AMERICAS"
 LONG_STOP_EXCESS_S = 60.0
@@ -34,8 +44,8 @@ TRAFFIC_CAP = 6
 
 def load(season: str | tuple[str, ...]) -> tuple[pd.DataFrame, pd.DataFrame]:
     seasons = (season,) if isinstance(season, str) else season
-    return (pace.load_open_seasons(INTERIM_DIR / "laps.parquet", seasons=seasons),
-            pace.load_open_seasons(INTERIM_DIR / "practice_laps.parquet", seasons=seasons))
+    laps = apply_clean_rule(pace.load_open_seasons(INTERIM_DIR / "laps.parquet", seasons=seasons), CLEAN_RULE)
+    return laps, pace.load_open_seasons(INTERIM_DIR / "practice_laps.parquet", seasons=seasons)
 
 
 def outside_le_mans(frame: pd.DataFrame) -> pd.DataFrame:
@@ -167,6 +177,7 @@ def stage_fit(n_boot: int) -> None:
     race_medians = stops.groupby(["event_key", "CLASS"])["pit_loss_s"].median()
     report = {
         "timestamp_utc": datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ"),
+        "clean_rule": CLEAN_RULE,
         "races": sorted(fit_laps["event_key"].unique()),
         "part_a": {"sizes": support_tables(frame), "support_limits": limits, "laps_past_limit": laps_past_limit(frame, limits),
                    "support_by_age": pace.support_by_age(frame).to_dict("records"),
@@ -255,7 +266,7 @@ def stage_check() -> None:
             "pit_time_vs_loss_median_difference_s": {c: float((group["pit_loss_s"] - group["pit_time_s"]).median())
                                                      for c, group in pace.eligible_stops(events).groupby("CLASS")},
         },
-        "part_d": {
+        "part_d": None if CLEAN_RULE == "practice" else {
             "predictions": non_lm["primary"].to_dict("records"),
             "comparisons": pace.pace_comparisons(non_lm["primary"], expected_races=7),
             "by_class": {c: pace.pace_comparisons(non_lm["primary"][non_lm["primary"]["CLASS"] == c]) for c in pace.CLASSES},
@@ -374,7 +385,11 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--stage", choices=["fit", "check", "refit", "posthoc"], required=True)
     parser.add_argument("--n-boot", type=int, default=2000)
+    parser.add_argument("--run", choices=sorted(RUNS), default="e020")
     args = parser.parse_args()
+    configure(args.run)
+    if args.run == "e021" and args.stage == "posthoc":
+        raise SystemExit("E-021 registers no post-hoc stage")
     if args.stage == "fit":
         stage_fit(args.n_boot)
     elif args.stage == "check":

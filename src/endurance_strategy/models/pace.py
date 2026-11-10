@@ -12,7 +12,8 @@ import numpy as np
 import pandas as pd
 import pyarrow.parquet as pq
 
-from endurance_strategy.features.clean_laps import EXCLUSION_FLAGS, FIELD_SLOW_RATIO, SLOW_LAP_RATIO
+from endurance_strategy.features.clean_laps import EXCLUSION_FLAGS
+from endurance_strategy.features.practice import clean_practice_mask, practice_pace  # noqa: F401  (re-exported for E-020's code)
 from endurance_strategy.io.load import CORPUS_V1
 from endurance_strategy.models.traffic import LOOSE_SLOW_LAP_RATIO, STINT_KEY, T_975
 
@@ -432,30 +433,6 @@ def pit_coverage(fit: pd.DataFrame, check: pd.DataFrame, driver_changed: bool | 
 
 
 # --- Part D: what predicts a race's clean pace -------------------------------------------------
-
-
-def clean_practice_mask(practice: pd.DataFrame) -> pd.Series:
-    """The E-020 rule. No wet filter, because no weather is joined to practice."""
-    green = practice["FLAG_AT_FL"].eq("GF")
-    running = ~(practice["is_in_lap"] | practice["is_out_lap"])
-    timed = practice[["LAP_TIME_S", "S1_S", "S2_S", "S3_S"]].notna().all(axis=1)
-    reference = (practice["LAP_TIME_S"].where(green & running)
-                 .groupby([practice["event_key"], practice["session"], practice["CLASS"]]).transform("median"))
-    return green & running & timed & practice["stint_lap"].ge(2) & practice["LAP_TIME_S"].le(SLOW_LAP_RATIO * reference)
-
-
-def practice_pace(practice: pd.DataFrame, fastest_session_only: bool = False, wet_session_ratio: float = FIELD_SLOW_RATIO) -> pd.Series:
-    """Class median of clean practice laps, indexed by (event_key, CLASS).
-
-    A session whose class median is over `wet_session_ratio` times the fastest session's is dropped,
-    because no weather is joined to practice and a wet session would pass the per-session lap rule whole.
-    """
-    clean = practice[clean_practice_mask(practice)]
-    session_median = clean.groupby(["event_key", "CLASS", "session"])["LAP_TIME_S"].transform("median")
-    fastest = session_median.groupby([clean["event_key"], clean["CLASS"]]).transform("min")
-    if fastest_session_only:
-        return clean[session_median == fastest].groupby(["event_key", "CLASS"])["LAP_TIME_S"].median()
-    return clean[session_median <= wet_session_ratio * fastest].groupby(["event_key", "CLASS"])["LAP_TIME_S"].median()
 
 
 def race_target(laps: pd.DataFrame) -> pd.Series:

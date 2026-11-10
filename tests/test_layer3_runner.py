@@ -39,6 +39,9 @@ def synthetic_laps(event: str, rng: np.random.Generator) -> pd.DataFrame:
     frame["is_pit_lap"] = frame["is_in_lap"] | frame["is_out_lap"]
     frame["is_first_lap"] = frame["LAP_NUMBER"].eq(1)
     frame["is_usable_for_pace_model"] = ~frame[EXCLUSION_FLAGS].any(axis=1)
+    frame["is_slow_lap_race_ref"] = frame["is_slow_lap"]
+    frame["is_field_slow_race_ref"] = frame["is_field_slow"]
+    frame["is_usable_race_ref"] = frame["is_usable_for_pace_model"]
     return frame
 
 
@@ -56,6 +59,7 @@ def runner(tmp_path, monkeypatch):
     laps.to_parquet(interim / "laps.parquet", index=False)
     practice.to_parquet(interim / "practice_laps.parquet", index=False)
     monkeypatch.setattr(module, "INTERIM_DIR", interim)
+    monkeypatch.setattr(module, "CLEAN_RULE", "race")
     monkeypatch.setattr(module, "OUTPUT_DIR", tmp_path)
     monkeypatch.setattr(module, "FIT_FILE", tmp_path / "fit.json")
     monkeypatch.setattr(module, "CHECK_FILE", tmp_path / "check.json")
@@ -131,3 +135,41 @@ def test_median_stint_limit_counts_the_whole_stint_and_respects_support(runner):
     laps_all = pd.concat([laps, laps.assign(NUMBER="2")], ignore_index=True)
     limits = runner.median_stint_limits(laps_all, pd.concat([frame, lmgt], ignore_index=True), {"HYPERCAR": 40, "LMGT3": 18})
     assert limits == {"HYPERCAR": 25, "LMGT3": 18}
+
+
+def test_each_run_has_its_own_rule_and_files(runner):
+    runner.configure("e021")
+    assert runner.CLEAN_RULE == "practice" and runner.FIT_FILE.name == "e021_fit.json"
+    runner.configure("e020")
+    assert runner.CLEAN_RULE == "race" and runner.CHECK_FILE.name == "e020_check.json"
+
+
+def test_traffic_refit_runs_both_rules_on_open_seasons(runner):
+    spec = importlib.util.spec_from_file_location("run_traffic_refit", PROJECT_ROOT / "scripts" / "run_traffic_refit.py")
+    refit = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(refit)
+    laps = pd.read_parquet(runner.INTERIM_DIR / "laps.parquet")
+    laps = laps[laps["event_key"].str[:4].isin(["2024", "2025"])].copy()
+    marked = laps["stint_lap"].eq(5)  # The old rule flags these laps and the new one doesn't, so a mix-up shows.
+    laps.loc[marked, "is_slow_lap_race_ref"] = True
+    laps.loc[marked, "is_usable_race_ref"] = False
+    result = refit.run(laps, n_boot=20)
+    assert set(result) == {"practice", "race"}
+    assert result["race"]["HYPERCAR"]["race_gap_window"]["sizes"]["races"] == 14
+    assert result["race"]["HYPERCAR"]["past_window"]["sizes"]["laps"] < result["practice"]["HYPERCAR"]["past_window"]["sizes"]["laps"]
+    assert set(result["practice"]["LMGT3"]) == {"race_gap_window", "past_window", "loose_rule_race_gap_window"}
+    assert result["practice"]["LMGT3"]["race_gap_window"]["circuit_interval"]["clusters"] == 7
+
+
+def test_rule_check_gates(runner):
+    spec = importlib.util.spec_from_file_location("check_clean_rule", PROJECT_ROOT / "scripts" / "check_clean_rule.py")
+    check = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(check)
+    rows = [{"event_key": e, "CLASS": c, "switched": e == check.WET_RACE} for e in ("2025_CIRCUIT_OF_THE_AMERICAS", "2024_IMOLA") for c in ("HYPERCAR", "LMGT3")]
+    table = pd.DataFrame(rows)
+    assert check.gates(table, {"2024": 1, "2025": 2}, {"2024": 1, "2025": 2}) == []
+    assert len(check.gates(table, {"2024": 1, "2025": 3}, {"2024": 1, "2025": 2})) == 1
+    table.loc[table["event_key"] == check.WET_RACE, "switched"] = False
+    assert any("doesn't switch" in failure for failure in check.gates(table, {"2024": 1, "2025": 2}, {"2024": 1, "2025": 2}))
+    many = pd.DataFrame([{"event_key": f"2024_{i}", "CLASS": "HYPERCAR", "switched": True} for i in range(5)])
+    assert any("other race-classes" in failure for failure in check.gates(pd.concat([table.assign(switched=True), many]), {}, {}))

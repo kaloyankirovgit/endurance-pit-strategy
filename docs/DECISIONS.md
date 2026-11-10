@@ -350,6 +350,17 @@ Offsets are learned on 2024 and each 2025 race is predicted all three ways. That
 - **Pit loss:** per class, split by driver change, using empirical medians. The class figure beat nothing and nothing beat it, so per-circuit figures aren't adopted. The upper tail isn't used until the long stops are dealt with.
 - **Open: wet races.** COTA 2025 is in the registered 14-race refit. The slow-lap reference uses each race's own median, so a mostly wet race counts wet pace as normal. A rule for that has to be fixed before 2026 is opened, stated as an amendment, and the traffic refit in D-031 has to use it too.
 
+## D-033: A race that ran slow as a whole is measured against the weekend's practice pace
+
+*2026-11-10 · E-021 · Kaloyan chose practice as the reference*
+
+- **The problem:** COTA 2025 was a wet race, and it got through because the slow-lap and field-slow rules (D-012, D-025) measured each race against its own median (E-020).
+- **What the sport does:** the ACO's BoP method skipped abnormal-weather races, and analysts keep wet and dry references apart (`docs/research/industry_practice.md`).
+- **The rule:** a race and class switch to practice pace when their trimmed dry median is over 1.04 times it and practice had at least 8 cars and 100 clean laps. Otherwise the race keeps its own median, and its flags are exactly as before.
+- **Why practice:** Kaloyan chose it over dropping whole races, which would lose the dry part of a mixed race, and over changing nothing. The review turned "the faster of the two" into a switch, so dry races aren't tightened.
+- **Kept alongside:** the old flags stay in the table.
+- **Limits:** a race wet in practice and race isn't caught. Timing data doesn't record tyres.
+
 ---
 
 ## Tools

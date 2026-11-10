@@ -1110,3 +1110,60 @@ Run with `--stage posthoc`.
 - **139 of 2,503 eligible stops (5.6%, 2024 and 2025 pooled) cost over 60 s more than their pit-lane time.** 126 of those 139 have a caution-flag lap within two laps of the stop, against 92 of the other 2,364. One Spa 2025 in-lap took 319 s and still showed green at the line. A caution starting during the lap would look like this, but the timing can't confirm it, since the flag is only read at the line. Without them the median moves by up to 1.0 s and the 90th percentile drops by up to 13.4 s (pooled, Hypercar with driver change). The 60 s line was chosen after looking. So the medians are usable and the upper tail isn't a clean description of a stop that was green throughout.
 
 **Reviewed before reporting.** The statistical-reviewer agent checked these results against the run output. It found four errors in the first draft and eight smaller problems. All were corrected. Every figure it asked for is computed in `--stage posthoc`, and it was recomputed from the code rather than copied, which corrected one reviewer figure (the first red-flag lap is 14). No registered decision changed.
+
+---
+
+## E-021: Does measuring a wet race against practice keep wet running out, and what changes when Layer 3 and traffic are rerun?
+
+*Written 2026-11-10 · registered with its code before the tables were rebuilt*
+
+**Why.** E-020 found that COTA 2025 was wet and got through the clean-lap rules. The slow-lap rule (D-012) and the field-slow rule (D-025) measure each lap against that race's own median. In a mostly wet race the median is a wet lap, so wet laps look normal.
+
+The comparison with how the sport works (`docs/research/industry_practice.md`) points the same way: the ACO's 2017 BoP method skipped races run in abnormal weather. That supports keeping wet running out. It doesn't choose between flagging laps and dropping the race, which is Kaloyan's choice here (D-033).
+
+### The rule (D-033)
+
+- **When a race switches:** a race and class switch to the weekend's practice pace as their reference when the race as a whole ran slow. That means its dry median, trimmed at 1.07 the way practice laps are, is over 1.04 times practice pace. Practice must also have at least 8 cars and 100 clean laps in that class.
+- **Otherwise nothing changes.** A race that doesn't switch keeps exactly its E-020 flags. Both the slow-lap and the field-slow rule use the switched reference.
+- **Practice pace** is E-020's definition: clean practice laps, with sessions over 1.04 times the fastest session's median dropped as wet-looking.
+- **Ratios unchanged:** 1.07 and 1.04. The switch threshold reuses 1.04 rather than adding a new number.
+- **Why a switch and not "the faster of the two":** the first draft used the faster of the race median and practice pace. The review showed that practice is trimmed and so faster by construction, which would have tightened the rule in dry races. It could also hand the reference to one fast session. Under the switch, dry races are untouched.
+- **The E-020 flags stay in the table** as `is_slow_lap_race_ref`, `is_field_slow_race_ref`, `field_pace_ratio_race_ref` and `is_usable_race_ref`, so every earlier result can be rerun with `apply_clean_rule(laps, "race")`.
+- **Categories:** practice pace is RECONSTRUCTED from practice timing. Treating it as the dry reference is ASSUMED.
+
+**Known before writing this.** E-020 Part D showed race target and raw practice within about 1 s in 13 of 14 race-classes in 2025, and about 13.6 s apart at COTA 2025. So COTA is expected to switch, and that check confirms it rather than testing it. Which other races switch hasn't been computed.
+
+### Part 1: what the rule changes, measured first (`scripts/check_clean_rule.py`)
+
+On 2024 and 2025 only. The rebuild computes 2026 flags too, but nothing from 2026 is read.
+
+- **Per race and class:** whether it switched, the race-to-practice ratio, and the usable share under each rule. For switched race-classes, the same by race hour and by stint-age band.
+- **Gates, in code. The run stops, and nothing is rerun until E-021 is amended, if:**
+  1. the old flags don't reproduce E-020's analysis-lap counts outside Le Mans (41,501 in 2024 and 37,467 in 2025);
+  2. COTA 2025 doesn't switch in both main classes;
+  3. more than 4 other race-classes switch. The 4 is a judgement, and anything above it means the rule reaches beyond clearly wet races.
+
+### Part 2: reruns, all labelled as reruns
+
+2025 has already been seen, so none of these is a fresh test. The fresh test stays 2026, in the simulator's final test.
+
+- **E-020 Parts A to C, rerun under the new rule** (`scripts/run_layer3.py --run e021`), with the same code and the same three stages.
+- **E-020's decision stands.** F (no age effect) stays the simulator's default. If the rerun puts another model in charge, that model gets one test on 2026: the same ladder step, the rerun holder against F, with the same t-interval rule over the 2026 races outside Le Mans.
+- **What the rerun replaces for the simulator (D-032):** the E-021 refit replaces the E-020 refit for the stint-age range, the age limits, the warm-up figures and the stop medians.
+- **E-020 Part D isn't rerun, and the code skips it under this rule.** Its target, the race's clean pace, would be partly defined by practice pace, one of the predictors, so the comparison would be circular.
+- **The traffic refit on 2024 and 2025** that D-031 requires before the simulator's final test (`scripts/run_traffic_refit.py`):
+  - E-013's and E-014's primary specification unchanged, in both directions, with the race's class pace gap as the window and the past-only window, under both rules.
+  - Added: an interval resampling circuits as well as races, because the 14 races are 7 circuits run twice. Also the loose slow-lap rule.
+  - The past-only window doesn't depend on the clean-lap rule, so it's the cleaner comparison between the two rules.
+  - The new-rule figures go to the simulator. E-013 and E-014 used 18 races including 2026, so their figures aren't directly comparable.
+- **Reported with each:** sample sizes in races, cars, stints and laps, and intervals over races.
+
+**Known limits:**
+- A stricter slow-lap rule removes some slow laps that belong to a real effect, such as a hot afternoon, a heavy-fuel start, a Bronze driver's stint, or traffic. That pulls slopes towards zero. Under the switch, this applies only to races that switched.
+- A race that's wet in practice and race isn't caught.
+- Timing data doesn't record tyres, so a wet-tyre lap is inferred from its pace, never observed.
+
+**Review before running.** The statistical-reviewer agent reviewed the first draft and its code, and raised 3 must-fix and 7 should-fix points plus a note.
+- **Must-fix, all addressed:** practice and race references weren't measured the same way, one fast session could become the reference, and Part 1 had no code. The switch rule, the minimum practice size and `check_clean_rule.py` came from these.
+- **Should-fix:** also addressed. The industry comparison was softened in three places, Part D is skipped in code, the race-reference copy of the field-slow ratio was added, circuit intervals and the loose rule went into the traffic refit, and the 2026 test for a different holder was written down.
+- **Not reviewed again:** the switch rule itself.

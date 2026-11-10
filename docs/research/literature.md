@@ -58,6 +58,10 @@ The question was which laps other people use to estimate degradation and pit los
 
 **Tried and not read.** Heilmeier et al. (2020, the MDPI page) and the TUM dissertation refused automated access. The Research Square preprint "Baseline-relative evaluation of lap-time and tyre-degradation models" returned only its title. None of them is cited for anything until read.
 
+## Read for E-021: how teams and the rule-makers work (2026-11-10)
+
+Industry sources, as opposed to papers: BoP method statements, team press releases, race reports and the 2025 Sporting Regulations. The comparison is in `docs/research/industry_practice.md`. What it changed: the slow-lap reference (D-033), and the driver-change figure from E-020 now carries a note. The regulations put refuelling first and allow a driver change at any time during the stop. So the extra cost can't be attributed to the driver change rather than to tyre work at the same stops.
+
 ## Gaps
 
 These Layer 3 searches found no open study fitting stint age from WEC timing data, and nothing supporting the 1.07 slow-lap ratio in particular.

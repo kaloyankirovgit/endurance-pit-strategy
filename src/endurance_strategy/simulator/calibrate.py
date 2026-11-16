@@ -102,6 +102,31 @@ def caution_lap_ratio(laps: pd.DataFrame) -> dict:
     return out
 
 
+def restart_and_incidents(laps: pd.DataFrame) -> dict:
+    """INFERRED (E-022 amendment): per class, the restart-lap ratio and the incident process.
+
+    Measured against each car's mean clean lap in that race. A restart lap is green at the line after a
+    caution lap. An incident lap is any other green, non-pit lap after lap 1 that the clean-lap rules
+    exclude as slow or field-slow (mistakes, slow zones, local yellows, without saying which).
+    """
+    frame = laps.sort_values(["event_key", "NUMBER", "LAP_NUMBER"])
+    clean = frame[frame["is_usable_for_pace_model"]].groupby(["event_key", "NUMBER"])["LAP_TIME_S"].mean().rename("clean_mean")
+    frame = frame.join(clean, on=["event_key", "NUMBER"])
+    green = frame[frame["FLAG_AT_FL"].eq("GF") & ~frame["is_pit_lap"] & frame["LAP_NUMBER"].gt(1) & frame["clean_mean"].notna()]
+    out = {}
+    for car_class in CLASSES:
+        rows = green[green["CLASS"] == car_class]
+        restart = rows[rows["is_after_caution"]]
+        others = rows[~rows["is_after_caution"]]
+        incident = others[~others["is_usable_for_pace_model"] & (others["is_slow_lap"] | others["is_field_slow"])]
+        extra = (incident["LAP_TIME_S"] - incident["clean_mean"]).clip(lower=0)
+        out[car_class] = {"restart_lap_ratio": float((restart["LAP_TIME_S"] / restart["clean_mean"]).mean()) if len(restart) else 1.0,
+                          "restart_laps": int(len(restart)), "incident_rate": float(len(incident) / len(others)) if len(others) else 0.0,
+                          "incident_extra_s": float(extra.mean()) if len(extra) else 0.0, "incident_laps": int(len(incident)),
+                          "incident_extra_samples_s": np.round(extra.to_numpy(), 2).tolist()}
+    return out
+
+
 def lap_residuals(laps: pd.DataFrame) -> dict:
     """INFERRED: clean-lap residuals after removing each stint's own straight line, by class."""
     frame = analysis_laps(laps)
@@ -137,6 +162,7 @@ def circuit_table(laps: pd.DataFrame) -> pd.DataFrame:
             counts = exposed.loc[exposed["event_key"].isin(events), "candidate_traffic_count"].clip(upper=6)
             rows.append({"circuit": circuit, "CLASS": car_class, "races": len(events),
                          "hours": int(hours[events].max()), "clean_median_s": float(group["LAP_TIME_S"].median()),
+                         "clean_mean_s": float(group["LAP_TIME_S"].mean()),
                          "max_stint_laps": int(np.floor(clean_stints.quantile(STINT_LIMIT_QUANTILE))),
                          "stints_for_limit": int(len(clean_stints)), "traffic_rate": float(counts.mean())})
     return pd.DataFrame(rows)
@@ -153,19 +179,25 @@ def calibrate(laps: pd.DataFrame) -> dict:
         "caution": caution_model(laps),
         "caution_lap_ratio": caution_lap_ratio(laps),
         "pit_loss_median_s": {c: {str(k): float(np.median(v)) for k, v in d.items()} for c, d in pits.items()},
+        "pit_loss_mean_s": {c: {str(k): float(np.mean(v)) for k, v in d.items()} for c, d in pits.items()},
+        "restart_and_incidents": restart_and_incidents(laps),
         "pit_loss_samples_s": {c: {str(k): np.round(v, 2).tolist() for k, v in d.items()} for c, d in pits.items()},
         "lap_residuals_s": {c: np.round(v, 3).tolist() for c, v in lap_residuals(laps).items()},
     }
 
 
 def car_params(calibration: dict, circuit: str, car_class: str, base_pace_s: float | None = None, **overrides) -> CarParams:
-    """The parameters for one class at one circuit. Base pace defaults to the class's clean median there,
-    with the expected traffic taken off so it isn't counted twice."""
+    """The parameters for one class at one circuit, as expected values, since race time is a sum (E-022
+    amendment). Base pace defaults to the class's mean clean lap there, with the expected traffic taken off so
+    it isn't counted twice. Pit loss is the mean routine stop."""
     row = next(r for r in calibration["circuits"] if r["circuit"] == circuit and r["CLASS"] == car_class)
     traffic = row["traffic_rate"] * TRAFFIC_S_PER_CAR[car_class]
-    medians = calibration["pit_loss_median_s"][car_class]
+    medians = calibration.get("pit_loss_mean_s", calibration["pit_loss_median_s"])[car_class]
+    extras = calibration.get("restart_and_incidents", {}).get(car_class, {})
     values = dict(circuit=circuit, car_class=car_class, duration_s=row["hours"] * 3600.0,
-                  base_pace_s=(row["clean_median_s"] if base_pace_s is None else base_pace_s) - traffic,
+                  base_pace_s=(row.get("clean_mean_s", row["clean_median_s"]) if base_pace_s is None else base_pace_s) - traffic,
+                  restart_lap_ratio=extras.get("restart_lap_ratio", 1.0), incident_rate=extras.get("incident_rate", 0.0),
+                  incident_extra_s=extras.get("incident_extra_s", 0.0),
                   max_stint_laps=row["max_stint_laps"], pit_loss_s={False: medians["False"], True: medians["True"]},
                   age_slope_s=0.0, age_limit_laps=AGE_LIMIT_LAPS[car_class], warm_up_s=WARM_UP_S[car_class], traffic_rate=row["traffic_rate"],
                   traffic_s_per_car=TRAFFIC_S_PER_CAR[car_class], sc_pit_loss_factor=SC_PIT_LOSS_FACTOR, caution_lap_ratio=calibration["caution_lap_ratio"][car_class])
@@ -188,4 +220,7 @@ def randomness(calibration: dict, car_class: str, lap_noise: bool = True, pit_sp
         caution_rate_per_green_s={k: v / 3600 for k, v in caution["rate_per_green_hour"].items()} if cautions else None,
         caution_durations_s={k: np.asarray(v) for k, v in caution["durations_s"].items()} if cautions else None,
         age_slope_draw=(mean, (high - low) / (2 * 1.96)) if slope_uncertainty else None,
+        incident_extra_samples_s=(np.asarray(calibration["restart_and_incidents"][car_class]["incident_extra_samples_s"])
+                                  if lap_noise and calibration.get("restart_and_incidents", {}).get(car_class, {}).get("incident_extra_samples_s")
+                                  else None),
     )

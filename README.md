@@ -38,6 +38,14 @@ The rules and the code were committed before anything was fitted (E-020). The mo
 - **The wet-race fix (E-021):** a race that ran more than 4% slower than that weekend's practice is now measured against practice instead. Only COTA 2025 switched, and every other race kept its flags exactly. A rerun left the stint-age decision unchanged. Refitting traffic on 2024 and 2025 alone, so that 2026 stays a clean test, gave 0.35 s per car for Hypercars and 0.17 s for GT3 cars, close to the earlier figures.
 - **Checked against how the sport works:** each choice is compared with what teams and the rule-makers say they do in [`docs/research/industry_practice.md`](docs/research/industry_practice.md).
 
+### Race simulator (layer 4, built, validation in progress)
+
+A lap-by-lap simulator for one car (E-022). It covers green laps, pit stops, the warm-up lap, traffic, safety cars and full-course yellows. Every strategy has to pass a legality check that cites the regulations before it runs.
+
+- **Checked against real races:** 332 finished cars from 12 races in 2024 and 2025 were replayed through it. Each layer of the model cuts the error: 7.5% for laps × pace alone, 3.3% with cautions, 0.9% with pit stops, 0.67% with everything.
+- **Short of the target:** that's still above the 0.5% set before the run, so no strategy comparison has been reported yet.
+- **Where the error comes from:** races with many cautions, and safety cars that bunch up in some races far more than a steady random process allows.
+
 ### Regulation assistant (layer 6, mostly built)
 
 - **Retrieval:** the 2024 to 2026 sporting regulations are split into article-level chunks with season and page, and searched with BM25. It finds the right 2026 clause in the top 5 for 24 of 30 hand-written questions (E-009).
@@ -50,7 +58,7 @@ See [`evals/regulations/`](evals/regulations/).
 ### Checks on the AI tools
 
 - **An eval for the AI review agent:** 16 synthetic write-ups with planted statistical flaws and clean controls, run headless through Claude Code and scored in code against labels. It caught 11 of the 12 flaws (E-008). See [`evals/statistical_reviewer/`](evals/statistical_reviewer/).
-- **273 tests on synthetic data,** run in GitHub Actions on every push, with no real data needed.
+- **295 tests on synthetic data,** run in GitHub Actions on every push, with no real data needed.
 
 The full log of what's been tried, including null results, is in [`docs/EXPERIMENT_LOG.md`](docs/EXPERIMENT_LOG.md), and the reasoning behind the bigger choices is in [`docs/DECISIONS.md`](docs/DECISIONS.md).
 

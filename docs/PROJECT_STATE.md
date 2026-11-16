@@ -2,11 +2,11 @@
 
 Where things are right now. Updated at the end of each working session.
 
-*Last updated: 2026-11-10*
+*Last updated: 2026-11-16*
 
 ## Current stage
 
-Layer 1 is done and the race order is now checked against the official classifications. The first traffic result is in (E-013). A commit guard now enforces the no-data rule (D-016). The statistical-reviewer agent has an eval (E-008), and regulation retrieval and grounded answers are built and measured, now with the car class as an input (E-009 to E-012). Layer 3 is done and reported (E-020), and the wet-race fix and reruns are done (E-021, D-033). The simulator's inputs are set out in D-032. The deterministic simulator (Layer 4) is next.
+Layer 1 is done and the race order is now checked against the official classifications. The first traffic result is in (E-013). A commit guard now enforces the no-data rule (D-016). The statistical-reviewer agent has an eval (E-008), and regulation retrieval and grounded answers are built and measured, now with the car class as an input (E-009 to E-012). Layer 3 is done and reported (E-020), and the wet-race fix and reruns are done (E-021, D-033). The simulator's inputs are set out in D-032. The Layer 4 simulator is built, and its first validation failed the registered gate (E-022). Caution handling is next.
 
 ## Done
 
@@ -47,12 +47,17 @@ Layer 1 is done and the race order is now checked against the official classific
   - The Layer 3 rerun leaves the decision unchanged (no age effect).
   - The traffic refit on 2024 to 2025 gives 0.353 s (Hypercar) and 0.173 s (LMGT3) per car. It is the simulator's input in place of the 18-race figures, which included 2026.
   - How each choice compares with what teams and the rule-makers do is in `docs/research/industry_practice.md`.
-- 273 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
+- Layer 4's simulator is built and tested (E-022, D-034): one car, lap by lap, with legality checked first, separate random streams per source and 22 invariant tests.
+  - Replaying 332 finished cars from 12 races, it adds up to real race time within a median 0.67% after one round of fixes, against a registered gate of 0.5%. So the gate failed, and no strategy comparison has been run.
+  - The remaining error follows the cautions.
+  - Safety cars cluster by race far more than a constant-rate process allows (variance 30.8 against 4.6 per 6 hours).
+- 295 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
 
 ## Next
 
-1. **Deterministic simulator (Layer 4)**
-   - Built from D-032's inputs, with invariant tests before any randomness.
+1. **Finish Layer 4 (E-023, to register)**
+   - Price cautions by time rather than per lap, and draw the safety-car rate per race so races differ as much as real ones.
+   - Rerun the replay gate. Then the three-strategy comparison from E-022 Part D.
    - Before 2026 is opened: check Monza's classification and any later 2026 regulations revision (D-031).
 2. **Switch the answers to the hybrid (D-029)**
    - Run the answer eval on the fresh questions with the hybrid, then change the default.
@@ -95,7 +100,7 @@ Layer 1 is done and the race order is now checked against the official classific
 | Interim / processed layers | Built as one command, writing schema-checked Parquet |
 | Race order and gaps | Built, and the final order checked against the official classifications (E-007) |
 | Traffic, pace and pit-loss models | Traffic done: both directions and Le Mans pairs, reviewed (E-013 to E-015, D-024). Pace and pit loss done and reviewed (E-020, D-032) |
-| Simulator and optimiser | Not started |
+| Simulator and optimiser | Simulator built and tested; the replay gate failed at 0.67% against 0.5% (E-022). Optimiser not started |
 | Regulations and LLM layer | Retrieval (E-009, E-011, E-017), grounded answers with a code checker (E-010), in-scope refusal (E-018) and class-aware answers (E-012) built and measured; no simulator tool yet |
 | CI | Running on GitHub Actions, passing |
 | Commit guard hooks | Built and tested (D-016) |

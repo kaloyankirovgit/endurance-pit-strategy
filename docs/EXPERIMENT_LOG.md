@@ -1225,7 +1225,7 @@ On 2024 and 2025 only. The rebuild computes 2026 flags too, but nothing from 202
 
 ## E-022: Does a lap-by-lap simulator built from Layer 3 add up to a real race, and what does it say about three simple strategies?
 
-*Written 2026-11-13 · registered with its code before it was run on real data*
+*Written 2026-11-13 · registered with its code (`f9d345e`) before it was run on real data · run 2026-11-16: the replay gate failed*
 
 **What's built (D-034).** A simulator for one car, lap by lap, in `src/endurance_strategy/simulator/`.
 - **A lap's time:** base pace, plus the stint-age effect (ASSUMED, flat by default), the warm-up lap, the expected traffic cost and noise. A stop adds its pit loss to the out-lap.
@@ -1293,3 +1293,66 @@ Runs only if Part B's gate passes.
   - Pit spread ignored a zero pit loss.
 - **Notes, also addressed:** the FCY pit rule is now R5 in the feasibility table, a zero pace is rejected, and the stop search is capped.
 - **Not fixed, and stated:** a stop decided on the final lap isn't charged, and R2 (GT3 driving times) is checked only when driver categories are given, which Part D's Hypercar doesn't need. The fixes weren't reviewed again.
+
+### Found (run 2026-11-16, after commit `f9d345e`, `scripts/run_layer4.py` stages calibrate, replay and sanity; output in `reports/outputs/`, which stays local)
+
+**The replay gate failed, twice, so Part D's strategy comparison wasn't run.**
+
+**First run, as registered.** 332 cars from 12 races. Losail 2024 had no car meeting the filters, and COTA 2025 has no clean Hypercar laps.
+
+| Model | Median over races of each race's median absolute error | Worst race | Median signed error |
+|---|---|---|---|
+| M0 laps × clean median | 7.61% | 13.12% | −7.22% |
+| M1 + caution laps | 4.12% | 7.89% | −3.98% |
+| M2 + one pit loss per stop | 1.62% | 5.02% | −1.52% |
+| M3 + driver-change split and warm-up | 1.63% | 5.04% | −1.52% |
+
+- **The model ran fast by about 493 s per car on average.** Broken down by lap type, the missing time came from:
+  - restart laps after a caution, +40 s each (170 s per car);
+  - pit laps, +11 s each (163 s);
+  - slow laps such as mistakes and local yellows, +50 s each (79 s);
+  - slow-zone periods across the field, +22 s each (58 s);
+  - clean laps, +0.16 s each (28 s).
+- **Medians understate a sum** when slow laps make the tail long. A routine stop's mean is 89.5 s against a median of 83.2 s.
+
+**Amendment, 2026-11-16, after the first gate failure.** E-022 said the model is fixed before Part D, so these went in, each measured from the same 14 races:
+- Expected values instead of medians for clean pace and pit loss.
+- A restart-lap ratio: the green lap after a caution is 1.46 times the car's mean clean lap for Hypercars and 1.34 for LMGT3 (928 and 944 laps).
+- An incident process for the other green laps the clean-lap rules exclude: 2.2% of Hypercar laps with a mean extra 29.7 s, and 4.3% of LMGT3 laps with 22.9 s.
+- They're INFERRED, in-sample, and chosen after seeing the failure, so the rerun below is weaker evidence than the first run.
+
+**Second run.**
+
+| Model | Median over races | Worst race | Median signed error |
+|---|---|---|---|
+| M0 | 7.46% | 12.86% | −7.14% |
+| M1 | 3.28% | 6.09% | −3.21% |
+| M2 | 0.87% | 3.34% | −0.83% |
+| M3 | **0.67%** | 2.81% | −0.16% |
+
+- **The bias is nearly gone, but the gate (0.5%) still fails.**
+- **What's left follows the cautions.** Races with many safety cars or full-course yellows come out too fast: Imola 2024 −2.8%, Spa 2025 −2.0%, Fuji 2025 −1.6%. Races with none come out too slow, about +0.65% at COTA 2024 and both São Paulos.
+- One class-wide caution-lap ratio can't price how a caution plays out: queues forming, cars waved by, stops made under it. Pricing cautions by time instead of per lap is the next change. It needs its own registration, because these 14 races have now been used to choose the model.
+
+**Part C: the random parts.**
+- **Full-course yellows fit:** 2.97 per 6 hours observed (variance 2.63, 14 races) against 2.79 simulated (variance 2.54).
+- **Safety cars don't.** The mean fits (5.74 observed, 5.45 simulated), but the observed variance is 30.8 against 4.6 simulated. 4 of 14 races had none and some had more than 10.
+  - Safety cars cluster by race, plausibly through weather and the circuit, and a constant-rate process can't produce that.
+  - So the simulator understates how different races can be, which matters most for strategies that bet on a safety car.
+- **One source at a time** (Spa, Hypercar, 6 hours, 500 races each), as laps completed:
+
+| Randomness added | Mean laps | 5th to 95th percentile |
+|---|---|---|
+| None (deterministic) | 162.0 | 162 |
+| Lap noise | 162.3 | 161 to 163 |
+| + Pit-loss spread | 162.3 | 161 to 163 |
+| + Cautions | 150.0 | 142 to 156 |
+| + Slope uncertainty | 149.9 | 143 to 156 |
+
+  - Cautions dominate both the level and the spread. Lap noise and pit spread barely move a 6-hour total.
+
+**What this means.**
+- The deterministic simulator adds up to a real race to within 0.67% (median), but not within the registered 0.5%. Its errors are largest exactly where strategy is most interesting: races with safety cars.
+- Its caution process gets the average right and the race-to-race spread wrong.
+- Neither is ready to rank strategies, so no strategy result is reported.
+- Next: time-based caution pricing, and a caution process with race-level variation, such as a rate drawn per race. Each gets a fresh registration, and the 2026 races stay the final test.

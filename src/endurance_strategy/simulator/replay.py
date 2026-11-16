@@ -37,13 +37,14 @@ def finished_cars(laps: pd.DataFrame) -> pd.DataFrame:
 def model_params(calibration: dict, circuit: str, car_class: str, clean_s: float, model: str) -> CarParams:
     """The engine's parameters for one replay model. Base pace is the car's clean median, net of expected traffic."""
     params = car_params(calibration, circuit, car_class, base_pace_s=clean_s)
-    pooled = float(np.median(np.concatenate([np.asarray(v) for v in calibration["pit_loss_samples_s"][car_class].values()])))
+    pooled = float(np.mean(np.concatenate([np.asarray(v) for v in calibration["pit_loss_samples_s"][car_class].values()])))
     if model == "M0":
-        return replace(params, caution_lap_ratio={k: 1.0 for k in CAUTIONS}, pit_loss_s={False: 0.0, True: 0.0}, warm_up_s=0.0)
+        return replace(params, caution_lap_ratio={k: 1.0 for k in CAUTIONS}, restart_lap_ratio=1.0, pit_loss_s={False: 0.0, True: 0.0},
+                       warm_up_s=0.0, incident_rate=0.0)
     if model == "M1":
-        return replace(params, pit_loss_s={False: 0.0, True: 0.0}, warm_up_s=0.0)
+        return replace(params, pit_loss_s={False: 0.0, True: 0.0}, warm_up_s=0.0, incident_rate=0.0)
     if model == "M2":
-        return replace(params, pit_loss_s={False: pooled, True: pooled}, warm_up_s=0.0)
+        return replace(params, pit_loss_s={False: pooled, True: pooled}, warm_up_s=0.0, incident_rate=0.0)
     return params
 
 
@@ -53,7 +54,7 @@ def replay_car(car: pd.DataFrame, calibration: dict, model: str) -> float:
     The flag a lap is run under is its observed `FLAG_AT_FL`, and a stop's flag at pit entry is the in-lap's
     flag, the same convention the simulator uses."""
     car = car.sort_values("LAP_NUMBER")
-    clean = float(car.loc[car["is_usable_for_pace_model"], "LAP_TIME_S"].median())
+    clean = float(car.loc[car["is_usable_for_pace_model"], "LAP_TIME_S"].mean())
     params = model_params(calibration, car["event_key"].iloc[0][5:], car["CLASS"].iloc[0], clean, model)
     total, previous = 0.0, None
     for lap in car.itertuples():
@@ -63,7 +64,8 @@ def replay_car(car: pd.DataFrame, calibration: dict, model: str) -> float:
             flag = lap.FLAG_AT_FL if lap.FLAG_AT_FL in CAUTIONS else GREEN
             state = State(stint_lap=lap.stint_lap - 1, pitting_now=bool(lap.is_out_lap),
                           last_stop_driver_change=previous is not None and lap.DRIVER_NUMBER != previous.DRIVER_NUMBER,
-                          last_stop_flag=previous.FLAG_AT_FL if previous is not None else GREEN)
+                          last_stop_flag=previous.FLAG_AT_FL if previous is not None else GREEN,
+                          previous_flag=(previous.FLAG_AT_FL if previous is not None and previous.FLAG_AT_FL in CAUTIONS else GREEN))
             total += lap_time(state, params, flag, Draws(), params.age_slope_s)[0]
         previous = lap
     return total

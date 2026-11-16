@@ -28,6 +28,9 @@ class CarParams:
     traffic_s_per_car: float = 0.0          # INFERRED association (D-004, E-021)
     traffic_on: bool = True
     caution_lap_ratio: dict = field(default_factory=lambda: {"SF": 1.0, "FCY": 1.0})  # INFERRED
+    restart_lap_ratio: float = 1.0          # INFERRED (E-022 amendment): the green lap after a caution, part neutralised
+    incident_rate: float = 0.0              # INFERRED (E-022 amendment): share of green laps with a mistake, slow zone or local yellow
+    incident_extra_s: float = 0.0           # INFERRED (E-022 amendment): mean extra time on such a lap
 
     @property
     def expected_traffic_s(self) -> float:

@@ -36,6 +36,10 @@ flowchart LR
     n_pace_results[("Pace and pit-loss results")]:::local
     n_pace["Stint-age pace and pit loss"]
   end
+  subgraph simulator["Simulator"]
+    n_simulator_results[("Simulator results")]:::local
+    n_simulator["Race simulator"]
+  end
   subgraph rules["Regulation assistant"]
     n_regulation_pdf[("Regulation PDFs")]:::local
     n_regulation_chunks[("regulation_chunks.jsonl")]:::local
@@ -56,7 +60,6 @@ flowchart LR
     n_reviewer_eval["Score the review agent"]
   end
   subgraph planned["Planned, not built"]
-    n_simulator["Race simulator"]:::planned
     n_optimiser["Strategy optimiser"]:::planned
     n_simulator_tool["Simulator as an LLM tool"]:::planned
   end
@@ -98,7 +101,8 @@ flowchart LR
   n_practice_laps --> n_pace
   n_pace --> n_pace_results
   n_pace --> n_simulator
-  n_traffic_results --> n_simulator
+  n_laps --> n_simulator
+  n_simulator --> n_simulator_results
   n_simulator --> n_optimiser
   n_optimiser --> n_simulator_tool
   n_answer --> n_simulator_tool
@@ -133,6 +137,7 @@ It doesn't run anything. The pipeline is one command that takes under 20 seconds
 | Score answers | `rag/evaluate.py`<br>`scripts/run_answer_eval.py` | standard library | Repeated runs, full trace logging, scoring in code against labels |
 | Score the review agent | `evals/reviewer.py`<br>`scripts/run_reviewer_eval.py`<br>`llm.py` | standard library | Planted flaws and clean controls, headless runs, exact-match scoring |
 | Stint-age pace and pit loss | `models/pace.py`<br>`scripts/run_layer3.py` | pandas, numpy, pyarrow | Within-stint fits with races as the unit, decision ladder against baselines, frozen fit then one held-out check, sealed season |
+| Race simulator | `simulator/engine.py`<br>`simulator/types.py`<br>`simulator/feasibility.py`<br>`simulator/calibrate.py`<br>`simulator/replay.py`<br>`simulator/compare.py`<br>`scripts/run_layer4.py` | numpy, pandas | Lap-by-lap state transitions, feasibility before simulation, Poisson cautions, common random numbers, replay validation |
 
 Files that do real work but aren't a stage in the flow:
 
@@ -190,6 +195,7 @@ flowchart LR
     n_scripts_run_answer_eval["run_answer_eval"]
     n_scripts_run_e019["run_e019"]
     n_scripts_run_layer3["run_layer3"]
+    n_scripts_run_layer4["run_layer4"]
     n_scripts_run_racer_agent["run_racer_agent"]
     n_scripts_run_retrieval_comparison["run_retrieval_comparison"]
     n_scripts_run_retrieval_eval["run_retrieval_eval"]
@@ -199,13 +205,21 @@ flowchart LR
     n_scripts_run_traffic_le_mans["run_traffic_le_mans"]
     n_scripts_run_traffic_refit["run_traffic_refit"]
   end
-  subgraph g7["top level"]
+  subgraph g7["simulator"]
+    n_simulator_calibrate["calibrate"]
+    n_simulator_compare["compare"]
+    n_simulator_engine["engine"]
+    n_simulator_feasibility["feasibility"]
+    n_simulator_replay["replay"]
+    n_simulator_types["types"]
+  end
+  subgraph g8["top level"]
     n_lineage["lineage"]
     n_llm["llm"]
     n_paths["paths"]
     n_pipeline["pipeline"]
   end
-  subgraph g8["validation"]
+  subgraph g9["validation"]
     n_validation_classification["classification"]
     n_validation_quality["quality"]
     n_validation_schema["schema"]
@@ -260,6 +274,13 @@ flowchart LR
   n_scripts_run_layer3 --> n_features_traffic
   n_scripts_run_layer3 --> n_models_pace
   n_scripts_run_layer3 --> n_paths
+  n_scripts_run_layer4 --> n_models_pace
+  n_scripts_run_layer4 --> n_paths
+  n_scripts_run_layer4 --> n_simulator_calibrate
+  n_scripts_run_layer4 --> n_simulator_compare
+  n_scripts_run_layer4 --> n_simulator_engine
+  n_scripts_run_layer4 --> n_simulator_feasibility
+  n_scripts_run_layer4 --> n_simulator_replay
   n_scripts_run_racer_agent --> n_rag_racer_agent
   n_scripts_run_retrieval_comparison --> n_paths
   n_scripts_run_retrieval_comparison --> n_rag_embed
@@ -287,6 +308,17 @@ flowchart LR
   n_scripts_run_traffic_refit --> n_models_pace
   n_scripts_run_traffic_refit --> n_models_traffic
   n_scripts_run_traffic_refit --> n_paths
+  n_simulator_calibrate --> n_features_traffic
+  n_simulator_calibrate --> n_models_pace
+  n_simulator_calibrate --> n_models_traffic
+  n_simulator_calibrate --> n_simulator_engine
+  n_simulator_compare --> n_simulator_engine
+  n_simulator_engine --> n_simulator_feasibility
+  n_simulator_engine --> n_simulator_types
+  n_simulator_feasibility --> n_simulator_types
+  n_simulator_replay --> n_models_pace
+  n_simulator_replay --> n_simulator_calibrate
+  n_simulator_replay --> n_simulator_engine
   n_validation_classification --> n_io_download
   n_validation_classification --> n_io_load
   n_validation_classification --> n_paths

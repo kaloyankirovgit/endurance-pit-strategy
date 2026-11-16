@@ -80,8 +80,8 @@ def test_a_renamed_file_is_caught_by_its_marker():
 
 
 def test_a_built_step_cannot_rest_on_a_planned_one():
-    problems = check_lineage(steps=with_step("marts", after=("simulator",)))
-    assert "marts: built step depends on planned step simulator" in problems
+    problems = check_lineage(steps=with_step("marts", after=("optimiser",)))
+    assert "marts: built step depends on planned step optimiser" in problems
 
 
 def test_a_new_file_must_be_placed():
@@ -111,4 +111,5 @@ def test_function_local_imports_are_seen():
 
 
 def test_planned_steps_are_drawn_as_planned():
-    assert 'n_simulator["Race simulator"]:::planned' in lineage_mermaid()
+    assert 'n_optimiser["Strategy optimiser"]:::planned' in lineage_mermaid()
+    assert 'n_simulator["Race simulator"]:::planned' not in lineage_mermaid()

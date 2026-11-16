@@ -1220,3 +1220,76 @@ On 2024 and 2025 only. The rebuild computes 2026 flags too, but nothing from 202
 - **Still associations with inferred exposure (D-004),** not a cost per overtake.
 
 **Reviewed before reporting.** The statistical-reviewer agent checked this against the run output. It found two wrong figures (LMGT3 ladder races, and an hourly pace figure with no source) and a misreading of Part 1 for LMGT3, plus overclaims and missing sample sizes. All were corrected, and its figures were recomputed from the output before use.
+
+---
+
+## E-022: Does a lap-by-lap simulator built from Layer 3 add up to a real race, and what does it say about three simple strategies?
+
+*Written 2026-11-13 · registered with its code before it was run on real data*
+
+**What's built (D-034).** A simulator for one car, lap by lap, in `src/endurance_strategy/simulator/`.
+- **A lap's time:** base pace, plus the stint-age effect (ASSUMED, flat by default), the warm-up lap, the expected traffic cost and noise. A stop adds its pit loss to the out-lap.
+- **Caution laps:** a lap runs at the pace of the flag at its start, and caution laps use the class's caution-lap ratio. A stop is decided at pit entry, the end of the in-lap. It waits while a full-course yellow (FCY) has the pits closed (feasibility rule R5, ASSUMED from race reporting and article 12.2.1), and a stop made under a safety car (SC) costs an ASSUMED 30% of a green one.
+- **Energy limit:** it counts green laps only, because caution laps use far less energy. One green lap over the limit can happen right after a deferred stop.
+- **Stint-age effect:** flat by default (D-032), and never extrapolated past the supported ages (35 and 30 laps).
+- **The race** ends at the first crossing after time.
+- **Legality first:** every strategy passes a feasibility check citing its source (D-006). The rules are the energy-limit proxy (ASSUMED), GT3 minimum driving times (2025 Sporting Regulations, 13.2.3, p. 42) and the 45-minute points rule.
+- **The randomness** is drawn up front from a separate stream for each source: lap noise from clean-lap residuals, pit-loss spread from real stops as a multiple of the median, SC and FCY episodes, and optionally a stint-age slope drawn once per race from D-032's range.
+  - Every strategy run on a seed sees the same cautions, the same noise on lap n and the same draw for stop k.
+  - Episodes start as a Poisson process in green time, matching a rate per green hour.
+- **The simplified field:** traffic is an expected cost, not cars on track. So there are no positions, gaps or undercuts, and the simulator can't say where a car rejoins after a stop.
+
+**Data:** 2024 and 2025, outside Le Mans (14 races, 7 circuits), with E-021's clean-lap rule. 2026 stays sealed for the final test. Every part is fitted on the same 14 races that Parts B and C check, so neither part is a held-out test.
+
+### Part A: calibration (`--stage calibrate`)
+
+- **Measured here:** per circuit and class, the race length, clean median pace, the traffic rate and the energy-limit proxy (95th percentile of caution-free completed stints, in laps). Per class, the caution-lap ratios, lap residuals and pit-loss samples (routine stops without the long ones, D-032). The SC and FCY episodes, rebuilt from line crossings across the field: runs under a caution flag closer than one green lap are merged, so an FCY that becomes a safety car is one episode, and the merged episode takes the type with more crossings. Rates are per green hour.
+- **Taken from D-032:** the stint-age range, warm-up and traffic figures.
+- **SC pit loss is ASSUMED, not measured.** Measured against the same car's SC laps, it comes out near zero with a spread of about ±50 s (72 Hypercar and 104 LMGT3 stops). That's too noisy to use. The 30% default comes from that near-zero centre and from an F1 simulator's calibrated 45% (Santillana), and it gets a sensitivity of 0% and 60% in Part D.
+- **Already looked at:** that SC loss figure, the stint-length quantiles by class, the flag counts per race and the race lengths were printed while designing this.
+
+### Part B: replay real races (`--stage replay`)
+
+- **What:** every finished car of the two main classes without a garage stop, with at least 20 clean laps, from the 14 races. Its predicted race time for its observed laps is compared with its observed time.
+- **Four nested models,** each adding one part: M0 is laps × the car's clean median. M1 adds caution laps. M2 adds one pit loss per stop. M3 splits the pit loss by driver change and adds the warm-up lap. Lap 1 and red-flag laps are taken as observed.
+- **Same lap model as the simulator:** every model runs through the simulator's own `engine.lap_time`, with the observed flag on each lap and the in-lap's flag as the stop's flag at pit entry. So the gate tests the code Part D runs. A test replays a simulated car and gets zero error.
+- **In-sample and retrospective:** the car's own clean pace and the flags it saw are inputs. So this checks that the parts add up to a race, not that the simulator predicts one.
+- **Gate:** M3's median, over races, of each race's median absolute error must be at most 0.5% of race time (about 108 s in 6 hours, roughly one lap). If it isn't, the strategy comparison in Part D doesn't run and the model is fixed first.
+- **Reported:** every model's figure, the worst race and the median signed error.
+
+### Part C: are the random parts sensible? (`--stage sanity`)
+
+- **Caution counts:** observed episodes per 6 hours, including races with none, against the simulator's own caution generator over 2,000 races, comparing means and variances. A larger observed variance means cautions cluster more than modelled.
+- **One source at a time:** lap noise, then pit-loss spread, then cautions, then slope uncertainty, each added to the deterministic run of the Part D race. The laps completed are shown after each addition (simulation.md).
+
+### Part D: three strategies on the same simulated races (`--stage compare`)
+
+Runs only if Part B's gate passes.
+
+- **The setup:** Spa, 6 hours, a Hypercar at the class's 2024 to 2025 median pace, 2,000 simulated races (seed 20261113). Every strategy runs on every race (common random numbers).
+- **The strategies:**
+  1. The fewest stops the energy limit allows, with drivers rotating every stop.
+  2. One more stop.
+  3. The fewest stops, with drivers double-stinting, so a driver change at every second stop.
+- **Measure:** the difference in time to complete the lap that every simulated race reaches, against strategy 1, so no slow races drop out. Reported as the mean, the 5th to 95th percentile range and the share of races where it's faster.
+- **The primary run** uses the flat stint-age default (D-032), with lap noise, pit spread and cautions on.
+- **Sensitivity, fixed now:** no cautions, SC stop free (0%), SC stop costly (60%), the stint-age slope drawn per race from D-032's range, and the slope fixed at the top of its range (0.033 s per lap).
+- **What it isn't:**
+  - The output is SIMULATED, so it isn't a prediction of a real race or of what a team should do.
+  - The 5th to 95th range is race-to-race randomness for a car with these parameters, not a confidence interval.
+  - Strategy 3's advantage, if any, comes only from the lower pit loss without a driver change. That gap is an association that may really be tyre work (E-020, `industry_practice.md`).
+  - Track position and traffic after a stop aren't modelled.
+
+**Known limits:** one car, with no field. Caution starts are a constant-rate process, without circuit differences or clustering. The energy limit is a proxy in laps, not the BoP energy, which isn't collected. There's no fuel saving, no tyre choice and no retirements.
+
+**Review before running.** The simulator-reviewer agent attacked the code and this plan with synthetic runs.
+- **Must-fix, all fixed:** the replay didn't use the simulator's code, stops could be made into closed pits, and green laps could run past the energy limit.
+- **Should-fix, fixed:**
+  - Lap noise and pit draws drifted between strategies.
+  - The caution generator under-counted against a rate per total time, and Part C didn't use it.
+  - Line-crossing episodes split.
+  - The slope draw was centred on zero.
+  - The comparison dropped slow races.
+  - Pit spread ignored a zero pit loss.
+- **Notes, also addressed:** the FCY pit rule is now R5 in the feasibility table, a zero pace is rejected, and the stop search is capped.
+- **Not fixed, and stated:** a stop decided on the final lap isn't charged, and R2 (GT3 driving times) is checked only when driver categories are given, which Part D's Hypercar doesn't need. The fixes weren't reviewed again.

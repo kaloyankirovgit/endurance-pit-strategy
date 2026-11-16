@@ -368,6 +368,15 @@ Offsets are learned on 2024 and each 2025 race is predicted all three ways. That
 - **Kept alongside:** the old flags stay in the table.
 - **Limits:** a race wet in practice and race isn't caught. Timing data doesn't record tyres.
 
+## D-034: The first simulator models one car against an expected field
+
+*2026-11-13 · E-022*
+
+- **What it is:** a lap-by-lap simulator for one car, with legality checked first (D-006), the five parts kept separate (simulation.md), and randomness that can be switched off one source at a time.
+- **Why one car:** the timing data can rebuild the field (E-007). But modelling every car's strategy needs a model of rivals' choices, which the project doesn't have. One car with an expected traffic cost is the simplest thing that can compare strategies. It can't see track position, undercuts or rejoining in traffic, and that's the next step if Layer 5 needs it.
+- **Why a fixed comparison first:** E-022 compares three strategies on shared simulated races before any search. Plain search comes before anything cleverer (D-007).
+- **Parameters:** each one states its category in the code.
+
 ---
 
 ## Tools

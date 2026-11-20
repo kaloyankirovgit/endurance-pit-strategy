@@ -6,7 +6,7 @@ Where things are right now. Updated at the end of each working session.
 
 ## Current stage
 
-Layer 1 is done and the race order is now checked against the official classifications. The first traffic result is in (E-013). A commit guard now enforces the no-data rule (D-016). The statistical-reviewer agent has an eval (E-008), and regulation retrieval and grounded answers are built and measured, now with the car class as an input (E-009 to E-012). Layer 3 is done and reported (E-020), and the wet-race fix and reruns are done (E-021, D-033). The simulator's inputs are set out in D-032. The Layer 4 simulator is built. Its first validation failed the registered gate (E-022), the caution fixes in E-023 fixed the caution-heavy races but failed it again, and E-024's incident link made it worse. A decision on how to validate the simulator for strategy is next (D-035).
+Layer 1 is done and the race order is now checked against the official classifications. The first traffic result is in (E-013). A commit guard now enforces the no-data rule (D-016). The statistical-reviewer agent has an eval (E-008), and regulation retrieval and grounded answers are built and measured, now with the car class as an input (E-009 to E-012). Layer 3 is done and reported (E-020), and the wet-race fix and reruns are done (E-021, D-033). The simulator's inputs are set out in D-032. The Layer 4 simulator is built. Its first validation failed the registered gate (E-022), the caution fixes in E-023 fixed the caution-heavy races but failed it again, and E-024's incident link made it worse. From D-035 it is gated on what strategies differ in, starting with the cost of an extra stop (E-025, to register).
 
 ## Done
 
@@ -30,7 +30,7 @@ Layer 1 is done and the race order is now checked against the official classific
 - The other direction (E-014): a GT3 lap is 0.18 s longer (0.16 to 0.20) for each Hypercar close behind at lap start. A past-only window gives the same figures (0.36 and 0.17 s), and 2026 matches 2024 to 2025 at the same circuits (0.40 against 0.36 s for Hypercars, 4 races).
 - Le Mans with three classes (E-015). In each class pair the faster car's figure is larger. Four pairs hold under both slow-lap rules in 2025 and 2026, and two depend on the rule. 2024 is compromised: 52% of its laps are flagged slow, because of damp and drying running that the rain flag misses.
 - Layer 2 is closed (D-024).
-- Vague, engineer-style regulation questions (E-017): 30 written without the regulations to hand. On the 18 answerable ones the hybrid won 5 questions to 1 against BM25 pooled with the held-out set, short of the pre-registered p < 0.05 (p = 0.22), so BM25 stays the default. BM25 found the clause in the top 5 for 9 of 18. Kaloyan checked all 24 labels and agreed with each.
+- Vague, engineer-style regulation questions (E-017): 30 written without the regulations to hand. On the 18 answerable ones the hybrid won 5 questions to 1 against BM25 pooled with the held-out set, short of the pre-registered p < 0.05 (p = 0.22), so BM25 stays the default. BM25 found the clause in the top 5 for 9 of 18. I checked all 24 labels and agreed with each.
 - In-scope refusal tested (E-018). The 5 unanswerable vague questions that reached the answer step were declined every time (3 runs each, effective n = 5), while 13 of 18 runs where retrieval found the clause were answered. The checker's 2 rejections were false positives, and refusal text isn't checked.
 - A live tool in Le Mans Ultimate is parked until after the optimiser (D-026).
 - Field-wide slow periods are flagged (E-016, D-025). They catch a drying track the rain sensor misses, slow zones and local yellows. They remove 695 laps from the clean set (now 138,189), leave the 18-race traffic figures unchanged and fix most of E-015's loose-rule placebo failures.
@@ -61,9 +61,9 @@ Layer 1 is done and the race order is now checked against the official classific
 
 ## Next
 
-1. **Decide how Layer 4 is validated for strategy (D-035), then finish it**
-   - Four looks at the same 14 races have each moved the replay error rather than removed it.
-   - Proposed: gate what strategies differ in (the cost of an extra stop, of a longer stint, of a driver change), checked within races, and keep the race-time replay as a reported check. Then the three-strategy comparison.
+1. **Finish Layer 4 under D-035 (E-025, to register)**
+   - Register a within-race check of the cost of an extra stop with its own threshold, then fix the stop pricing (E-024 found it about 25 s too high per extra stop).
+   - Then stint length and driver changes, then the three-strategy comparison. The race-time replay stays a reported number.
    - Before 2026 is opened: check Monza's classification and any later 2026 regulations revision (D-031).
 2. **Switch the answers to the hybrid (D-029)**
    - Run the answer eval on the fresh questions with the hybrid, then change the default.

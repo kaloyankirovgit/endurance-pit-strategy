@@ -760,7 +760,7 @@ So 2024 is reported separately, and the result rests on 2025 and 2026, two races
 
 **Question:** E-011's questions were written after reading the clauses, which favours BM25. On questions written without the regulations to hand, does the hybrid (BM25 + embeddings, reciprocal rank fusion) retrieve the answering clause more often?
 
-**Question set:** `questions_vague.json`. Kaloyan wrote 30 questions without reading the regulations. Claude labelled them from the 2026 clause text before any retriever was run on them:
+**Question set:** `questions_vague.json`. I wrote 30 questions without reading the regulations. Claude labelled them from the 2026 clause text before any retriever was run on them:
 
 - 18 answerable: 12 in real-world wording and 6 in sim-racing wording whose real-world rule is in the corpus;
 - 6 that the corpus doesn't answer (pit windows, blue flags, track-limit warning counts, engine maps), kept for refusal tests;
@@ -776,7 +776,7 @@ So 2024 is reported separately, and the result rests on 2025 and 2026, two races
 - Embeddings alone are reported but can't become the default on this run.
 - Real and sim wording are reported separately, as description only.
 
-**Labels:** drafted by Claude and not yet spot-checked by Kaloyan. Any label changed after the run is logged here, and the run repeated.
+**Labels:** drafted by Claude and not yet spot-checked by me. Any label changed after the run is logged here, and the run repeated.
 
 **Found** (run `20261026T125420Z`; the original and held-out rows reproduce E-011 exactly):
 
@@ -801,13 +801,13 @@ So 2024 is reported separately, and the result rests on 2025 and 2026, two races
 
 **What it doesn't show:**
 
-- **Every label is provisional.** One labeller (Claude), not yet checked. Kaloyan's check happens after the results exist, so the rules for changing a label are fixed here first: a label changes only if the gold article doesn't answer the question or another article answers it better. He checks with the retriever ranks hidden. Results are reported before and after any change, under the same decision rule.
+- **Every label is provisional.** One labeller (Claude), not yet checked. My check happens after the results exist, so the rules for changing a label are fixed here first: a label changes only if the gold article doesn't answer the question or another article answers it better. He checks with the retriever ranks hidden. Results are reported before and after any change, under the same decision rule.
 - **The pooled test includes the held-out 2 to 0, part of the pattern that suggested this test (D-020).** That tilts it towards a pass, and it still failed. A future rule should be tested on a set that played no part in proposing it.
 - **18 answerable questions from one author.** One question moves recall@5 by about 6 points.
 
 **Reproducing the test:** `sign_test` and `compare_hits` in `rag/evaluate.py` (unit-tested). The comparison script prints every pairing and the E-017 rule. The first p-values were worked out by hand, and the code reproduces them: 5 against 0 gives 0.0625 (E-011), and 5 against 1 gives 0.219.
 
-**Label check (2026-10-26, after the run):** Kaloyan checked all 24 labels against the clause text with the retriever ranks hidden, and agreed with every one. v04 and v16 stay answerable but partial, as labelled. No label changed, so the results above stand without a rerun. He saw Claude's notes while checking, so this confirms the labels rather than being an independent second labelling.
+**Label check (2026-10-26, after the run):** I checked all 24 labels against the clause text with the retriever ranks hidden, and agreed with every one. v04 and v16 stay answerable but partial, as labelled. No label changed, so the results above stand without a rerun. He saw Claude's notes while checking, so this confirms the labels rather than being an independent second labelling.
 
 **Reviewed by** the statistical-reviewer agent before reporting. It kept the decision and corrected the wording of the recall-drop and embedding claims, and the truncation explanation.
 
@@ -859,12 +859,12 @@ So 2024 is reported separately, and the result rests on 2025 and 2026, two races
 
 - **Retrievers:** BM25 and the hybrid as in E-011 and E-017: k1 = 1.5, b = 0.75, `BAAI/bge-small-en-v1.5` (which resolves to `Qdrant/bge-small-en-v1.5-onnx-Q`, snapshot `aa8f8b06`), reciprocal rank fusion with constant 60, depth 50 and equal weights, `fastembed` 0.9.0. Nothing tuned. The chunk file is SHA-256 `6e12122e`. The sub-clause embedding idea is not applied. The run first reproduces the E-017 rows, and stops if they differ.
 - **Questions:** `evals/regulations/questions_fresh.json`, 50 written with the regulations closed: 25 in real race-engineer wording and 25 in sim-racer wording. At least half come from someone who hasn't seen this project, if that can be arranged. Otherwise a topic list is committed first. Near-duplicates of the 78 earlier answerable questions are rejected.
-- **Labels:** the answering 2026 articles are drafted by Claude from the clause text, reading the regulations by section and not by running a retriever or keyword search, with the transcript saved. Kaloyan checks every label before any run, without Claude's notes. The questions and labels are committed before any run.
+- **Labels:** the answering 2026 articles are drafted by Claude from the clause text, reading the regulations by section and not by running a retriever or keyword search, with the transcript saved. I check every label before any run, without Claude's notes. The questions and labels are committed before any run.
 - **Frozen labels decide.** A later change needs E-017's grounds, is made with ranks hidden, and is reported only as sensitivity. Any gold article in the top 5 counts as a hit. Partial questions count as answerable, as in E-017.
 - **Size:** at least 30 answerable questions, and at most 2 per gold article. If there are fewer, more are written before any run.
 - **Primary measure:** top-5 hit, question by question, hybrid against BM25, answerable questions only, season filter on.
 
-**Amendment, 2026-11-09, committed before any question was generated.** Kaloyan chose to have the questions written by a blind model instead of people, to get to Layer 3 sooner. It changes who writes the questions and nothing else in this entry:
+**Amendment, 2026-11-09, committed before any question was generated.** I chose to have the questions written by a blind model instead of people, to get to Layer 3 sooner. It changes who writes the questions and nothing else in this entry:
 
 - **Author:** the racer agent (`rag/racer_agent.py`), run headless from an empty folder with no tools and without user, project or MCP settings. A canary run with the same isolation is asked what it can see, and the script stops if it can quote the project.
 - **Personas, replacing the real and sim split:** 4 people competing (2 real drivers, 2 sim racers), `wording: racer`, and 4 people watching, `wording: fan`. Each writes 10 questions in one independent run.
@@ -876,9 +876,9 @@ So 2024 is reported separately, and the result rests on 2025 and 2026, two races
 
 - The agent wrote 80 questions. 3 were near-duplicates. Of the other 77, 43 were kept: 22 racer and 21 fan, 33 answerable and 10 not.
 - **That's 43 questions, not the 50 planned.** The questions cluster on a few topics (driving time, pitting under yellow, tyres while refuelling), so the 2-per-article cap ran through the reserve. The size rule of at least 30 answerable is met, so no more were written.
-- The amendment didn't say how the cap applies across the two groups. It was applied with racer and fan alternating by position, main set first, and a question is dropped if any of its gold articles is already at 2. This was chosen after the labels were drafted and before any retriever ran. Its effect is UNKNOWN: 4 of the 5 questions that differ touch an article at the cap, and losing 2 of them would have made the outcome inconclusive. The draft labels for all 77 candidates are in `evals/regulations/racer_agent/` so the cap can be re-applied, but only the 43 kept were checked by Kaloyan.
+- The amendment didn't say how the cap applies across the two groups. It was applied with racer and fan alternating by position, main set first, and a question is dropped if any of its gold articles is already at 2. This was chosen after the labels were drafted and before any retriever ran. Its effect is UNKNOWN: 4 of the 5 questions that differ touch an article at the cap, and losing 2 of them would have made the outcome inconclusive. The draft labels for all 77 candidates are in `evals/regulations/racer_agent/` so the cap can be re-applied, but only the 43 kept were checked by me.
 - Labels came from reading 6.2, 6.5, 7.2, 7.4, 9.1, 12, 13, 14 and 15.1 of the 2026 text in full, plus 1.4.1, 3.1.1, 4.1.3, 4.3.1, 4.3.2, 6.1, 6.3, 6.4.6, 6.6, 9.2.1 and Appendix 4 (1.4.1, 6.3.1 and 6.3.2 only to their first 1,800 characters). "Not answered" therefore means not in those parts. Appendix 4 lost its table's first column in extraction, so it couldn't be used as a source.
-- **Label check:** Kaloyan confirmed on 2026-11-09 that he checked every label on the sheet and changed none. The sheet showed the question and the article text, without Claude's notes. The tick boxes on it were left blank, so the record of the check is that statement. The questions and labels were already committed (`4da29f0`).
+- **Label check:** On 2026-11-09 I checked every label on the sheet and changed none. The sheet showed the question and the article text, without Claude's notes. The tick boxes on it were left blank, so this entry is the record of the check. The questions and labels were already committed (`4da29f0`).
 
 **Rule:**
 
@@ -904,7 +904,7 @@ Under a flat prior updated on E-017's direction, adoption is about 35% to 76% ac
 
 **Known limits:**
 
-- Kaloyan prefers the hybrid, knows BM25's misses, has seen E-017's questions and read the clause text for 24 labels on 2026-10-26. Wording overlap with the clause text is the thing that separates the retrievers, which is why outside authors matter here.
+- I prefer the hybrid, know BM25's misses, have seen E-017's questions and read the clause text for 24 labels on 2026-10-26. Wording overlap with the clause text is the thing that separates the retrievers, which is why outside authors matter here.
 - The labels again come from Claude.
 - "No keyword search while labelling" can only be checked from the saved transcript.
 - Reviewed by the statistical-reviewer agent before being fixed. It rejected the first version of this rule (wins at least equal to losses, ties to the hybrid).
@@ -929,7 +929,7 @@ Under a flat prior updated on E-017's direction, adoption is about 35% to 76% ac
 - **By who is asking (description only):** racer 16 of 18 for the hybrid against 14 of 18 for BM25 (2 wins, 0 losses). Fan 11 of 15 against 10 of 15 (2 wins, 1 loss). Embeddings alone found 12 of 15 fan questions, one more than the hybrid. Neither subset can carry a claim.
 - **The 5 questions that differ:** the hybrid hits f05 (13.2.3, rank 3), f15 (6.5.4, rank 4), f32 (12.3.1 only, rank 2) and f39 (6.4.6, rank 5). BM25 hits f04 (12.3.2 only, rank 5).
 - **The result leans on the questions with several gold articles.** 11 of the 33 have several, and any one in the top 5 counts as a hit. On the 22 with a single gold article the split is 3 to 0, which the rule would call inconclusive. Requiring every gold article in the top 5 gives 6 to 0. So multi-gold labels don't favour the hybrid, but passing the 4-question gate depends on them.
-- **What this doesn't show:** every question came from one model, and Claude drafted the labels. Kaloyan checked them without notes, but with BM25's misses in mind from earlier work. The hybrid contains BM25, so this measures what adding embeddings changes, and it says nothing about real users or sim-racing wording alone.
+- **What this doesn't show:** every question came from one model, and Claude drafted the labels. I checked them without notes, but with BM25's misses in mind from earlier work. The hybrid contains BM25, so this measures what adding embeddings changes, and it says nothing about real users or sim-racing wording alone.
 - **Not applied yet.** `rag/answer.py` and the answer eval still use BM25. As fixed above, the E-010, E-012 and E-018 figures don't carry over, and the answer eval runs on the fresh set before the switch is made.
 
 ---
@@ -1040,7 +1040,7 @@ Any change is a dated amendment to this entry saying what was known when it was 
 
 **Known limits:** one race per circuit per fit season, so a circuit effect and a one-off race are the same thing in 2024. Seven fit races means wide intervals. The races share cars, teams and circuits across seasons, and that isn't resampled. Deliberate fuel or tyre saving isn't visible in timing data and is tied to strategy, which is what's being modelled.
 
-**Reviewed before being fixed.** The statistical-reviewer agent raised 14 objections to the first draft, and Kaloyan accepted all of them on 2026-11-09, including the decision ladder and the wet-session rule. The change to leave stint lap 2 out of L and the pit-loss reference came from working through that review, and wasn't checked by the reviewer separately. The code-reviewer agent then compared the code with this entry. Its findings were fixed or written in here before this was committed, except a missing 2024 stop count at a circuit, which stops the run with an error.
+**Reviewed before being fixed.** The statistical-reviewer agent raised 14 objections to the first draft, and I accepted all of them on 2026-11-09, including the decision ladder and the wet-session rule. The change to leave stint lap 2 out of L and the pit-loss reference came from working through that review, and wasn't checked by the reviewer separately. The code-reviewer agent then compared the code with this entry. Its findings were fixed or written in here before this was committed, except a missing 2024 stop count at a circuit, which stops the run with an error.
 
 ### Found (run 2026-11-10, after commit `f4d8ff4`, by `python scripts/run_layer3.py --stage fit`, then `check`, then `refit`, output in `reports/outputs/`, which stays local)
 
@@ -1119,7 +1119,7 @@ Run with `--stage posthoc`.
 
 **Why.** E-020 found that COTA 2025 was wet and got through the clean-lap rules. The slow-lap rule (D-012) and the field-slow rule (D-025) measure each lap against that race's own median. In a mostly wet race the median is a wet lap, so wet laps look normal.
 
-The comparison with how the sport works (`docs/research/industry_practice.md`) points the same way: the ACO's 2017 BoP method skipped races run in abnormal weather. That supports keeping wet running out. It doesn't choose between flagging laps and dropping the race, which is Kaloyan's choice here (D-033).
+The comparison with how the sport works (`docs/research/industry_practice.md`) points the same way: the ACO's 2017 BoP method skipped races run in abnormal weather. That supports keeping wet running out. It doesn't choose between flagging laps and dropping the race, which was my choice here (D-033).
 
 ### The rule (D-033)
 
@@ -1538,4 +1538,4 @@ It also asked for the interval on b, the cap, the fit-then-use test and the stop
 **What this means.**
 - Four looks at the same 14 races (E-022, its amendment, E-023, E-024) have each moved the error rather than removed it. Further fixes chosen from these races' errors would fit them, not validate anything.
 - The gate on total race time isn't the right test of a strategy tool on its own. In Part D every strategy runs on the same simulated races, so errors common to all of them (most of the caution error) cancel. What doesn't cancel is how the simulator prices the things strategies differ in: an extra stop, a longer stint, a driver change.
-- **Next (to decide, D-035):** validate those differences directly, starting with the marginal stop cost against within-race data like the check above, registered and with a gate of its own. Keep the race-time replay as a reported check rather than the only gate. The final test stays 2026, sealed.
+- **Next (decided in D-035):** validate those differences directly, starting with the marginal stop cost against within-race data like the check above, registered and with a gate of its own. Keep the race-time replay as a reported check rather than the only gate. The final test stays 2026, sealed.

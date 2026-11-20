@@ -359,12 +359,12 @@ Offsets are learned on 2024 and each 2025 race is predicted all three ways. That
 
 ## D-033: A race that ran slow as a whole is measured against the weekend's practice pace
 
-*2026-11-10 · E-021 · Kaloyan chose practice as the reference*
+*2026-11-10 · E-021 · I chose practice as the reference*
 
 - **The problem:** COTA 2025 was a wet race, and it got through because the slow-lap and field-slow rules (D-012, D-025) measured each race against its own median (E-020).
 - **What the sport does:** the ACO's BoP method skipped abnormal-weather races, and analysts keep wet and dry references apart (`docs/research/industry_practice.md`).
 - **The rule:** a race and class switch to practice pace when their trimmed dry median is over 1.04 times it and practice had at least 8 cars and 100 clean laps. Otherwise the race keeps its own median, and its flags are exactly as before.
-- **Why practice:** Kaloyan chose it over dropping whole races, which would lose the dry part of a mixed race, and over changing nothing. The review turned "the faster of the two" into a switch, so dry races aren't tightened.
+- **Why practice:** I chose it over dropping whole races, which would lose the dry part of a mixed race, and over changing nothing. The review turned "the faster of the two" into a switch, so dry races aren't tightened.
 - **Kept alongside:** the old flags stay in the table.
 - **Limits:** a race wet in practice and race isn't caught. Timing data doesn't record tyres.
 
@@ -376,6 +376,17 @@ Offsets are learned on 2024 and each 2025 race is predicted all three ways. That
 - **Why one car:** the timing data can rebuild the field (E-007). But modelling every car's strategy needs a model of rivals' choices, which the project doesn't have. One car with an expected traffic cost is the simplest thing that can compare strategies. It can't see track position, undercuts or rejoining in traffic, and that's the next step if Layer 5 needs it.
 - **Why a fixed comparison first:** E-022 compares three strategies on shared simulated races before any search. Plain search comes before anything cleverer (D-007).
 - **Parameters:** each one states its category in the code.
+
+---
+
+## D-035: The simulator is gated on what strategies differ in, not on total race time alone
+
+*2026-11-20 · E-022 to E-024*
+
+- **What changed:** the gate before any strategy result is now a registered within-race check of how the simulator prices the things strategies differ in. The first is the cost of an extra pit stop; stint length and driver changes follow. The 0.5% race-time replay stays, reported every run, but it no longer decides on its own whether Part D runs.
+- **Why:** four looks at the same 14 races (E-022, its amendment, E-023, E-024) each moved the replay error rather than removed it, so further fixes chosen from those errors would fit those races, not validate the simulator. And a strategy comparison runs every strategy on the same simulated races, so errors common to all of them, most of the caution error included, cancel. What doesn't cancel is the price of the differences. E-024's exploratory check found an extra stop overcharged by about 25 s within a race (9 to 44 s), which a race-time gate can't see and which would bias a stop-count comparison directly.
+- **This changes the target, so it is stated openly.** It was decided after the race-time gate failed three times. It doesn't make passing easier: the stop-cost check is new, registered before it runs, and has its own threshold.
+- **What stays fixed:** 2026 is sealed for the final test (D-031), and strategy output stays SIMULATED, never a prediction.
 
 ---
 

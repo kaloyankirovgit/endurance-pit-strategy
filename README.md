@@ -9,7 +9,7 @@ The question I'm working towards:
 
 ## Where it's at
 
-The data pipeline, the traffic study and the pace and pit-loss study are done, and the regulation assistant is mostly built and tested. The simulator is next.
+The data pipeline, the traffic study and the pace and pit-loss study are done, and the regulation assistant is mostly built and tested. The simulator is built and being validated: it hasn't yet passed the checks set for it, so it gives no strategy advice yet.
 
 ### Data pipeline (layer 1, done)
 
@@ -40,12 +40,12 @@ The rules and the code were committed before anything was fitted (E-020). The mo
 
 ### Race simulator (layer 4, built, validation in progress)
 
-A lap-by-lap simulator for one car (E-022, E-023). It covers green laps, pit stops, the warm-up lap, traffic, safety cars and full-course yellows. Every strategy has to pass a legality check that cites the regulations before it runs.
+A lap-by-lap simulator for one car (E-022 to E-024). It covers green laps, pit stops, the warm-up lap, traffic, safety cars and full-course yellows. Every strategy has to pass a legality check that cites the regulations before it runs. Each validation run had its rules and code committed before it touched real data.
 
-- **Checked against real races:** 332 finished cars from 12 races in 2024 and 2025 were replayed through it. Each layer of the model cuts the error: 7.5% for laps × pace alone, 3.3% with cautions, 0.9% with pit stops, 0.67% with everything.
-- **Short of the target:** that's still above the 0.5% set before the run, so no strategy comparison has been reported yet.
-- **Second attempt (E-023):** cautions are now priced by time, from how much of its green speed a car keeps under a safety car or full-course yellow (about 0.4 to 0.6), fitted from line crossings. That fixed the races with many cautions (Imola 2024 went from −2.8% to −1.85%), but races with few cautions now run up to 1.2% slow. Overall it came out at 0.78%, so the gate failed again, and the green-lap side is the next suspect.
-- **A bug found on the way:** a safety car's bunched queue had been split into one "episode" per lap. With that fixed, real races have about 2 safety cars each, and the simulated counts match them in average and spread.
+- **Checked against real races:** 332 finished cars from 12 races in 2024 and 2025 were replayed through it, and the pass mark was a typical error under 0.5% of race time. It came out at 0.67%, then 0.78% and 0.98% across three attempts, so no strategy comparison has been reported.
+- **What the attempts fixed:** cautions are now priced by how long they last, from how much of its green speed a car keeps under a safety car or full-course yellow (about 0.35 to 0.6). That fixed the races with many cautions (Imola 2024 went from −2.8% to −1.85%). The simulated safety cars and yellows now match real races in average and spread.
+- **A bug found on the way:** a safety car's bunched queue had been split into one "episode" per lap. Fixed, real races have about 2 safety cars each, not 6, and an earlier finding that safety cars cluster by race turned out to be mostly that bug.
+- **Why the target changed (D-035):** each fix moved the error rather than removed it, and every attempt was checked on the same 14 races. A strategy comparison runs every strategy on the same simulated races, so errors they share cancel. What matters is how the simulator prices what strategies differ in, and a check found each extra stop costs about 25 s too much within a race (9 to 44 s). So the next gate tests the cost of a stop directly, and the race-time replay stays as a reported number. The 2026 races stay sealed for the final test.
 
 ### Regulation assistant (layer 6, mostly built)
 
@@ -59,7 +59,7 @@ See [`evals/regulations/`](evals/regulations/).
 ### Checks on the AI tools
 
 - **An eval for the AI review agent:** 16 synthetic write-ups with planted statistical flaws and clean controls, run headless through Claude Code and scored in code against labels. It caught 11 of the 12 flaws (E-008). See [`evals/statistical_reviewer/`](evals/statistical_reviewer/).
-- **295 tests on synthetic data,** run in GitHub Actions on every push, with no real data needed.
+- **314 tests on synthetic data,** run in GitHub Actions on every push, with no real data needed.
 
 The full log of what's been tried, including null results, is in [`docs/EXPERIMENT_LOG.md`](docs/EXPERIMENT_LOG.md), and the reasoning behind the bigger choices is in [`docs/DECISIONS.md`](docs/DECISIONS.md).
 
@@ -73,8 +73,8 @@ The build goes in layers. Each one has to work before the next one leans on it.
    - Rebuild who was where on track, then look at how lap times change when a faster car is working through slower traffic.
 3. **Pace, stints and pit loss** (done)
    - How pace fades through a stint, and what a stop actually costs.
-4. **Simulator**
-   - A lap-by-lap race model, deterministic first, then with randomness added one piece at a time and checked against real races.
+4. **Simulator** (built, validation in progress)
+   - A lap-by-lap race model, deterministic first, then with randomness added one piece at a time and checked against real races. Next: check the cost of a pit stop directly (D-035).
 5. **Optimiser**
    - Search the legal pit windows and compare strategies with intervals rather than single numbers.
 6. **Regulation assistant** (mostly built; the simulator tool is still to come)
@@ -240,7 +240,7 @@ This project is built in close collaboration with Claude Code, Anthropic's codin
 - **Where I come in:** I set the direction and the standards, and I review every change before it's committed. Every commit goes through me, and I'm accountable for what's in the repo.
 - **How the work is kept honest:**
   - [`CLAUDE.md`](CLAUDE.md) and [`.claude/rules/`](.claude/rules/) set the standards Claude works to, from data licensing to how statistical results are allowed to be worded.
-  - Review agents in [`.claude/agents/`](.claude/agents/) check code, data, statistics and the simulator before a result is reported. The statistical reviewer is itself evaluated against planted flaws in [`evals/`](evals/).
+  - Review agents in [`.claude/agents/`](.claude/agents/) check code, data, statistics and the simulator before a result is reported. Before each simulator run, the simulator reviewer tried to break the code with made-up races, and its must-fix findings were fixed before any real data was used. The statistical reviewer is itself evaluated against planted flaws in [`evals/`](evals/).
   - A commit hook blocks the licensed timing data from being committed, whether Claude or I run the commit (D-016).
 
 The setup is part of the project, not just tooling around it. A lot of the work here is about running an AI-assisted workflow where the checks are enforced rather than hoped for.

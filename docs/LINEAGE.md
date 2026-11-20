@@ -137,7 +137,7 @@ It doesn't run anything. The pipeline is one command that takes under 20 seconds
 | Score answers | `rag/evaluate.py`<br>`scripts/run_answer_eval.py` | standard library | Repeated runs, full trace logging, scoring in code against labels |
 | Score the review agent | `evals/reviewer.py`<br>`scripts/run_reviewer_eval.py`<br>`llm.py` | standard library | Planted flaws and clean controls, headless runs, exact-match scoring |
 | Stint-age pace and pit loss | `models/pace.py`<br>`scripts/run_layer3.py` | pandas, numpy, pyarrow | Within-stint fits with races as the unit, decision ladder against baselines, frozen fit then one held-out check, sealed season |
-| Race simulator | `simulator/engine.py`<br>`simulator/types.py`<br>`simulator/feasibility.py`<br>`simulator/calibrate.py`<br>`simulator/replay.py`<br>`simulator/compare.py`<br>`scripts/run_layer4.py` | numpy, pandas | Lap-by-lap state transitions, feasibility before simulation, Poisson cautions, common random numbers, replay validation |
+| Race simulator | `simulator/engine.py`<br>`simulator/types.py`<br>`simulator/feasibility.py`<br>`simulator/calibrate.py`<br>`simulator/replay.py`<br>`simulator/compare.py`<br>`scripts/run_layer4.py` | numpy, pandas | Lap-by-lap state transitions, feasibility before simulation, cautions priced by time, gamma-Poisson caution rate fitted by simulated moments, common random numbers, replay validation |
 
 Files that do real work but aren't a stage in the flow:
 

@@ -153,9 +153,10 @@ STEPS = (
     Step("simulator", "Race simulator", "simulator",
          ("simulator/engine.py", "simulator/types.py", "simulator/feasibility.py", "simulator/calibrate.py", "simulator/replay.py",
           "simulator/compare.py", "scripts/run_layer4.py"),
-         ("simulate", "step", "check_strategy", "calibrate", "replay", "run_strategies"), after=("pace",),
+         ("simulate", "step", "check_strategy", "calibrate", "replay", "run_strategies", "time_to_cover", "caution_progress",
+          "rate_spread"), after=("pace",),
          reads=("laps",), writes=("simulator_results",), libraries=("numpy", "pandas"),
-         methods="Lap-by-lap state transitions, feasibility before simulation, Poisson cautions, common random numbers, replay validation"),
+         methods="Lap-by-lap state transitions, feasibility before simulation, cautions priced by time, gamma-Poisson caution rate fitted by simulated moments, common random numbers, replay validation"),
     Step("optimiser", "Strategy optimiser", "planned", after=("simulator",), planned=True),
     Step("simulator_tool", "Simulator as an LLM tool", "planned", after=("optimiser", "answer"), planned=True),
 )

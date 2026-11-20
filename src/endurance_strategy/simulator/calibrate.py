@@ -37,25 +37,33 @@ def race_hours(laps: pd.DataFrame) -> pd.Series:
 def caution_episodes(laps: pd.DataFrame) -> pd.DataFrame:
     """RECONSTRUCTED caution periods from line crossings across the field.
 
-    Runs of crossings under a caution flag (SF or FCY) are merged when the gap between them is under one
-    median green lap, so a stray green crossing doesn't split a safety car and an FCY that turns into a
-    safety car stays one episode. A merged episode takes the type with more crossings. A red flag (RF)
+    Crossings under a caution flag (SF or FCY) belong to one episode until racing resumes, meaning some car
+    crosses the line green twice in a row (a full green lap) before the next caution crossing. So a stray green
+    crossing doesn't split a safety car, an FCY that turns into a safety car stays one episode, and a safety
+    car whose bunched queue leaves the line empty for longer than a green lap isn't cut into one episode per
+    lap. (E-022 merged on a gap of under one median green lap, which did cut them: amendment 1 of E-023.)
+    A merged episode takes the type with more crossings. A red flag (RF)
     isn't modelled. E-023: the episode runs from the first to the last crossing under the caution, so it is
     the period the caution flag shows at the line, and a stop or pit closure in it matches the real flag. (E-022
     added one green lap after the last crossing.)
     """
     rows = []
     for event, race in laps.groupby("event_key"):
-        crossings = race.sort_values("ELAPSED_S")
+        crossings = race.sort_values("ELAPSED_S", kind="stable")
         flags = crossings["FLAG_AT_FL"].to_numpy()
         times = crossings["ELAPSED_S"].to_numpy(dtype=float)
+        cars = crossings["NUMBER"].to_numpy()
         lap_s = float(race.loc[race["FLAG_AT_FL"].eq("GF"), "LAP_TIME_S"].median())
-        caution = np.isin(flags, CAUTIONS)
-        current = None
-        for t, flag, is_caution in zip(times, flags, caution):
-            if not is_caution:
+        current, green_since = None, {}
+        for t, flag, car in zip(times, flags, cars):
+            if flag == "GF":
+                green_since[car] = green_since.get(car, 0) + 1
                 continue
-            if current is not None and t - current["end"] < lap_s:
+            if flag not in CAUTIONS:
+                continue
+            raced = any(n >= 2 for n in green_since.values())
+            green_since = {}
+            if current is not None and not raced:
                 current["end"] = t
                 current[flag] = current.get(flag, 0) + 1
             else:

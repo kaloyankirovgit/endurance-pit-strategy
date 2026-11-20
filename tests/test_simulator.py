@@ -117,11 +117,27 @@ def test_strategies_share_the_same_simulated_races():
 def test_caution_episodes_from_line_crossings():
     rows = []
     for car in range(4):
-        for lap, flag in enumerate(["GF", "SF", "SF", "GF", "FCY", "GF"], start=1):
+        for lap, flag in enumerate(["GF", "SF", "SF", "GF", "GF", "FCY", "GF"], start=1):
             rows.append({"event_key": "2024_X", "NUMBER": str(car), "ELAPSED_S": lap * 100.0 + car, "LAP_TIME_S": 100.0, "FLAG_AT_FL": flag})
     episodes = caution_episodes(pd.DataFrame(rows))
     assert list(episodes["kind"]) == ["SF", "FCY"]
     assert episodes.iloc[0]["duration_s"] == pytest.approx(103.0)   # first to last caution crossing (E-023)
+
+
+def test_a_bunched_safety_car_queue_stays_one_episode_and_one_green_lap_does_not_end_it():
+    """Amendment 1 of E-023: under a safety car the queue crosses within seconds, then the line is empty for a
+    whole slow lap, longer than a green lap. That is one episode. Racing resumes only when a car completes a
+    full green lap."""
+    rows = []
+    for car in range(20):
+        t = car * 1.0
+        for lap, (flag, took) in enumerate([("GF", 100), ("SF", 180), ("SF", 180), ("SF", 180), ("GF", 120),
+                                            ("SF", 180), ("SF", 180), ("GF", 120), ("GF", 100), ("GF", 100), ("FCY", 150),
+                                            ("FCY", 150), ("GF", 100)], start=1):
+            t += took
+            rows.append({"event_key": "2024_X", "NUMBER": str(car), "ELAPSED_S": t, "LAP_TIME_S": float(took), "FLAG_AT_FL": flag})
+    episodes = caution_episodes(pd.DataFrame(rows))
+    assert list(episodes["kind"]) == ["SF", "FCY"]     # one restart lap doesn't split the first; two green laps do
 
 
 def test_calibration_refuses_the_sealed_season():

@@ -30,6 +30,10 @@ class CarParams:
     caution_lap_ratio: dict = field(default_factory=lambda: {"SF": 1.0, "FCY": 1.0})  # INFERRED
     restart_lap_ratio: float = 1.0          # INFERRED (E-022 amendment): the green lap after a caution, part neutralised
     incident_rate: float = 0.0              # INFERRED (E-022 amendment): share of green laps with a mistake, slow zone or local yellow
+                                            # (E-024: the rate in a race with no cautions, the intercept)
+    incident_rate_per_caution_hour: float = 0.0   # INFERRED (E-024): how much that share rises per caution episode per green
+                                                  # hour, since incidents cluster in races with many cautions
+    incident_caution_rate_cap: float = float("inf")   # E-024: cautions per green hour are capped at the fitted range
     incident_extra_s: float = 0.0           # INFERRED (E-022 amendment): mean extra time on such a lap
     caution_progress: dict | None = None    # INFERRED (E-023): share of green speed kept under each caution type. When set,
                                             # cautions are priced by time (a lap straddling an episode is partly slowed) and

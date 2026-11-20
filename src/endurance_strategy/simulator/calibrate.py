@@ -268,6 +268,57 @@ def restart_and_incidents(laps: pd.DataFrame) -> dict:
     return out
 
 
+INCIDENT_BOOTSTRAP_DRAWS = 2000
+INCIDENT_BOOTSTRAP_SEED = 20261121
+
+
+def _weighted_line(x: np.ndarray, y: np.ndarray, w: np.ndarray) -> tuple[float, float]:
+    design = np.column_stack([np.ones_like(x), x]) * np.sqrt(w)[:, None]
+    a, b = np.linalg.lstsq(design, y * np.sqrt(w), rcond=None)[0]
+    return float(a), float(b)
+
+
+def incident_model(laps: pd.DataFrame, per_race: list[dict]) -> dict:
+    """INFERRED (E-024): per class, the incident share of green laps as a + b × (caution episodes per green hour),
+    by least squares across races weighted by each race's green laps. The incident laps are defined exactly as in
+    `restart_and_incidents`. An association across races: incidents (slow zones, local yellows, mistakes) and
+    cautions share causes such as weather and the circuit, and neither causes the other in this model."""
+    table = pd.DataFrame(per_race).set_index("event_key")
+    cautions_per_h = (table["SF"] + table["FCY"]) / table["green_hours"]
+    frame = laps.sort_values(["event_key", "NUMBER", "LAP_NUMBER"])
+    clean = frame[frame["is_usable_for_pace_model"]].groupby(["event_key", "NUMBER"])["LAP_TIME_S"].mean().rename("clean_mean")
+    frame = frame.join(clean, on=["event_key", "NUMBER"])
+    green = frame[frame["FLAG_AT_FL"].eq("GF") & ~frame["is_pit_lap"] & frame["LAP_NUMBER"].gt(1) & frame["clean_mean"].notna()
+                  & ~frame["is_after_caution"]]
+    out = {}
+    for car_class in CLASSES:
+        rows = green[green["CLASS"] == car_class]
+        incident = ~rows["is_usable_for_pace_model"] & (rows["is_slow_lap"] | rows["is_field_slow"])
+        by_race = pd.DataFrame({"laps": rows.groupby("event_key").size(), "incidents": incident.groupby(rows["event_key"]).sum()})
+        by_race["rate"] = by_race["incidents"] / by_race["laps"]
+        by_race["cautions_per_green_hour"] = cautions_per_h.reindex(by_race.index)
+        x, y, w = by_race["cautions_per_green_hour"].to_numpy(), by_race["rate"].to_numpy(), by_race["laps"].to_numpy(dtype=float)
+        if len(x) == 0:
+            continue
+        if len(x) < 3 or np.ptp(x) == 0:   # the link can't be fitted: keep the pooled rate, with no slope, and say so
+            out[car_class] = {"intercept": float(np.average(y, weights=w)), "per_caution_hour": 0.0, "slope_identified": False,
+                              "races": int(len(x)), "max_cautions_per_green_hour": float(x.max())}
+            continue
+        a, b = _weighted_line(x, y, w)
+        rng = np.random.default_rng(INCIDENT_BOOTSTRAP_SEED)
+        slopes = []
+        for _ in range(INCIDENT_BOOTSTRAP_DRAWS):   # resample whole races, the independent unit
+            pick = rng.integers(0, len(x), len(x))
+            if np.ptp(x[pick]) > 0:
+                slopes.append(_weighted_line(x[pick], y[pick], w[pick])[1])
+        out[car_class] = {"intercept": float(a), "per_caution_hour": float(b), "slope_identified": True, "races": int(len(by_race)),
+                          "per_caution_hour_p05": float(np.quantile(slopes, 0.05)), "per_caution_hour_p95": float(np.quantile(slopes, 0.95)),
+                          "share_of_draws_at_or_below_zero": float(np.mean(np.array(slopes) <= 0)),
+                          "max_cautions_per_green_hour": float(x.max()),
+                          "by_race": by_race.round(5).reset_index().to_dict("records")}
+    return out
+
+
 def lap_residuals(laps: pd.DataFrame) -> dict:
     """INFERRED: clean-lap residuals after removing each stint's own straight line, by class."""
     frame = analysis_laps(laps)
@@ -275,6 +326,21 @@ def lap_residuals(laps: pd.DataFrame) -> dict:
     for car_class in CLASSES:
         rows = frame[frame["CLASS"] == car_class]
         out[car_class] = detrend_within_stint(rows, ["LAP_TIME_S"])["LAP_TIME_S"].to_numpy()
+    return out
+
+
+def pit_loss_with_long_stops(laps: pd.DataFrame) -> dict:
+    """INFERRED (E-024): mean loss over all eligible stops by class and driver change, the long ones included.
+    Race time is a sum, so its expected stop cost includes the occasional long stop that `pit_loss_samples`
+    leaves out of the routine distribution (D-032)."""
+    stops = eligible_stops(routine_stop_events(laps))
+    out = {}
+    for car_class in CLASSES:
+        rows = stops[stops["CLASS"] == car_class]
+        long = rows["pit_loss_s"] - rows["pit_time_s"] > LONG_STOP_EXCESS_S
+        out[car_class] = {str(changed): float(group["pit_loss_s"].mean()) for changed, group in rows.groupby("driver_changed")}
+        out[car_class]["long_share"] = float(long.mean())
+        out[car_class]["stops"] = int(len(rows))
     return out
 
 
@@ -314,10 +380,13 @@ def calibrate(laps: pd.DataFrame) -> dict:
         raise ValueError("2026 is sealed for the simulator's final test")
     laps = laps[~laps["event_key"].str.contains("LE_MANS")]
     pits = pit_loss_samples(laps)
+    caution = caution_model(laps)
     return {
         "races": sorted(laps["event_key"].unique()),
         "circuits": circuit_table(laps).to_dict("records"),
-        "caution": caution_model(laps),
+        "caution": caution,
+        "incident_model": incident_model(laps, caution["per_race"]),
+        "pit_loss_with_long_s": pit_loss_with_long_stops(laps),
         "caution_progress": caution_progress(laps, caution_episodes(laps)),
         "caution_lap_ratio": caution_lap_ratio(laps),
         "pit_loss_median_s": {c: {str(k): float(np.median(v)) for k, v in d.items()} for c, d in pits.items()},
@@ -334,8 +403,11 @@ def car_params(calibration: dict, circuit: str, car_class: str, base_pace_s: flo
     it isn't counted twice. Pit loss is the mean routine stop."""
     row = next(r for r in calibration["circuits"] if r["circuit"] == circuit and r["CLASS"] == car_class)
     traffic = row["traffic_rate"] * TRAFFIC_S_PER_CAR[car_class]
-    medians = calibration.get("pit_loss_mean_s", calibration["pit_loss_median_s"])[car_class]
-    extras = calibration.get("restart_and_incidents", {}).get(car_class, {})
+    medians = calibration.get("pit_loss_mean_s", calibration["pit_loss_median_s"])[car_class]   # routine stops (E-024: long ones only in M3_long)
+    extras = dict(calibration.get("restart_and_incidents", {}).get(car_class, {}))
+    incidents = calibration.get("incident_model", {}).get(car_class)
+    if incidents is not None:   # E-024: the rate follows the race's cautions
+        extras["incident_rate"] = incidents["intercept"]
     progress = calibration.get("caution_progress", {}).get(car_class)
     if progress is not None:   # E-023: cautions priced by time, so the per-lap restart ratio isn't used
         restart_extra = progress.get("restart", {}).get("extra_s", 0.0)
@@ -349,6 +421,8 @@ def car_params(calibration: dict, circuit: str, car_class: str, base_pace_s: flo
                   restart_lap_ratio=1.0 if progress else extras.get("restart_lap_ratio", 1.0), caution_progress=progress,
                   restart_extra_s=restart_extra if progress else 0.0,
                   incident_rate=extras.get("incident_rate", 0.0),
+                  incident_rate_per_caution_hour=incidents["per_caution_hour"] if incidents is not None else 0.0,
+                  incident_caution_rate_cap=incidents["max_cautions_per_green_hour"] if incidents is not None else float("inf"),
                   incident_extra_s=extras.get("incident_extra_s", 0.0),
                   max_stint_laps=row["max_stint_laps"], pit_loss_s={False: medians["False"], True: medians["True"]},
                   age_slope_s=0.0, age_limit_laps=AGE_LIMIT_LAPS[car_class], warm_up_s=WARM_UP_S[car_class], traffic_rate=row["traffic_rate"],

@@ -23,7 +23,7 @@ from endurance_strategy.simulator.feasibility import check_strategy, even_strate
 from endurance_strategy.simulator.replay import caution_bias, replay, summarise
 
 OUTPUT_DIR = PROJECT_ROOT / "reports" / "outputs"
-EXPERIMENT = "e023"   # E-022's outputs stay on disk under e022_*
+EXPERIMENT = "e024"   # earlier outputs stay on disk under e022_* and e023_*
 FILES = {stage: OUTPUT_DIR / f"{EXPERIMENT}_{stage}.json" for stage in ("calibrate", "replay", "sanity", "compare")}
 REPLAY_GATE_PCT = 0.5
 DEMO_CIRCUIT, DEMO_CLASS = "SPA_FRANCORCHAMPS", "HYPERCAR"

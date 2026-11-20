@@ -26,7 +26,7 @@ from endurance_strategy.models.pace import CLASSES
 from endurance_strategy.simulator.calibrate import car_params, race_hours
 from endurance_strategy.simulator.engine import CAUTIONS, GREEN, CarParams, Draws, State, flag_at, lap_time
 
-MODELS = ("M0", "M1", "M2", "M3")
+MODELS = ("M0", "M1", "M2", "M3", "M3_long")   # M3_long (E-024, reported, not gated): M3 with long stops in the pit loss
 
 
 def finished_cars(laps: pd.DataFrame) -> pd.DataFrame:
@@ -45,12 +45,15 @@ def model_params(calibration: dict, circuit: str, car_class: str, clean_s: float
     pooled = float(np.mean(np.concatenate([np.asarray(v) for v in calibration["pit_loss_samples_s"][car_class].values()])))
     if model == "M0":
         return replace(params, caution_lap_ratio={k: 1.0 for k in CAUTIONS}, restart_lap_ratio=1.0, pit_loss_s={False: 0.0, True: 0.0},
-                       warm_up_s=0.0, incident_rate=0.0,
+                       warm_up_s=0.0, incident_rate=0.0, incident_rate_per_caution_hour=0.0,
                        caution_progress=None if params.caution_progress is None else {k: 1.0 for k in CAUTIONS})
     if model == "M1":
-        return replace(params, pit_loss_s={False: 0.0, True: 0.0}, warm_up_s=0.0, incident_rate=0.0)
+        return replace(params, pit_loss_s={False: 0.0, True: 0.0}, warm_up_s=0.0, incident_rate=0.0, incident_rate_per_caution_hour=0.0)
+    if model == "M3_long" and "pit_loss_with_long_s" in calibration:
+        long = calibration["pit_loss_with_long_s"][car_class]
+        return replace(params, pit_loss_s={False: long["False"], True: long["True"]})
     if model == "M2":
-        return replace(params, pit_loss_s={False: pooled, True: pooled}, warm_up_s=0.0, incident_rate=0.0)
+        return replace(params, pit_loss_s={False: pooled, True: pooled}, warm_up_s=0.0, incident_rate=0.0, incident_rate_per_caution_hour=0.0)
     return params
 
 
@@ -83,7 +86,8 @@ def replay_car(car: pd.DataFrame, calibration: dict, model: str) -> float:
 def _replay_on_clock(car: pd.DataFrame, params: CarParams, episodes: list) -> float:
     """E-023: the car's observed laps and stops, run on the model's own clock through the race's episodes."""
     total, previous = 0.0, None
-    for lap in car.itertuples():
+    next_is_out = list(car["is_out_lap"].astype(bool).iloc[1:]) + [False]
+    for lap, in_lap in zip(car.itertuples(), next_is_out):
         if lap.LAP_NUMBER == 1 or lap.FLAG_AT_FL == "RF":
             total += lap.LAP_TIME_S
         else:
@@ -91,7 +95,7 @@ def _replay_on_clock(car: pd.DataFrame, params: CarParams, episodes: list) -> fl
             state = State(race_time_s=total, stint_lap=lap.stint_lap - 1, pitting_now=bool(lap.is_out_lap),
                           last_stop_driver_change=previous is not None and lap.DRIVER_NUMBER != previous.DRIVER_NUMBER,
                           last_stop_flag=flag_at(total, episodes))   # pit entry is the end of the in-lap, which is now
-            total += lap_time(state, params, flag, Draws(), params.age_slope_s, total, episodes)[0]
+            total += lap_time(state, params, flag, Draws(), params.age_slope_s, total, episodes, in_lap=in_lap)[0]
         previous = lap
     return total
 

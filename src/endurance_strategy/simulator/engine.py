@@ -42,7 +42,7 @@ class State:
 class Draws:
     """The random inputs for one lap. Zero in the deterministic simulator."""
     lap_noise_s: float = 0.0
-    pit_loss_scale: float = 1.0   # a sampled stop as a multiple of the median, so zero pit loss stays zero
+    pit_loss_scale: float = 1.0   # a sampled stop as a multiple of the mean, so zero pit loss stays zero (E-024: mean, not median)
     incident_s: float | None = None  # a sampled incident (0 or its extra time); None uses the expected value
 
 
@@ -112,7 +112,7 @@ def draw_race(randomness: Randomness | None, params: CarParams, seed: int | None
     scale = {False: np.ones(MAX_STOPS_DRAWN), True: np.ones(MAX_STOPS_DRAWN)}
     if randomness.pit_loss_samples_s is not None:
         for key, samples in randomness.pit_loss_samples_s.items():
-            scale[key] = streams[2].choice(samples, MAX_STOPS_DRAWN) / np.median(samples)
+            scale[key] = streams[2].choice(samples, MAX_STOPS_DRAWN) / np.mean(samples)   # E-024: keeps the deterministic mean
     slope = None
     if randomness.age_slope_draw is not None:
         mean, sd = randomness.age_slope_draw
@@ -120,7 +120,7 @@ def draw_race(randomness: Randomness | None, params: CarParams, seed: int | None
     cautions = draw_cautions(randomness, params.duration_s, streams[0]) if randomness.caution_rate_per_green_s else []
     incidents = None
     if randomness.incident_extra_samples_s is not None:
-        hit = streams[4].random(max_laps) < params.incident_rate
+        hit = streams[4].random(max_laps) < race_incident_rate(params, cautions)
         incidents = np.where(hit, streams[4].choice(randomness.incident_extra_samples_s, max_laps), 0.0)
     return RaceDraws(cautions, noise, scale, slope, incidents)
 
@@ -145,6 +145,17 @@ def time_to_cover(work_s: float, start_s: float, episodes: list, progress: dict)
     return t + left - start_s
 
 
+def race_incident_rate(params: CarParams, episodes: list | None) -> float:
+    """E-024: the share of green laps with an incident in this race, rising with its cautions per green hour.
+    The replay passes the race's real episodes and the simulator its drawn ones, so both use one rule."""
+    if not params.incident_rate_per_caution_hour:
+        return params.incident_rate
+    episodes = episodes or []
+    green_h = max(params.duration_s - sum(end - start for start, end, _ in episodes), 1.0) / 3600
+    per_hour = min(len(episodes) / green_h, params.incident_caution_rate_cap)
+    return max(params.incident_rate + params.incident_rate_per_caution_hour * per_hour, 0.0)
+
+
 def flag_at(time_s: float, episodes: list[tuple[float, float, str]]) -> str:
     for start, end, kind in episodes:
         if start <= time_s < end:
@@ -153,7 +164,7 @@ def flag_at(time_s: float, episodes: list[tuple[float, float, str]]) -> str:
 
 
 def lap_time(state: State, params: CarParams, flag: str, draws: Draws, slope_s: float, start_s: float = 0.0,
-             episodes: list | None = None) -> tuple[float, dict]:
+             episodes: list | None = None, in_lap: bool = False) -> tuple[float, dict]:
     """Deterministic given its inputs. Returns the lap time and its parts, so each component can be checked.
     The replay calls this too (E-022 Part B, E-023).
 
@@ -173,10 +184,15 @@ def lap_time(state: State, params: CarParams, flag: str, draws: Draws, slope_s: 
         parts["noise"] = draws.lap_noise_s
         work = sum(parts.values())   # the car's full green lap, the unit the caution share is fitted in
         parts["caution"] = time_to_cover(work, start_s, episodes or [], params.caution_progress) - work
-        if flag not in CAUTIONS:     # like a pit loss, an incident is time on top, not slowed by a caution
-            parts["incident"] = params.incident_rate * params.incident_extra_s if draws.incident_s is None else draws.incident_s
-            if any(start_s - params.base_pace_s < end <= start_s for _, end, _ in episodes or []):
-                parts["caution"] += params.restart_extra_s   # the restart lap, fitted the same way (calibrate.caution_progress)
+        restart = flag not in CAUTIONS and any(start_s - params.base_pace_s < end <= start_s for _, end, _ in episodes or [])
+        if restart:
+            parts["caution"] += params.restart_extra_s   # the restart lap, fitted the same way (calibrate.caution_progress)
+        # E-024: an incident only on the laps the incident fit counts: green throughout (no caution in the lap), not
+        # lap 1, not a pit lap, not a restart lap. Like a pit loss, it's time on top, not slowed by a caution.
+        elif (flag not in CAUTIONS and abs(parts["caution"]) < 1e-9 and state.lap_number > 0 and not state.pitting_now
+              and not in_lap):
+            parts["incident"] = (race_incident_rate(params, episodes) * params.incident_extra_s if draws.incident_s is None
+                                 else draws.incident_s)
     elif flag in CAUTIONS:
         parts["caution"] = params.base_pace_s * (params.caution_lap_ratio[flag] - 1.0)
     elif state.previous_flag in CAUTIONS:   # a restart lap: green at the line, partly run under the caution
@@ -206,10 +222,11 @@ def decide(state: State, strategy: Strategy, params: CarParams, entry_flag: str,
 
 def step(state: State, strategy: Strategy, params: CarParams, flag: str, entry_flag: str, draws: Draws,
          slope_s: float, episodes: list | None = None) -> tuple[State, dict]:
-    """One lap: the state transition. Pure: the same inputs always give the same output."""
-    seconds, parts = lap_time(state, params, flag, draws, slope_s, state.race_time_s, episodes)
+    """One lap: the state transition. Pure: the same inputs always give the same output. The stop is decided
+    first, because an in-lap carries no incident (E-024)."""
     green = flag not in CAUTIONS
     stop, forced, deferred = decide(state, strategy, params, entry_flag, green)
+    seconds, parts = lap_time(state, params, flag, draws, slope_s, state.race_time_s, episodes, in_lap=stop)
     stint_lap = state.stint_lap + 1
     record = {"lap": state.lap_number + 1, "stint": state.stint_number, "stint_lap": stint_lap, "driver": state.driver,
               "flag": flag, "entry_flag": entry_flag, "lap_time_s": seconds, "in_lap": stop, "out_lap": state.pitting_now,
@@ -267,7 +284,7 @@ def simulate(params: CarParams, strategy: Strategy, randomness: Randomness | Non
             if state.pitting_now and 0 < state.stops <= len(race.pit_loss_scale[state.last_stop_driver_change]) else 1.0,
             incident_s=float(race.incident_s[lap_index]) if race.incident_s is not None and lap_index < len(race.incident_s) else None,
         )
-        seconds, _ = lap_time(state, params, flag, draws, slope, state.race_time_s, race.cautions)
+        seconds, _ = lap_time(state, params, flag, draws, slope, state.race_time_s, race.cautions, in_lap=True)  # pit entry time
         entry_flag = flag_at(state.race_time_s + seconds, race.cautions)
         state, record = step(state, strategy, params, flag, entry_flag, draws, slope, race.cautions)
         records.append(record)

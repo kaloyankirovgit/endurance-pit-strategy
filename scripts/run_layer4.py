@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Layer 4, as registered in E-022: calibrate the simulator, replay real races, check its randomness, compare strategies.
+"""Layer 4, as registered in E-022 and amended by E-023: calibrate the simulator, replay real races, check its
+randomness, compare strategies. E-023 prices cautions by time and draws each race's safety-car rate.
 
 Stages, run in order: `calibrate`, `replay`, `sanity`, `compare`. Only 2024 and 2025 are read, outside Le Mans.
 Output stays local in reports/outputs, because it's derived from the timing data.
@@ -19,10 +20,11 @@ from endurance_strategy.simulator import calibrate as cal
 from endurance_strategy.simulator.compare import paired_summary, run_strategies, time_at_lap
 from endurance_strategy.simulator.engine import Strategy, draw_race, simulate
 from endurance_strategy.simulator.feasibility import check_strategy, even_strategy
-from endurance_strategy.simulator.replay import replay, summarise
+from endurance_strategy.simulator.replay import caution_bias, replay, summarise
 
 OUTPUT_DIR = PROJECT_ROOT / "reports" / "outputs"
-FILES = {stage: OUTPUT_DIR / f"e022_{stage}.json" for stage in ("calibrate", "replay", "sanity", "compare")}
+EXPERIMENT = "e023"   # E-022's outputs stay on disk under e022_*
+FILES = {stage: OUTPUT_DIR / f"{EXPERIMENT}_{stage}.json" for stage in ("calibrate", "replay", "sanity", "compare")}
 REPLAY_GATE_PCT = 0.5
 DEMO_CIRCUIT, DEMO_CLASS = "SPA_FRANCORCHAMPS", "HYPERCAR"
 DRIVERS = ("A", "B", "C")
@@ -57,9 +59,10 @@ def stage_replay() -> None:
     table = replay(load_laps(), calibration)
     summary = summarise(table)
     gate = summary["M3"]["median_abs_pct_over_races"] <= REPLAY_GATE_PCT
-    write("replay", {"summary": summary, "gate_pct": REPLAY_GATE_PCT, "gate_passed": bool(gate),
+    bias = caution_bias(table, calibration)
+    write("replay", {"summary": summary, "gate_pct": REPLAY_GATE_PCT, "gate_passed": bool(gate), "caution_bias_M3": bias,
                      "cars": table.drop(columns=[]).round(4).to_dict("records")})
-    print(json.dumps(summary, indent=1), "gate passed:", gate)
+    print(json.dumps(summary, indent=1), "\ncaution bias:", json.dumps(bias, indent=1), "\ngate passed:", gate)
 
 
 def fewest_stops(params, drivers=DRIVERS, most: int = 40) -> int:
@@ -78,12 +81,18 @@ def stage_sanity() -> None:
     six_hours = cal.car_params(calibration, DEMO_CIRCUIT, DEMO_CLASS)
     only_cautions = cal.randomness(calibration, DEMO_CLASS, lap_noise=False, pit_spread=False)
     simulated = [draw_race(only_cautions, six_hours, SEED + i).cautions for i in range(N_RACES)]
+    constant = cal.randomness(calibration, DEMO_CLASS, lap_noise=False, pit_spread=False, rate_by_race=False)
+    simulated_constant = [draw_race(constant, six_hours, SEED + i).cautions for i in range(N_RACES)]
     for kind in ("SF", "FCY"):
         per_6h = observed[kind] / observed["hours"] * 6
         counts = np.array([sum(1 for e in race if e[2] == kind) for race in simulated])
+        counts_constant = np.array([sum(1 for e in race if e[2] == kind) for race in simulated_constant])
         out[kind] = {"observed_per_6h": {"mean": float(per_6h.mean()), "variance": float(per_6h.var(ddof=1)), "races": int(len(per_6h)),
-                                         "races_with_none": int((observed[kind] == 0).sum())},
-                     "simulated_per_6h": {"mean": float(counts.mean()), "variance": float(counts.var(ddof=1))},
+                                         "races_with_none": int((observed[kind] == 0).sum()), "share_with_none": float((observed[kind] == 0).mean())},
+                     "simulated_per_6h": {"mean": float(counts.mean()), "variance": float(counts.var(ddof=1)),
+                                          "share_with_none": float((counts == 0).mean())},
+                     "simulated_constant_rate_per_6h": {"mean": float(counts_constant.mean()), "variance": float(counts_constant.var(ddof=1))},
+                     "rate_spread": caution["rate_spread"][kind],
                      "median_duration_s": float(np.median(caution["durations_s"][kind]))}
     params = cal.car_params(calibration, DEMO_CIRCUIT, DEMO_CLASS)
     strategy = even_strategy(params, fewest_stops(params), DRIVERS)
@@ -124,12 +133,13 @@ def compare_once(calibration: dict, label: str, randomness_kwargs: dict, **param
 
 def stage_compare() -> None:
     if not read("replay")["gate_passed"]:
-        raise SystemExit("the replay gate failed, so E-022 doesn't run the strategy comparison")
+        raise SystemExit("the replay gate failed, so the strategy comparison doesn't run (E-022, E-023)")
     calibration = read("calibrate")
     full = dict(lap_noise=True, pit_spread=True, cautions=True)
     mean, low, high = cal.AGE_SLOPE_RANGE_S[DEMO_CLASS]
     runs = [compare_once(calibration, "primary", full),
             compare_once(calibration, "no_cautions", dict(full, cautions=False)),
+            compare_once(calibration, "constant_caution_rate", dict(full, rate_by_race=False)),
             compare_once(calibration, "sc_stop_free", full, sc_pit_loss_factor=0.0),
             compare_once(calibration, "sc_stop_costly", full, sc_pit_loss_factor=0.6),
             compare_once(calibration, "age_slope_uncertain", dict(full, slope_uncertainty=True)),

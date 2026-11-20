@@ -1356,3 +1356,51 @@ Runs only if Part B's gate passes.
 - Its caution process gets the average right and the race-to-race spread wrong.
 - Neither is ready to rank strategies, so no strategy result is reported.
 - Next: time-based caution pricing, and a caution process with race-level variation, such as a rate drawn per race. Each gets a fresh registration, and the 2026 races stay the final test.
+
+## E-023: Do time-priced cautions and a safety-car rate drawn per race close E-022's replay gap, and what do the three strategies then show?
+
+*Written 2026-11-20 · registered with its code before it is run on real data*
+
+**Why.** E-022's replay missed its 0.5% gate at 0.67%, and the error followed the cautions: races with many came out too fast, races with none too slow. Its safety cars also clustered by race far more than a constant rate allows (variance 30.8 against 4.6 per 6 hours). These are the two changes E-022 named, and nothing else is changed.
+
+**Change 1: cautions priced by time (`CarParams.caution_progress`).**
+- **Idea:** a car under a caution keeps a share of its green speed. Its full green lap (base, age, warm-up, traffic, noise) is covered at full speed outside an episode and at that share inside one. So a lap straddling a caution's start or end is only partly slowed, and the cost of a caution follows its length, not how many line crossings fall inside it. An incident (E-022's amendment) is added on top of a lap that starts green, like a pit loss.
+- **Episodes** now run from the first to the last crossing under the caution across the field, so they are the period the line shows the caution. E-022 added one green lap after the last crossing. Without that tail, a stop or an FCY pit closure follows the real flag at the line.
+- **Measured** per class and caution type, from 2024 and 2025 outside Le Mans, the way the engine applies it. For each car and episode: its last crossing at or before the start and its first at or after the end. Over that bracket it covered (laps) × (its mean clean lap) of green running. The bracket outside the episode is taken at full speed, and the rest of the work was done inside. The share is that work summed over the summed episode durations. The clean lap includes traffic, as the engine's full green lap does. Left out: lap 1, a bracket with a pit lap, a red flag or another episode in it, and a car with no crossing after the episode. 
+- **Restart cost per episode (`CarParams.restart_extra_s`).** The lap that starts at the bracket's end, within one clean lap of the episode's end, green throughout and without a stop, is the field restarting. Its mean extra time over the car's clean lap is charged once per episode on the lap that starts within one green lap after the episode ends. Without it, the same caution time split into more episodes replays too fast, which is E-022's pattern (a synthetic case in the review: −45 s over 6 short safety cars against +2 s for one long one).
+- **Replaces** the per-lap caution ratio and the restart-lap ratio from E-022's amendment, with a share and a restart cost fitted on the same brackets.
+- **Synthetic check, fit then use:** a field at a known share (0.35 and 0.6) through three safety cars, the share fitted from rebuilt episodes, then every car's race rebuilt with it. The median error is under 0.1% of race time. A missing share, or one outside (0, 1], stops the run instead of meaning a free caution.
+- **Replay (Part B):** M1 to M3 now run each car on the model's own clock through its race's rebuilt episodes, as the simulator does with drawn ones. A lap's flag and a stop's flag at pit entry come from those episodes at the predicted time. M0 keeps full speed under cautions. A test replays simulated cars with cautions and gets zero error. **This changes what the gate measures:** if the model's clock drifts, a real stop can fall just inside or outside a safety car and swing its price by about 50 s. E-022's replay used each lap's observed flag.
+- **Kept:** the 30% SC pit loss (ASSUMED) and the FCY pit closure (R5). A pit loss is added after the lap's cover time, so it isn't itself slowed or sped by a caution.
+
+**Change 2: each race draws its own caution rate (`Randomness.caution_rate_shape`).**
+- **Idea:** a race's rate is the calibrated rate times a gamma multiplier with mean 1 and shape k, so counts per race have variance mu + mu²/k. Weather and circuit plausibly drive this, but neither is modelled, only the spread.
+- **Estimated by simulated moments, rate and spread together,** per caution type. For each 1/k on a grid (0 to 6, step 0.2), the simulator's own generator, with the observed mix of race lengths, first has its rate rescaled until the mean count per race matches the observed one, and then runs 3,000 races. The 1/k whose variance of counts per 6 hours is closest to the observed one is kept, with its rate (seed 20261120).
+  - Why jointly: a gamma multiplier alone lowers the mean count, because races that draw a high rate fill with cautions and run out of green time (the review measured 14 to 37% fewer).
+  - A closed-form moment estimate was tried first and read low for the same reason.
+  - **If the observed variance is beyond the top of the grid**, `out_of_reach` is set and the shortfall reported in Part C. It doesn't block the replay gate, which uses each race's own episodes, but Part D's spread of races is then understated and is reported as such.
+  - The constant-rate sensitivity in Part D uses the original rate.
+- **How loosely 14 races pin it down:** 200 sets of 14 races drawn at the fitted 1/k are refitted the same way, and their 5th to 95th percentile is reported next to the estimate. With that few races it will be wide.
+- **Synthetic tests:** a known spread (1/k = 1 and 0) is recovered within 0.25 from 800 races, with the mean count kept within 6%, and an unreachable variance is flagged.
+
+**Review before running.** The simulator-reviewer agent attacked the code and this plan with synthetic runs.
+- **Must-fix, both fixed:** the caution share was fitted and applied in different units, reading high and making caution-heavy races too fast (0.2 to 0.4% of race time in its tests). The closed-form spread estimate read low.
+- **Should-fix, fixed:** the green tail of an episode was priced as a caution for stops and FCY closure; a lap's green parts switched on and off with the flag at its start; a missing share silently meant a free caution. Clock drift is now stated above.
+- **Checked and fine:** common random numbers between strategies hold with the per-race rate, and nothing reads 2026.
+- **Second round, on the fixes:** the time pricing now replays an engine-generated field within about ±1 s over 6 hours, with traffic, noise and 1 to 8 episodes. It raised two more must-fix items, both fixed: the restart lap had no cost once the episode's tail was removed, and the gamma multiplier lowered the mean count with real episode lengths. Those last fixes weren't reviewed again.
+- **Still open:** a class with safety-car shares but no usable FCY car-episodes stops the run (loud, not silent). With 14 races the spread's 90% refit range is wide (0.15 to 2.95 for a true 1/k of 1.25 in the review's check), which is why the range is reported.
+
+**Same as E-022:** data (14 races, 2024 and 2025 outside Le Mans, 2026 sealed), the car filter, nested models M0 to M3, the gate, Part D's car, seed, 2,000 races and three strategies.
+
+**Gate, unchanged:** M3's median over races of each race's median absolute error ≤ 0.5% of race time. If it fails, Part D doesn't run (enforced in `scripts/run_layer4.py`), the failure is reported, and no further amendment is made inside E-023.
+
+**Also reported:**
+- The Spearman correlation between each race's caution count and its M3 median signed error, over the races the replay covers (12 in E-022). It's descriptive. E-022's pattern would show as a negative value.
+- Part C: simulated safety-car and FCY counts per 6 hours with the per-race rate and with a constant rate, against observed (mean, variance, share of races with none).
+- Part D adds one sensitivity: a constant caution rate.
+
+**What this can't show.**
+- **This is the third look at these 14 races.** E-022 chose the model on them, and E-023's changes were chosen from E-022's errors. A pass says the parts add up to these races. It isn't a held-out test, and 2026 stays sealed for that (D-031).
+- The caution share is an average over cars and episodes. Real cautions differ: queue position, wave-bys and closed pit lanes all vary by episode.
+- The gamma spread reproduces how much races differ, not why. A strategy that bets on a safety car is judged against a fitted spread from 14 races. Circuit differences are folded into that spread, and safety cars and FCYs are drawn independently, though an FCY often turns into a safety car.
+- The output of Part D is SIMULATED, not a prediction of a real race (E-022's limits all stand).

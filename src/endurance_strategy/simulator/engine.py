@@ -53,6 +53,8 @@ class Randomness:
     pit_loss_samples_s: dict | None = None             # INFERRED: eligible stops, by driver change
     caution_rate_per_green_s: dict | None = None       # INFERRED: episodes per second of green running, by type
     caution_durations_s: dict | None = None            # INFERRED: observed episode lengths, by type
+    caution_rate_shape: dict | None = None             # INFERRED (E-023): gamma shape of each race's own rate, by type;
+                                                       # None or a missing type keeps the rate constant across races
     incident_extra_samples_s: np.ndarray | None = None # INFERRED: extra time on observed incident laps
     age_slope_draw: tuple | None = None                # ASSUMED: (mean, sd) to draw the stint-age slope once per race
 
@@ -74,8 +76,17 @@ class RaceDraws:
 
 def draw_cautions(randomness: Randomness, duration_s: float, rng: np.random.Generator) -> list[tuple[float, float, str]]:
     """Caution episodes (start, end, type): starts follow a Poisson process in green time, so the gaps
-    between episodes are exponential and the rate is per second of green running."""
+    between episodes are exponential and the rate is per second of green running.
+
+    With `caution_rate_shape` (E-023), each race first draws its own rate for that type: the calibrated rate
+    times a gamma multiplier with mean 1 and shape k. Counts per race are then overdispersed (variance
+    mu + mu^2/k), so some races have no safety car and some have many, as observed."""
     rates = {kind: rate for kind, rate in (randomness.caution_rate_per_green_s or {}).items() if rate > 0}
+    shapes = randomness.caution_rate_shape or {}
+    for kind in sorted(rates):
+        shape = shapes.get(kind)
+        if shape:
+            rates[kind] *= float(rng.gamma(shape, 1.0 / shape))
     total = sum(rates.values())
     if total <= 0:
         return []
@@ -114,6 +125,26 @@ def draw_race(randomness: Randomness | None, params: CarParams, seed: int | None
     return RaceDraws(cautions, noise, scale, slope, incidents)
 
 
+def time_to_cover(work_s: float, start_s: float, episodes: list, progress: dict) -> float:
+    """Seconds needed, from `start_s`, to cover `work_s` seconds of green running when each second inside a
+    caution episode covers only `progress[kind]` of a green second (E-023). Episodes don't overlap."""
+    t, left = start_s, work_s
+    for start, end, kind in sorted(episodes):
+        if end <= t:
+            continue
+        if start > t:
+            if left <= start - t:
+                return t + left - start_s
+            left -= start - t
+            t = start
+        rate = progress[kind]
+        if rate > 0 and rate * (end - t) >= left:
+            return t + left / rate - start_s
+        left -= max(rate, 0.0) * (end - t)
+        t = end
+    return t + left - start_s
+
+
 def flag_at(time_s: float, episodes: list[tuple[float, float, str]]) -> str:
     for start, end, kind in episodes:
         if start <= time_s < end:
@@ -121,13 +152,32 @@ def flag_at(time_s: float, episodes: list[tuple[float, float, str]]) -> str:
     return GREEN
 
 
-def lap_time(state: State, params: CarParams, flag: str, draws: Draws, slope_s: float) -> tuple[float, dict]:
+def lap_time(state: State, params: CarParams, flag: str, draws: Draws, slope_s: float, start_s: float = 0.0,
+             episodes: list | None = None) -> tuple[float, dict]:
     """Deterministic given its inputs. Returns the lap time and its parts, so each component can be checked.
-    The replay calls this too, with the observed flags (E-022 Part B)."""
+    The replay calls this too (E-022 Part B, E-023).
+
+    Two ways to price a caution. Per lap (E-022): a lap started under a caution runs at the class's caution-lap
+    ratio, and the green lap after one at the restart ratio. By time (E-023, when `params.caution_progress` is
+    set): the car's full green lap (base, age, warm-up, traffic, noise) is covered at full speed outside the
+    episodes and at the caution's share of that speed inside them, so a lap straddling a caution's start or
+    end is only partly slowed. The share is fitted in the same unit, the car's full clean lap. The green parts
+    keep their values under a caution and the `caution` part is the extra time the slowing adds."""
     stint_lap = state.stint_lap + 1
     parts = {"base": params.base_pace_s, "age": 0.0, "warm_up": 0.0, "traffic": 0.0, "pit": 0.0, "noise": 0.0, "caution": 0.0,
              "incident": 0.0}
-    if flag in CAUTIONS:
+    if params.caution_progress is not None:
+        parts["age"] = slope_s * (min(max(stint_lap, 3), params.age_limit_laps) - 3)
+        parts["warm_up"] = params.warm_up_s if stint_lap == 2 else 0.0
+        parts["traffic"] = params.expected_traffic_s
+        parts["noise"] = draws.lap_noise_s
+        work = sum(parts.values())   # the car's full green lap, the unit the caution share is fitted in
+        parts["caution"] = time_to_cover(work, start_s, episodes or [], params.caution_progress) - work
+        if flag not in CAUTIONS:     # like a pit loss, an incident is time on top, not slowed by a caution
+            parts["incident"] = params.incident_rate * params.incident_extra_s if draws.incident_s is None else draws.incident_s
+            if any(start_s - params.base_pace_s < end <= start_s for _, end, _ in episodes or []):
+                parts["caution"] += params.restart_extra_s   # the restart lap, fitted the same way (calibrate.caution_progress)
+    elif flag in CAUTIONS:
         parts["caution"] = params.base_pace_s * (params.caution_lap_ratio[flag] - 1.0)
     elif state.previous_flag in CAUTIONS:   # a restart lap: green at the line, partly run under the caution
         parts["caution"] = params.base_pace_s * (params.restart_lap_ratio - 1.0)
@@ -155,9 +205,9 @@ def decide(state: State, strategy: Strategy, params: CarParams, entry_flag: str,
 
 
 def step(state: State, strategy: Strategy, params: CarParams, flag: str, entry_flag: str, draws: Draws,
-         slope_s: float) -> tuple[State, dict]:
+         slope_s: float, episodes: list | None = None) -> tuple[State, dict]:
     """One lap: the state transition. Pure: the same inputs always give the same output."""
-    seconds, parts = lap_time(state, params, flag, draws, slope_s)
+    seconds, parts = lap_time(state, params, flag, draws, slope_s, state.race_time_s, episodes)
     green = flag not in CAUTIONS
     stop, forced, deferred = decide(state, strategy, params, entry_flag, green)
     stint_lap = state.stint_lap + 1
@@ -217,9 +267,9 @@ def simulate(params: CarParams, strategy: Strategy, randomness: Randomness | Non
             if state.pitting_now and 0 < state.stops <= len(race.pit_loss_scale[state.last_stop_driver_change]) else 1.0,
             incident_s=float(race.incident_s[lap_index]) if race.incident_s is not None and lap_index < len(race.incident_s) else None,
         )
-        seconds, _ = lap_time(state, params, flag, draws, slope)
+        seconds, _ = lap_time(state, params, flag, draws, slope, state.race_time_s, race.cautions)
         entry_flag = flag_at(state.race_time_s + seconds, race.cautions)
-        state, record = step(state, strategy, params, flag, entry_flag, draws, slope)
+        state, record = step(state, strategy, params, flag, entry_flag, draws, slope, race.cautions)
         records.append(record)
     frame = pd.DataFrame(records)
     return RaceResult(laps=state.lap_number, finish_time_s=state.race_time_s, stops=state.stops, extra_stops=state.extra_stops,

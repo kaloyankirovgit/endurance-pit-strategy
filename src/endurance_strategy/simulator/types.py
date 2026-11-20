@@ -31,6 +31,11 @@ class CarParams:
     restart_lap_ratio: float = 1.0          # INFERRED (E-022 amendment): the green lap after a caution, part neutralised
     incident_rate: float = 0.0              # INFERRED (E-022 amendment): share of green laps with a mistake, slow zone or local yellow
     incident_extra_s: float = 0.0           # INFERRED (E-022 amendment): mean extra time on such a lap
+    caution_progress: dict | None = None    # INFERRED (E-023): share of green speed kept under each caution type. When set,
+                                            # cautions are priced by time (a lap straddling an episode is partly slowed) and
+                                            # the per-lap caution and restart ratios aren't used
+    restart_extra_s: float = 0.0            # INFERRED (E-023): extra time on the lap that starts within one green lap after
+                                            # an episode ends (the field restarting), used only with caution_progress
 
     @property
     def expected_traffic_s(self) -> float:

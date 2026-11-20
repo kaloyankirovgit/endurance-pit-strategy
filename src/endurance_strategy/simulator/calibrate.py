@@ -23,6 +23,10 @@ LONG_STOP_EXCESS_S = 60.0       # E-020: stops this far over their pit-lane time
 STINT_LIMIT_QUANTILE = 0.95     # ASSUMED energy-limit proxy
 SC_PIT_LOSS_FACTOR = 0.3        # ASSUMED: a stop under a safety car costs this share of a green one (E-022 Part A)
 MIN_EPISODE_CROSSINGS = 3       # a caution needs at least this many line crossings under it
+SPREAD_GRID = np.round(np.arange(0.0, 6.01, 0.2), 2)    # E-023: candidate 1/k for the per-race caution rate
+SPREAD_RACES_PER_POINT = 3000   # simulated races per grid point
+SPREAD_CHECKS = 200             # parametric refits at the fitted 1/k
+SPREAD_SEED = 20261120
 
 
 def race_hours(laps: pd.DataFrame) -> pd.Series:
@@ -36,7 +40,9 @@ def caution_episodes(laps: pd.DataFrame) -> pd.DataFrame:
     Runs of crossings under a caution flag (SF or FCY) are merged when the gap between them is under one
     median green lap, so a stray green crossing doesn't split a safety car and an FCY that turns into a
     safety car stays one episode. A merged episode takes the type with more crossings. A red flag (RF)
-    isn't modelled. The length runs from the first to the last crossing plus one median green lap.
+    isn't modelled. E-023: the episode runs from the first to the last crossing under the caution, so it is
+    the period the caution flag shows at the line, and a stop or pit closure in it matches the real flag. (E-022
+    added one green lap after the last crossing.)
     """
     rows = []
     for event, race in laps.groupby("event_key"):
@@ -63,9 +69,130 @@ def caution_episodes(laps: pd.DataFrame) -> pd.DataFrame:
         counts = {kind: r.get(kind, 0) for kind in CAUTIONS}
         if sum(counts.values()) >= MIN_EPISODE_CROSSINGS:
             out.append({"event_key": r["event_key"], "kind": max(counts, key=counts.get), "start_s": r["start"],
-                        "duration_s": r["end"] - r["start"] + r["lap_s"], "crossings": sum(counts.values()),
+                        "duration_s": r["end"] - r["start"], "crossings": sum(counts.values()),
                         "mixed": all(counts.values())})
     return pd.DataFrame(out, columns=["event_key", "kind", "start_s", "duration_s", "crossings", "mixed"])
+
+
+def _per_6h_variance(counts: np.ndarray, hours: np.ndarray) -> float:
+    return float(np.var(counts / hours * 6, ddof=1))
+
+
+def _simulated_counts(kind: str, inverse_shape: float, rates_per_green_h: dict, durations_s: dict, hours: np.ndarray,
+                      rng: np.random.Generator) -> np.ndarray:
+    """Caution counts of one type from the simulator's own generator, one race per entry of `hours`."""
+    from endurance_strategy.simulator.engine import draw_cautions
+    shape = {kind: 1.0 / inverse_shape} if inverse_shape > 0 else None
+    randomness = Randomness(caution_rate_per_green_s={k: v / 3600 for k, v in rates_per_green_h.items()},
+                            caution_durations_s={k: np.asarray(v) for k, v in durations_s.items()}, caution_rate_shape=shape)
+    return np.array([sum(1 for e in draw_cautions(randomness, h * 3600.0, rng) if e[2] == kind) for h in hours])
+
+
+def rate_spread(per_race: pd.DataFrame, rates_per_green_h: dict, durations_s: dict, grid=SPREAD_GRID,
+                races_per_point: int = SPREAD_RACES_PER_POINT, checks: int = SPREAD_CHECKS, seed: int = SPREAD_SEED) -> dict:
+    """INFERRED (E-023): per caution type, how much each race's own rate varies (1/k of a gamma multiplier),
+    fitted with the rate itself so the mean count stays where it was observed.
+
+    Simulated moments with the simulator's own generator and the observed mix of race lengths. A gamma
+    multiplier alone lowers the mean count, because races that draw a high rate fill with cautions and run out
+    of green time. So for each 1/k on the grid, the rate is first rescaled until the simulated mean count per
+    race matches the observed one, and then the 1/k whose variance of counts per 6 hours is closest to the
+    observed one is kept. If even the top of the grid falls short, `out_of_reach` is set and the shortfall
+    reported. The other type keeps its constant rate meanwhile. Then a parametric check: `checks` sets of as
+    many races as observed, drawn at the fit, are refitted on the same curve to show how loosely they pin 1/k."""
+    rng = np.random.default_rng(seed)
+    hours = per_race["hours"].to_numpy(dtype=float)
+    many = np.resize(hours, races_per_point)
+    out = {}
+    for kind in CAUTIONS:
+        observed_counts = per_race[kind].to_numpy(dtype=float)
+        observed, target_mean = _per_6h_variance(observed_counts, hours), float(observed_counts.mean())
+        if rates_per_green_h.get(kind, 0) <= 0 or target_mean == 0:
+            out[kind] = {"inverse_shape": 0.0, "shape": None, "rate_per_green_hour": rates_per_green_h.get(kind, 0.0),
+                         "out_of_reach": False, "races": int(len(hours))}
+            continue
+        curve, rates = [], []
+        for x in grid:
+            rate = dict(rates_per_green_h)
+            half = many[: races_per_point // 2]
+            target = target_mean * half.mean() / hours.mean()   # the observed mean count, for this mix of race lengths
+            for _ in range(3):   # rescale the rate until the simulated mean count matches
+                simulated = _simulated_counts(kind, x, rate, durations_s, half, rng)
+                rate[kind] *= target / max(simulated.mean(), 1e-9)
+            counts = _simulated_counts(kind, x, rate, durations_s, many, rng)
+            curve.append(_per_6h_variance(counts, many))
+            rates.append(rate[kind])
+        curve = np.array(curve)
+        index = int(np.argmin(np.abs(curve - observed)))
+        fitted = float(grid[index])
+        rate_at_fit = dict(rates_per_green_h, **{kind: rates[index]})
+        refits = [float(grid[int(np.argmin(np.abs(curve - _per_6h_variance(
+            _simulated_counts(kind, fitted, rate_at_fit, durations_s, hours, rng), hours))))]) for _ in range(checks)]
+        out[kind] = {"inverse_shape": fitted, "shape": 1.0 / fitted if fitted > 0 else None, "rate_per_green_hour": rates[index],
+                     "observed_variance_per_6h": observed, "observed_mean_per_race": target_mean,
+                     "simulated_variance_per_6h_at_fit": float(curve[index]), "constant_rate_variance_per_6h": float(curve[0]),
+                     "out_of_reach": bool(index == len(grid) - 1 and curve[-1] < observed),
+                     "refit_p05": float(np.quantile(refits, 0.05)), "refit_p95": float(np.quantile(refits, 0.95)),
+                     "refit_share_at_zero": float(np.mean(np.array(refits) == 0)), "races": int(len(hours)),
+                     "grid": [float(x) for x in grid], "curve": [round(float(v), 3) for v in curve],
+                     "rates": [round(float(r), 4) for r in rates]}
+    return out
+
+
+def caution_progress(laps: pd.DataFrame, episodes: pd.DataFrame) -> dict:
+    """INFERRED (E-023): per class and caution type, the share of green speed a car keeps inside an episode.
+
+    Fitted the way the engine applies it. For each car and episode, take the car's last crossing at or before
+    the episode's start and its first crossing at or after its end. Over that bracket the car covered
+    (laps between them) × (its mean clean lap) of green running; the part of the bracket outside the episode
+    is taken at full speed, and the rest of that work was done inside the episode. The share is the sum of
+    that work over the sum of episode durations. The car's mean clean lap includes traffic, as the engine's
+    full green lap does. Left out: lap 1, a bracket with a pit lap, a red flag or another episode in it, and a
+    car with no crossing after the episode. A cell with no car-episodes is reported as None, not filled in."""
+    out = {car_class: {kind: [0.0, 0.0, 0] for kind in CAUTIONS} for car_class in CLASSES}
+    restart = {car_class: [] for car_class in CLASSES}
+    by_event = {event: group.sort_values("start_s") for event, group in episodes.groupby("event_key")}
+    for (event, number), car in laps[laps["CLASS"].isin(CLASSES)].groupby(["event_key", "NUMBER"]):
+        if event not in by_event:
+            continue
+        car = car.sort_values("LAP_NUMBER")
+        clean = car.loc[car["is_usable_for_pace_model"], "LAP_TIME_S"].mean()
+        if not clean > 0:
+            continue
+        times = car["ELAPSED_S"].to_numpy(dtype=float)
+        lap_count = car["LAP_NUMBER"].to_numpy(dtype=float)
+        blocked = car.loc[car["is_pit_lap"] | car["FLAG_AT_FL"].eq("RF"), "ELAPSED_S"].to_numpy(dtype=float)
+        car_class = car["CLASS"].iloc[0]
+        race_episodes = by_event[event]
+        for episode in race_episodes.itertuples():
+            start, end = episode.start_s, episode.start_s + episode.duration_s
+            a = np.searchsorted(times, start, side="right") - 1
+            b = np.searchsorted(times, end, side="left")
+            if a < 1 or b >= len(times):
+                continue
+            t_a, t_b = times[a], times[b]
+            if ((blocked > t_a) & (blocked <= t_b)).any():
+                continue
+            others = race_episodes[(race_episodes["start_s"] != episode.start_s)]
+            if ((others["start_s"] < t_b) & (others["start_s"] + others["duration_s"] > t_a)).any():
+                continue
+            work = (lap_count[b] - lap_count[a]) * clean
+            green = (t_b - t_a) - episode.duration_s
+            cell = out[car_class][episode.kind]
+            cell[0] += work - green
+            cell[1] += episode.duration_s
+            cell[2] += 1
+            # The restart lap: the one starting at the bracket's end, if it starts within one clean lap of the
+            # episode's end (the engine's rule), is green throughout, and has no pit stop or red flag.
+            if b + 1 < len(times) and t_b - end < clean and not ((blocked > t_b) & (blocked <= times[b + 1])).any() \
+                    and not ((others["start_s"] < times[b + 1]) & (others["start_s"] + others["duration_s"] > t_b)).any():
+                restart[car_class].append(times[b + 1] - t_b - clean)
+    result = {car_class: {kind: {"progress": cell[0] / cell[1] if cell[1] else None, "car_episodes": cell[2]}
+                          for kind, cell in kinds.items()} for car_class, kinds in out.items()}
+    for car_class in CLASSES:
+        result[car_class]["restart"] = {"extra_s": float(np.mean(restart[car_class])) if restart[car_class] else 0.0,
+                                        "laps": len(restart[car_class])}
+    return result
 
 
 def caution_model(laps: pd.DataFrame) -> dict:
@@ -76,12 +203,18 @@ def caution_model(laps: pd.DataFrame) -> dict:
     per_race = (episodes.groupby(["event_key", "kind"]).size().unstack(fill_value=0)
                 .reindex(index=hours.index, columns=list(CAUTIONS), fill_value=0))
     per_race["hours"] = hours
+    per_race["green_hours"] = (hours * 3600 - episodes.groupby("event_key")["duration_s"].sum().reindex(hours.index, fill_value=0)) / 3600
+    rates = {kind: float((episodes["kind"] == kind).sum() / (green_s / 3600)) for kind in CAUTIONS}
+    durations = {kind: episodes.loc[episodes["kind"] == kind, "duration_s"].round(1).tolist() for kind in CAUTIONS}
     return {
+        "rate_spread": rate_spread(per_race, rates, durations),
+        "episodes_by_race": {event: [[round(r.start_s, 1), round(r.start_s + r.duration_s, 1), r.kind] for r in group.itertuples()]
+                             for event, group in episodes.groupby("event_key")},
         "racing_hours": float(hours.sum()), "green_hours": green_s / 3600,
         "episodes": {kind: int((episodes["kind"] == kind).sum()) for kind in CAUTIONS},
         "mixed_episodes": int(episodes["mixed"].sum()),
-        "rate_per_green_hour": {kind: float((episodes["kind"] == kind).sum() / (green_s / 3600)) for kind in CAUTIONS},
-        "durations_s": {kind: episodes.loc[episodes["kind"] == kind, "duration_s"].round(1).tolist() for kind in CAUTIONS},
+        "rate_per_green_hour": rates,
+        "durations_s": durations,
         "per_race": per_race.reset_index().to_dict("records"),
     }
 
@@ -177,6 +310,7 @@ def calibrate(laps: pd.DataFrame) -> dict:
         "races": sorted(laps["event_key"].unique()),
         "circuits": circuit_table(laps).to_dict("records"),
         "caution": caution_model(laps),
+        "caution_progress": caution_progress(laps, caution_episodes(laps)),
         "caution_lap_ratio": caution_lap_ratio(laps),
         "pit_loss_median_s": {c: {str(k): float(np.median(v)) for k, v in d.items()} for c, d in pits.items()},
         "pit_loss_mean_s": {c: {str(k): float(np.mean(v)) for k, v in d.items()} for c, d in pits.items()},
@@ -194,9 +328,19 @@ def car_params(calibration: dict, circuit: str, car_class: str, base_pace_s: flo
     traffic = row["traffic_rate"] * TRAFFIC_S_PER_CAR[car_class]
     medians = calibration.get("pit_loss_mean_s", calibration["pit_loss_median_s"])[car_class]
     extras = calibration.get("restart_and_incidents", {}).get(car_class, {})
+    progress = calibration.get("caution_progress", {}).get(car_class)
+    if progress is not None:   # E-023: cautions priced by time, so the per-lap restart ratio isn't used
+        restart_extra = progress.get("restart", {}).get("extra_s", 0.0)
+        progress = {kind: progress[kind]["progress"] for kind in CAUTIONS}
+        if all(value is None for value in progress.values()):
+            progress = None    # no caution in the calibration races, so nothing to price
+        elif any(value is None or not 0 < value <= 1 for value in progress.values()):
+            raise ValueError(f"caution share for {car_class} is missing or outside (0, 1]: {progress}")
     values = dict(circuit=circuit, car_class=car_class, duration_s=row["hours"] * 3600.0,
                   base_pace_s=(row.get("clean_mean_s", row["clean_median_s"]) if base_pace_s is None else base_pace_s) - traffic,
-                  restart_lap_ratio=extras.get("restart_lap_ratio", 1.0), incident_rate=extras.get("incident_rate", 0.0),
+                  restart_lap_ratio=1.0 if progress else extras.get("restart_lap_ratio", 1.0), caution_progress=progress,
+                  restart_extra_s=restart_extra if progress else 0.0,
+                  incident_rate=extras.get("incident_rate", 0.0),
                   incident_extra_s=extras.get("incident_extra_s", 0.0),
                   max_stint_laps=row["max_stint_laps"], pit_loss_s={False: medians["False"], True: medians["True"]},
                   age_slope_s=0.0, age_limit_laps=AGE_LIMIT_LAPS[car_class], warm_up_s=WARM_UP_S[car_class], traffic_rate=row["traffic_rate"],
@@ -206,19 +350,23 @@ def car_params(calibration: dict, circuit: str, car_class: str, base_pace_s: flo
 
 
 def randomness(calibration: dict, car_class: str, lap_noise: bool = True, pit_spread: bool = True, cautions: bool = True,
-               slope_uncertainty: bool = False) -> Randomness:
+               slope_uncertainty: bool = False, rate_by_race: bool = True) -> Randomness:
     """The random parts, each of which can be switched off to see what it adds (simulation.md).
 
     `slope_uncertainty` draws the stint-age slope once per race from D-032's range (centred on its mean),
     replacing the flat default. It's a sensitivity, since the flat model held (D-032)."""
     caution = calibration["caution"]
+    spread = caution.get("rate_spread", {}) if rate_by_race else {}
+    shapes = {kind: cell["shape"] for kind, cell in spread.items() if cell["shape"]}
+    rates = {kind: (spread[kind]["rate_per_green_hour"] if kind in shapes else rate) for kind, rate in caution["rate_per_green_hour"].items()}
     mean, low, high = AGE_SLOPE_RANGE_S[car_class]
     samples = calibration["pit_loss_samples_s"][car_class]
     return Randomness(
         lap_residuals_s=np.asarray(calibration["lap_residuals_s"][car_class]) if lap_noise else None,
         pit_loss_samples_s={False: np.asarray(samples["False"]), True: np.asarray(samples["True"])} if pit_spread else None,
-        caution_rate_per_green_s={k: v / 3600 for k, v in caution["rate_per_green_hour"].items()} if cautions else None,
+        caution_rate_per_green_s={k: v / 3600 for k, v in rates.items()} if cautions else None,
         caution_durations_s={k: np.asarray(v) for k, v in caution["durations_s"].items()} if cautions else None,
+        caution_rate_shape=shapes if cautions and rate_by_race and shapes else None,
         age_slope_draw=(mean, (high - low) / (2 * 1.96)) if slope_uncertainty else None,
         incident_extra_samples_s=(np.asarray(calibration["restart_and_incidents"][car_class]["incident_extra_samples_s"])
                                   if lap_noise and calibration.get("restart_and_incidents", {}).get(car_class, {}).get("incident_extra_samples_s")

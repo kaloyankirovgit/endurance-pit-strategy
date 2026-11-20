@@ -101,7 +101,7 @@ def caution_bias(table: pd.DataFrame, calibration: dict, model: str = "M3") -> d
     per_race = pd.DataFrame(calibration["caution"]["per_race"]).set_index("event_key")
     errors = table.groupby("event_key")[f"{model}_error_pct"].median()
     cautions = (per_race["SF"] + per_race["FCY"]).reindex(errors.index)
-    return {"spearman": float(errors.corr(cautions, method="spearman")), "races": int(len(errors)),
+    return {"spearman": float(errors.rank().corr(cautions.rank())), "races": int(len(errors)),   # Spearman: Pearson on ranks, no SciPy
             "by_race": [{"event_key": e, "cautions": int(cautions[e]), "median_signed_pct": float(errors[e])} for e in errors.index]}
 
 

@@ -1411,3 +1411,46 @@ Runs only if Part B's gate passes.
 - **Fix:** an episode now continues until racing resumes, meaning some car crosses the line green twice in a row before the next caution crossing. A synthetic test with a bunched 20-car queue checks it, and checks that a single restart lap doesn't split the episode.
 - **What it puts in doubt in E-022:** Part C's safety-car counts and their clustering (5.74 per 6 hours, variance 30.8 against 4.6 simulated) were measured on split episodes. The clustering may be partly an artefact of the split, so E-022's Part C safety-car finding is superseded by this rerun.
 - **Nothing else changes:** the gate, the data and Part D stay as registered. The first calibration's output is kept as `e023_calibrate_before_amendment1.json`, and the first calibration figures are recorded here: SF share 0.053 (Hypercar, 46) and 0.527 (LMGT3, 51); FCY 0.328 (674) and 0.389 (629); restart 1.44 and 1.34 s; SF fitted 1/k = 1.0 (refit range 0.2 to 3.4) with simulated variance 31.9 against observed 30.8; FCY 1/k = 0.
+
+### Found (run 2026-11-20, after commits `fd7661f` and `896b4cf`; output in `reports/outputs/e023_*`, which stays local)
+
+**The replay gate failed again, so Part D's strategy comparison wasn't run.** As registered, no further amendment is made inside E-023.
+
+**Calibration, after amendment 1.**
+- **Episodes:** 28 safety cars (2.0 per race, median 665 s) and 44 FCYs (median 164 s) over 14 races. E-022's split rule had found 87 "safety cars".
+- **Share of green speed kept** (car-episodes): Hypercar 0.44 under a safety car (209) and 0.35 under an FCY (689); LMGT3 0.60 (213) and 0.41 (645).
+- **Restart lap:** +1.40 s (Hypercar, 645 laps) and +1.78 s (LMGT3, 641).
+- **Per-race safety-car rate:** fitted 1/k = 0.4, but 200 refits of 14 races span 0 to 1.6, and 34% land on zero. So 14 races can't tell this spread from a constant rate. FCYs show no extra spread (1/k = 0).
+
+**Part B: replay** (332 cars, 12 races, as in E-022).
+
+| Model | Median over races | Worst race | Median signed error |
+|---|---|---|---|
+| M0 laps × clean mean | 7.39% | 12.76% | −7.08% |
+| M1 + cautions by time | 3.24% | 5.03% | −3.18% |
+| M2 + one pit loss per stop | 0.96% | 2.42% | −0.82% |
+| M3 + driver-change split, warm-up, incidents | **0.78%** | 1.95% | −0.22% |
+
+- **Worse than E-022's 0.67% overall, though the worst race improved** from 2.81% to 1.95%.
+- **The caution-heavy races improved most:** Imola 2024 went from −2.81% to −1.85%, Spa 2024 from −2.57% to −0.75% (1 car) and Fuji 2025 from −1.61% to −0.46%.
+- **The races with few cautions got slower:** COTA 2024 went from +0.64% to +1.17% and São Paulo 2025 from +0.69% to +0.99%. Spa 2025 is still −1.95%.
+- **The error still follows the cautions:** Spearman −0.55 between a race's caution count and its median signed error, over 12 races (descriptive).
+- **Both classes are off by the same amount** (median signed −0.22% and −0.23%).
+
+**Part C: the random parts.**
+
+| Per 6 hours | Observed (14 races) | Simulated, rate per race | Simulated, constant rate |
+|---|---|---|---|
+| Safety cars, mean | 1.81 | 1.66 | 1.74 |
+| Safety cars, variance | 2.17 | 2.21 | 1.55 |
+| Safety cars, share of races with none | 29% | 25% | |
+| FCYs, mean | 2.90 | 2.78 | 2.74 |
+| FCYs, variance | 2.39 | 2.74 | 2.67 |
+
+- **One source at a time** (Spa, Hypercar, 500 races): no randomness gives 162 laps; lap noise and pit spread give 161 to 163; cautions give 140 to 161 (mean 153.8); slope uncertainty adds nothing visible. Cautions still dominate.
+
+**What this means.**
+- **Time-priced cautions fixed the races they were aimed at, and the error moved to the races without cautions.** The low-caution races now run too slow by up to 1.2%. So something on the green side is now overcharged. The likeliest suspect is the incident charge (E-022's amendment): it is pooled over all races, and its slow-zone and local-yellow laps cluster around cautions, so races without cautions are charged incidents they didn't have. That is a hypothesis from the error pattern, not something this run tested.
+- **E-022's safety-car clustering was mostly an artefact** of splitting episodes. With episodes rebuilt properly, safety-car counts vary only a little more than a constant rate gives, and 14 races can't separate the two.
+- **No strategy result is reported.** The simulator now gets caution counts and their spread right, and prices caution time from data, but it still doesn't add up to real races within the registered 0.5%.
+- **Next:** test the incident hypothesis in a fresh registration, for example an incident charge measured outside caution brackets or per race, with the same gate. The 14 races have now been used three times, so any further pass is weaker evidence, and 2026 stays sealed for the final test.

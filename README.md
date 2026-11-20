@@ -40,11 +40,12 @@ The rules and the code were committed before anything was fitted (E-020). The mo
 
 ### Race simulator (layer 4, built, validation in progress)
 
-A lap-by-lap simulator for one car (E-022). It covers green laps, pit stops, the warm-up lap, traffic, safety cars and full-course yellows. Every strategy has to pass a legality check that cites the regulations before it runs.
+A lap-by-lap simulator for one car (E-022, E-023). It covers green laps, pit stops, the warm-up lap, traffic, safety cars and full-course yellows. Every strategy has to pass a legality check that cites the regulations before it runs.
 
 - **Checked against real races:** 332 finished cars from 12 races in 2024 and 2025 were replayed through it. Each layer of the model cuts the error: 7.5% for laps × pace alone, 3.3% with cautions, 0.9% with pit stops, 0.67% with everything.
 - **Short of the target:** that's still above the 0.5% set before the run, so no strategy comparison has been reported yet.
-- **Where the error comes from:** races with many cautions, and safety cars that bunch up in some races far more than a steady random process allows.
+- **Second attempt (E-023):** cautions are now priced by time, from how much of its green speed a car keeps under a safety car or full-course yellow (about 0.4 to 0.6), fitted from line crossings. That fixed the races with many cautions (Imola 2024 went from −2.8% to −1.85%), but races with few cautions now run up to 1.2% slow. Overall it came out at 0.78%, so the gate failed again, and the green-lap side is the next suspect.
+- **A bug found on the way:** a safety car's bunched queue had been split into one "episode" per lap. With that fixed, real races have about 2 safety cars each, and the simulated counts match them in average and spread.
 
 ### Regulation assistant (layer 6, mostly built)
 

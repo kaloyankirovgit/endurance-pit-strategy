@@ -1504,3 +1504,38 @@ It also asked for the interval on b, the cap, the fit-then-use test and the stop
 - **This is the fourth look at these 14 races,** and the changes were chosen from a breakdown of E-023's errors on them. A pass means the parts now add up to these races, which is a weaker claim with each look. The held-out test is 2026, sealed (D-031), and that's where the simulator is judged.
 - b is fitted from 14 races, with caution counts from 0 to about 9.
 - `M3_long` charges long stops as an average on every stop. In a real race they are rare, large and near cautions, so it's reported for size only.
+
+### Found (run 2026-11-20, after commit `28b402b`; output in `reports/outputs/e024_*`, which stays local)
+
+**The gate failed, and M3 got worse: 0.98% against E-023's 0.78%.** Part D wasn't run, and no amendment is made inside E-024.
+
+**The incident link.**
+
+| Class | a (no cautions) | b per caution per green hour | 90% interval for b | Races |
+|---|---|---|---|---|
+| Hypercar | −0.037 | 0.077 | 0.007 to 0.142 | 13 |
+| LMGT3 | −0.105 | 0.183 | 0.010 to 0.390 | 14 |
+
+- **Incidents do rise with a race's cautions:** b is above zero in nearly every race resample (0.15% at or below zero for Hypercars, none for LMGT3).
+- **But a straight line is the wrong shape.** Its intercepts are negative, so races with few cautions get no incidents at all once the rate is floored at zero. Real quiet races still have some (1.3 incident laps per car).
+
+**Replay** (332 cars, 12 races).
+
+| Model | Median over races | Worst race | Median signed error |
+|---|---|---|---|
+| M3 (gated) | 0.98% | 2.44% | −0.82% |
+| M3_long (long stops in the pit loss, not gated) | 0.79% | 2.12% | −0.52% |
+
+- The model is now too fast overall: the incident charge fell too far.
+- The error still follows the cautions: Spearman −0.57 over 12 races.
+- Part C is as in E-023: cautions match in mean and spread.
+
+**Exploratory, after the run: the cost of an extra stop.** Within each race, a car's M3 error was regressed on how many stops it made, each measured from its race's mean, so race-level errors such as cautions cancel. Each extra stop comes out **25 s too slow** in E-024 (90% interval 9 to 44 s, resampling 12 races) and 37 s in E-023 (21 to 55 s).
+- The model overcharges the marginal stop. Cars that stop more may make cheaper stops (shorter work, stops under a caution, drive-throughs counted as stops), and the single mean stop cost doesn't see that.
+- This matters more for strategy than the race-time gate does. A pit strategy is mostly a choice of how many stops and when, so a stop cost that's wrong at the margin would bias Part D directly, however well race time adds up.
+- It's exploratory and in-sample. It was looked for after the result, and it isn't a registered finding.
+
+**What this means.**
+- Four looks at the same 14 races (E-022, its amendment, E-023, E-024) have each moved the error rather than removed it. Further fixes chosen from these races' errors would fit them, not validate anything.
+- The gate on total race time isn't the right test of a strategy tool on its own. In Part D every strategy runs on the same simulated races, so errors common to all of them (most of the caution error) cancel. What doesn't cancel is how the simulator prices the things strategies differ in: an extra stop, a longer stint, a driver change.
+- **Next (to decide, D-035):** validate those differences directly, starting with the marginal stop cost against within-race data like the check above, registered and with a gate of its own. Keep the race-time replay as a reported check rather than the only gate. The final test stays 2026, sealed.

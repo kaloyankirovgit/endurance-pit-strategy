@@ -6,7 +6,7 @@ Where things are right now. Updated at the end of each working session.
 
 ## Current stage
 
-Layer 1 is done and the race order is now checked against the official classifications. The first traffic result is in (E-013). A commit guard now enforces the no-data rule (D-016). The statistical-reviewer agent has an eval (E-008), and regulation retrieval and grounded answers are built and measured, now with the car class as an input (E-009 to E-012). Layer 3 is done and reported (E-020), and the wet-race fix and reruns are done (E-021, D-033). The simulator's inputs are set out in D-032. The Layer 4 simulator is built. Its first validation failed the registered gate (E-022), and the caution fixes in E-023 fixed the caution-heavy races but failed the gate again. The green-lap incident charge is the next suspect.
+Layer 1 is done and the race order is now checked against the official classifications. The first traffic result is in (E-013). A commit guard now enforces the no-data rule (D-016). The statistical-reviewer agent has an eval (E-008), and regulation retrieval and grounded answers are built and measured, now with the car class as an input (E-009 to E-012). Layer 3 is done and reported (E-020), and the wet-race fix and reruns are done (E-021, D-033). The simulator's inputs are set out in D-032. The Layer 4 simulator is built. Its first validation failed the registered gate (E-022), the caution fixes in E-023 fixed the caution-heavy races but failed it again, and E-024's incident link made it worse. A decision on how to validate the simulator for strategy is next (D-035).
 
 ## Done
 
@@ -56,13 +56,14 @@ Layer 1 is done and the race order is now checked against the official classific
   - A bug inherited from E-022 was found and fixed before the replay: a safety car's bunched queue had split it into one "episode" per lap. With it fixed there are 2.0 safety cars per race, not about 6, and E-022's safety-car clustering turns out to be mostly that artefact.
   - Simulated caution counts now match the real ones in mean, variance and share of races with none.
   - The replay gate failed again: 0.78% against 0.5% (E-022: 0.67%). Caution-heavy races improved (Imola 2024 from −2.8% to −1.85%), while races with few cautions now run up to 1.2% slow. No strategy comparison has been run.
-- 306 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
+- Incidents tied to each race's cautions (E-024). The link is real (b above zero in nearly every race resample), but a straight line gives quiet races no incidents, and the gate came out worse at 0.98%. An exploratory check found the model overcharges each extra stop by about 25 s within a race (9 to 44 s), which matters more for strategy than total race time.
+- 314 tests, all running on synthetic data with no real data needed. One fails if any git-ignored file is ever committed.
 
 ## Next
 
-1. **Finish Layer 4 (E-024, to register)**
-   - Test whether the incident charge overcharges races without cautions: measure it outside caution brackets, or per race, and rerun the same 0.5% gate. The 14 races have now been used three times, so any pass is weaker evidence.
-   - Then the three-strategy comparison from E-022 Part D.
+1. **Decide how Layer 4 is validated for strategy (D-035), then finish it**
+   - Four looks at the same 14 races have each moved the replay error rather than removed it.
+   - Proposed: gate what strategies differ in (the cost of an extra stop, of a longer stint, of a driver change), checked within races, and keep the race-time replay as a reported check. Then the three-strategy comparison.
    - Before 2026 is opened: check Monza's classification and any later 2026 regulations revision (D-031).
 2. **Switch the answers to the hybrid (D-029)**
    - Run the answer eval on the fresh questions with the hybrid, then change the default.
